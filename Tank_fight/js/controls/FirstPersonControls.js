@@ -163,6 +163,15 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	};
 
+	this.spinAvatar = function(angle){
+		new TWEEN.Tween( { y: this.object.rotation.y } )
+      		.to( { y: angle }, 100 )
+      		.onUpdate( function () {
+         		 this.object.rotation.y = this.y;
+      		} )
+      		.start();
+	}
+
 	this.onKeyUp = function ( event ) {
 
 		switch( event.keyCode ) {
@@ -220,8 +229,15 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 			 	console.log("move backward " + this.object.z);
 			}
 
-			if ( this.moveLeft ) this.object.translateX( - actualMoveSpeed );
-			if ( this.moveRight ) this.object.translateX( actualMoveSpeed );
+			if ( this.moveLeft ) {
+				this.object.translateY( -actualMoveSpeed );
+			 	this.object.translateX( - actualMoveSpeed );
+			}
+			if ( this.moveRight ){
+				//this.object.rotation(new THREE.Vector3(0,10*Math.PI/180, 0));
+				this.object.translateY( actualMoveSpeed );
+				this.object.translateX( actualMoveSpeed );
+			} 
 
 			if ( this.moveUp ) this.object.translateY( actualMoveSpeed );
 			if ( this.moveDown ) this.object.translateY( - actualMoveSpeed );
@@ -280,7 +296,6 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 		targetPosition.z = position.z + 100 * Math.sin( this.phi ) * Math.sin( this.theta );
 
 		this.object.lookAt( targetPosition );
-
 	};
 
 

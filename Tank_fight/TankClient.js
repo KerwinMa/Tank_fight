@@ -12,13 +12,14 @@ loader.load( './models/simple_tank1.dae', function ( collada ) {
 	dae = collada.scene;
 	skin = collada.skins[1];
 	dae.scale.x = dae.scale.y = dae.scale.z = 25;
-	dae.position.x = 500;
+	dae.position.x = -500;
 	dae.position.y = 0;
-	dae.position.z = 0;
+	dae.position.z = -500;
 	dae.updateMatrix();
 	obj.add(dae);
-	// dae.rotation.x =  Math.PI;
-	// dae.rotation.z = - Math.PI/2;
+	//obj.rotation();
+	dae.rotation.y =  Math.PI/2;
+	//dae.rotation.z = Math.PI/2;
 	// dae.rotation.y = - Math.PI/1;
 	//dae.
 	//obj.matrixAutoUpdate = true;
@@ -80,10 +81,11 @@ function init() {
 	scene.add(obj);
 
 		controls = new THREE.FirstPersonControls(obj);
-		controls.movementSpeed = 10000;
-		controls.lookSpeed = 15;
+		controls.movementSpeed = 50000;
+		controls.lookSpeed = 0;
 		controls.lookVertical = false; // Temporary solution; play on flat surfaces only
 		controls.noFly = true;
+		controls.activeLook = false;
 
 	// Lights
 
@@ -105,7 +107,7 @@ function init() {
 
 	renderer = new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
-
+	//renderer.domElement.style.backgroundColor = '#D6F1FF';
 	container.appendChild( renderer.domElement );
 
 	stats = new Stats();
@@ -169,7 +171,8 @@ function render() {
 	var delta = clock.getDelta();
 	scene.remove(obj);
 	controls.update(delta);
-					
+	if(controls.moveLeft)	dae.rotation.y += -10*Math.PI/180;
+	if(controls.moveRight)	dae.rotation.y +=10*Math.PI/180;			
 	scene.add(obj);
 	camera.lookAt( scene.position );
 

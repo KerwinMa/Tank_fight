@@ -132,9 +132,7 @@ var PointerLockControls = function ( camera ) {
 		if ( moveRight ) velocity.x += 0.12 * delta;
 
 		if ( isOnObject === true ) {
-
 			velocity.y = Math.max( 0, velocity.y );
-
 		}
 
 		yawObject.translateX( velocity.x );
@@ -142,14 +140,9 @@ var PointerLockControls = function ( camera ) {
 		yawObject.translateZ( velocity.z );
 
 		if ( yawObject.position.y < 10 ) {
-
 			velocity.y = 0;
 			yawObject.position.y = 10;
-
 			canJump = true;
-
 		}
-
 	};
-
 };
