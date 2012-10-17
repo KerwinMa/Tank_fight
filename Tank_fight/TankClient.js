@@ -39,7 +39,17 @@ function init() {
 	camera.position.z = 10;
 
 	scene = new THREE.Scene();
+	//Event listener for shooting
+	$(document).click(function(e) {
+		e.preventDefault;
+		if (e.which === 1) { // Left click only
+			createBullet();
+			}
+	});
 
+	
+	
+	
 	// Grid
 
 	var size = 500, step = 50;
@@ -180,6 +190,32 @@ function render() {
 	particleLight.position.y = Math.cos( timer * 5 ) * 4000;
 	particleLight.position.z = Math.cos( timer * 4 ) * 3009;
 
+	//Simple bullet moving
+	for(var i = 0; i <bullets.length; i++){
+		var b=bullets[i];
+		b.translateX(3);
+		b.translateZ(3);
+	}
+	
+
+
 	renderer.render( scene, camera );
 
 }
+//Creating bullets
+var bullets = [];
+var sphereMaterial = new THREE.MeshBasicMaterial({color: 0x333333});
+var sphereGeo = new THREE.SphereGeometry(20, 60, 60);
+function createBullet() {
+	var sphere = new THREE.Mesh(sphereGeo, sphereMaterial);
+	sphere.position.set(0,0,0);
+	bullets.push(sphere);
+	scene.add(sphere);
+	return sphere;
+}
+
+
+
+
+
+
