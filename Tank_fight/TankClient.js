@@ -1,9 +1,10 @@
 var container, stats;
 
-var camera, scene, renderer, objects, controls;
+var camera, scene, renderer, objects, controls,projector;
 var particleLight, pointLight;
-var dae, skin, obj;
-
+var dae, skin, obj, mouse = { x: 0, y: 0 };
+var WIDTH = window.innerWidth,
+	HEIGHT = window.innerHeight;
 var loader = new THREE.ColladaLoader();
 
 loader.options.convertUpAxis = true;
@@ -31,14 +32,18 @@ loader.load( './models/simple_tank1.dae', function ( collada ) {
 function init() {
 	container = document.createElement( 'div' );
 	document.body.appendChild( container );
-
+	
 	camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 2000, 1000 );
 	camera.position.x = 200;
 	camera.position.y = 150;
 	camera.position.z = 10;
 
 	scene = new THREE.Scene();
+	
+	projector = new THREE.Projector();
+	document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 	//Event listener for shooting
+	
 	$(document).click(function(e) {
 		e.preventDefault;
 		if (e.which === 1) { // Left click only
@@ -191,8 +196,9 @@ function render() {
 	//Simple bullet moving
 	for(var i = 0; i <bullets.length; i++){
 		var b=bullets[i];
-		b.translateX(3);
-		b.translateZ(3);
+		var d=b.ray.direction;
+		b.translateX(5*d.x);
+		b.translateZ(5*d.z);
 	}
 	
 
@@ -205,13 +211,48 @@ var bullets = [];
 var sphereMaterial = new THREE.MeshBasicMaterial({color: 0x333333});
 var sphereGeo = new THREE.SphereGeometry(20, 60, 60);
 function createBullet() {
+	
+	var matrix = new THREE.Matrix4();
+    matrix.extractRotation(dae.matrix);
+   	var direction = new THREE.Vector3(0,0,1);
+    matrix.multiplyVector3(direction);
+	
+	
+	
 	var sphere = new THREE.Mesh(sphereGeo, sphereMaterial);
-	sphere.position.set(0,0,0);
+		sphere.position.set(obj.position.x+dae.position.x, obj.position.y+dae.position.y, obj.position.z-dae.position.z);
+	//var vector = new THREE.Vector3(500, 0,-500);
+	var vector = new THREE.Vector3(mouse.x, 1, mouse.y);
+	var dirVector = new THREE.Vector3();
+	
+	projector.unprojectVector(vector, camera);
+	dirVector.sub(vector,sphere.position.clone());
+	console.log(vector.x);
+	console.log(vector.y);
+	console.log(vector.z);
+	sphere.ray = new THREE.Ray(
+				sphere.position.clone(),
+				dirVector.normalize(),0,1000
+		);
+		
+	console.log(sphere.ray);
+	console.log(dirVector.x);
+	console.log(dirVector.y);
+	console.log(dirVector.z);
+	
+	console.log("sphere"+sphere.position.x);
+	console.log("sphere"+sphere.position.y);
+	console.log("sphere"+sphere.position.z);
 	bullets.push(sphere);
 	scene.add(sphere);
 	return sphere;
 }
-
+function onDocumentMouseMove(e) {
+	e.preventDefault();
+	mouse.x = e.clientX;
+	mouse.y = e.clientY;
+	
+	}
 
 
 
