@@ -220,23 +220,30 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 			actualMoveSpeed = delta * this.movementSpeed;
 
 			if ( this.moveForward || ( this.autoForward && !this.moveBackward ) ){
+				//this.object.rotation.y += 10*Math.PI/180;
 				this.object.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
 				console.log("moveForward " + this.object.z);
 			} 
 			
-			if ( this.moveBackward ) {
+			if ( this.moveBackward ) {				
 			 	this.object.translateZ( actualMoveSpeed );
+			 	this.object.rotation.y += -10*Math.PI/180;
 			 	console.log("move backward " + this.object.z);
 			}
 
 			if ( this.moveLeft ) {
-				this.object.translateY( -actualMoveSpeed );
+				//this.object.translateY( -actualMoveSpeed );
 			 	this.object.translateX( - actualMoveSpeed );
+			 	this.object.rotation.y += -10*Math.PI/180;
 			}
 			if ( this.moveRight ){
 				//this.object.rotation(new THREE.Vector3(0,10*Math.PI/180, 0));
-				this.object.translateY( actualMoveSpeed );
+				//this.object.translateY( actualMoveSpeed );
 				this.object.translateX( actualMoveSpeed );
+				//if(this.object.rotation.y + 10*Math.PI/180 < 2*Math.PI)
+				this.object.rotation.y += 10*Math.PI/180;
+				// else 
+				// 	this.object.rotation.y = this.object.rotation.y + 10*Math.PI/180 - 2*Math.PI;
 			} 
 
 			if ( this.moveUp ) this.object.translateY( actualMoveSpeed );

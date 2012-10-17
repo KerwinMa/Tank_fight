@@ -26,7 +26,6 @@ loader.load( './models/simple_tank1.dae', function ( collada ) {
 	
 	init();
 	animate();
-
 } );
 
 function init() {
@@ -90,12 +89,12 @@ function init() {
 
 	scene.add(obj);
 
-		controls = new THREE.FirstPersonControls(obj);
-		controls.movementSpeed = 50000;
-		controls.lookSpeed = 0;
-		controls.lookVertical = false; // Temporary solution; play on flat surfaces only
-		controls.noFly = true;
-		controls.activeLook = false;
+	controls = new THREE.FirstPersonControls(obj);
+	controls.movementSpeed = 50000;
+	controls.lookSpeed = 0;
+	controls.lookVertical = false; // Temporary solution; play on flat surfaces only
+	controls.noFly = true;
+	controls.activeLook = false;
 
 	// Lights
 
@@ -126,7 +125,6 @@ function init() {
 	container.appendChild( stats.domElement );
 
 	window.addEventListener( 'resize', onWindowResize, false );
-
 }
 
 function onWindowResize() {
@@ -135,7 +133,6 @@ function onWindowResize() {
 	camera.updateProjectionMatrix();
 
 	renderer.setSize( window.innerWidth, window.innerHeight );
-
 }
 
 var t = 0;
@@ -181,8 +178,9 @@ function render() {
 	var delta = clock.getDelta();
 	scene.remove(obj);
 	controls.update(delta);
-	if(controls.moveLeft)	dae.rotation.y += -10*Math.PI/180;
-	if(controls.moveRight)	dae.rotation.y +=10*Math.PI/180;			
+	// if(controls.moveLeft)	dae.rotation.y += -10*Math.PI/180;
+	// if(controls.moveRight)	dae.rotation.y +=10*Math.PI/180;
+				
 	scene.add(obj);
 	camera.lookAt( scene.position );
 
