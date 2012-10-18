@@ -5,6 +5,7 @@ var particleLight, pointLight;
 var dae, skin, obj, mouse = { x: 0, y: 0 };
 var WIDTH = window.innerWidth,
 	HEIGHT = window.innerHeight;
+var vel=7,velX, velZ;
 var loader = new THREE.ColladaLoader();
 
 loader.options.convertUpAxis = true;
@@ -16,6 +17,7 @@ loader.load( './models/simple_tank1.dae', function ( collada ) {
 	dae.position.x = -500;
 	dae.position.y = 0;
 	dae.position.z = -500;
+	dae.rotation.y=0;
 	dae.updateMatrix();
 	obj.add(dae);
 	//obj.rotation();
@@ -183,8 +185,8 @@ function render() {
 	var delta = clock.getDelta();
 	scene.remove(obj);
 	controls.update(delta);
-	// if(controls.moveLeft)	dae.rotation.y += -10*Math.PI/180;
-	// if(controls.moveRight)	dae.rotation.y +=10*Math.PI/180;
+	if(controls.moveLeft)	dae.rotation.y += -10*Math.PI/180;
+	if(controls.moveRight)	dae.rotation.y +=10*Math.PI/180;
 				
 	scene.add(obj);
 	camera.lookAt( scene.position );
@@ -194,11 +196,12 @@ function render() {
 	particleLight.position.z = Math.cos( timer * 4 ) * 3009;
 
 	//Simple bullet moving
-	for(var i = 0; i <bullets.length; i++){
+	for(var i = 0; i <bullets.length; i++)
+	{
 		var b=bullets[i];
 		var d=b.ray.direction;
-		b.translateX(5*d.x);
-		b.translateZ(5*d.z);
+		b.translateX(b.velX);
+		b.translateZ(b.velZ);
 	}
 	
 
@@ -209,40 +212,25 @@ function render() {
 //Creating bullets
 var bullets = [];
 var sphereMaterial = new THREE.MeshBasicMaterial({color: 0x333333});
-var sphereGeo = new THREE.SphereGeometry(20, 60, 60);
+var sphereGeo = new THREE.SphereGeometry(10, 30, 30);
 function createBullet() {
-	
-	var matrix = new THREE.Matrix4();
-    matrix.extractRotation(dae.matrix);
-   	var direction = new THREE.Vector3(0,0,1);
-    matrix.multiplyVector3(direction);
-	
 	
 	
 	var sphere = new THREE.Mesh(sphereGeo, sphereMaterial);
-		sphere.position.set(obj.position.x+dae.position.x, obj.position.y+dae.position.y, obj.position.z-dae.position.z);
-	//var vector = new THREE.Vector3(500, 0,-500);
+		sphere.position.set(obj.position.x+dae.position.x, obj.position.y+dae.position.y+25, obj.position.z-dae.position.z);
+	
 	var vector = new THREE.Vector3(mouse.x, 1, mouse.y);
 	var dirVector = new THREE.Vector3();
-	
-	projector.unprojectVector(vector, camera);
 	dirVector.sub(vector,sphere.position.clone());
-	console.log(vector.x);
-	console.log(vector.y);
-	console.log(vector.z);
 	sphere.ray = new THREE.Ray(
 				sphere.position.clone(),
 				dirVector.normalize(),0,1000
 		);
-		
-	console.log(sphere.ray);
-	console.log(dirVector.x);
-	console.log(dirVector.y);
-	console.log(dirVector.z);
+	//bullets direction
+	var degree=Math.ceil((dae.rotation.y%(2*Math.PI))*(180/Math.PI));	
+	sphere.velX=-vel*Math.sin(dae.rotation.y%(2*Math.PI));
+	sphere.velZ=-vel*Math.cos(dae.rotation.y%(2*Math.PI));
 	
-	console.log("sphere"+sphere.position.x);
-	console.log("sphere"+sphere.position.y);
-	console.log("sphere"+sphere.position.z);
 	bullets.push(sphere);
 	scene.add(sphere);
 	return sphere;
