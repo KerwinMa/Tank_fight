@@ -8,6 +8,32 @@ var WIDTH = window.innerWidth,
 var vel=7,velX, velZ;
 var loader = new THREE.ColladaLoader();
 
+// Map part
+
+var map = [ // 1 2 3 4 5 6 7 8 9
+           [1, 1, 1, 1, 1, 1, 1, 1, 1, 1,], // 0
+           [1, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 1
+           [1, 0, 0, 0, 2, 0, 0, 0, 0, 1,], // 2
+           [1, 0, 0, 0, 0, 2, 0, 0, 0, 1,], // 3
+           [1, 0, 0, 2, 0, 0, 2, 0, 0, 1,], // 4
+           [1, 0, 0, 0, 2, 0, 0, 0, 0, 1,], // 5
+           [1, 0, 0, 0, 0, 1, 0, 0, 0, 1,], // 6
+           [1, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 7
+           [1, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 8
+           [1, 1, 1, 1, 1, 1, 1, 1, 1, 1,], // 9
+           ], mapW = map.length, mapH = map[0].length;
+
+// Semi-constants
+var WIDTH = window.innerWidth,
+HEIGHT = window.innerHeight,
+ASPECT = WIDTH / HEIGHT,
+UNITSIZE = 200,
+WALLHEIGHT = UNITSIZE / 5;
+// Global vars
+//var t = THREE, scene, cam, renderer, controls, clock, projector, model, skin;
+
+// End of Map part
+
 loader.options.convertUpAxis = true;
 loader.load( './models/simple_tank1.dae', function ( collada ) {
 	obj = new THREE.Object3D();
@@ -35,12 +61,14 @@ function init() {
 	container = document.createElement( 'div' );
 	document.body.appendChild( container );
 	
-	camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 2000, 1000 );
-	camera.position.x = 200;
-	camera.position.y = 150;
-	camera.position.z = 10;
+	camera = new THREE.OrthographicCamera( window.innerWidth/-1 , window.innerWidth/1, window.innerHeight/1, window.innerHeight/-1, -1000, 1000 );
+	camera.position.x = 60;
+	camera.position.y = 45;
+	camera.position.z = 0;
 
 	scene = new THREE.Scene();
+	//scene = new t.Scene();
+	setupScene();
 	
 	projector = new THREE.Projector();
 	document.addEventListener( 'mousemove', onDocumentMouseMove, false );
@@ -58,7 +86,7 @@ function init() {
 	
 	// Grid
 
-	var size = 500, step = 50;
+/*	var size = 500, step = 50;
 
 	var geometry = new THREE.Geometry();
 
@@ -93,7 +121,7 @@ function init() {
 
 		scene.add( cube );
 	}
-
+*/
 	scene.add(obj);
 
 	controls = new THREE.FirstPersonControls(obj);
@@ -118,7 +146,7 @@ function init() {
 	scene.add( directionalLight );
 
 	pointLight = new THREE.PointLight( 0xffffff, 4 );
-	pointLight.position = particleLight.position;
+	//pointLight.position = particleLight.position;
 	//scene.add( pointLight );
 
 	renderer = new THREE.WebGLRenderer();
@@ -191,9 +219,9 @@ function render() {
 	scene.add(obj);
 	camera.lookAt( scene.position );
 
-	particleLight.position.x = Math.sin( timer * 4 ) * 3009;
-	particleLight.position.y = Math.cos( timer * 5 ) * 4000;
-	particleLight.position.z = Math.cos( timer * 4 ) * 3009;
+	//particleLight.position.x = Math.sin( timer * 4 ) * 3009;
+	//particleLight.position.y = Math.cos( timer * 5 ) * 4000;
+	//particleLight.position.z = Math.cos( timer * 4 ) * 3009;
 
 	//Simple bullet moving
 	for(var i = 0; i <bullets.length; i++)
@@ -242,7 +270,45 @@ function onDocumentMouseMove(e) {
 	
 	}
 
+function setupScene() {
+	var units = mapW;
+ 
+	// Geometry: floor
+	var floor = new THREE.Mesh(
+			new THREE.CubeGeometry(units * UNITSIZE, 1, units * UNITSIZE),
+			new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture('images/wall-2.jpg')})
+	);
+	floor.position.x =-100;
+	floor.position.z = -100;
+	scene.add(floor);
+ 
+	// Geometry: walls
+	var cube = new THREE.CubeGeometry(UNITSIZE, WALLHEIGHT, UNITSIZE);
+	var materials = [
+	                 new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture('images/wall-1.jpg')}),
+	                 new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture('images/wall-1.jpg')}),
+	                 ];
+	for (var i = 0; i < mapW; i++) {
+		for (var j = 0, m = map[i].length; j < m; j++) {
+			if (map[i][j]) {
+				var wall = new THREE.Mesh(cube, materials[map[i][j]-1]);
+				wall.position.x = (i - units/2) * UNITSIZE;
+				wall.position.y = WALLHEIGHT/2;
+				wall.position.z = (j - units/2) * UNITSIZE;
+				scene.add(wall);
+			}
+		}
+	}
+	
 
+	/*/ Lighting
+	var directionalLight1 = new THREE.DirectionalLight( 0xF7EFBE, 0.7 );
+	directionalLight1.position.set( 0.5, 1, 0.5 );
+	scene.add( directionalLight1 );
+	var directionalLight2 = new THREE.DirectionalLight( 0xF7EFBE, 0.5 );
+	directionalLight2.position.set( -0.5, -1, -0.5 );
+	scene.add( directionalLight2 ); */
+}
 
 
 
