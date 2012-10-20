@@ -125,7 +125,7 @@ function init() {
 	scene.add(obj);
 
 	controls = new THREE.FirstPersonControls(obj);
-	controls.movementSpeed = 50000;
+	controls.movementSpeed = 3000;
 	controls.lookSpeed = 0;
 	controls.lookVertical = false; // Temporary solution; play on flat surfaces only
 	controls.noFly = true;
@@ -212,9 +212,9 @@ function render() {
 	var timer = Date.now() * 0.0005;
 	var delta = clock.getDelta();
 	scene.remove(obj);
-	controls.update(delta);
-	if(controls.moveLeft)	dae.rotation.y += -10*Math.PI/180;
-	if(controls.moveRight)	dae.rotation.y +=10*Math.PI/180;
+	controls.update(0.001);
+	//if(controls.moveLeft)	dae.rotation.y += -10*Math.PI/180;
+	//if(controls.moveRight)	dae.rotation.y +=10*Math.PI/180;
 				
 	scene.add(obj);
 	camera.lookAt( scene.position );

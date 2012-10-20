@@ -218,32 +218,97 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 			}
 
 			actualMoveSpeed = delta * this.movementSpeed;
-
+			//console.log("actualMoveSpeed = "+actualMoveSpeed);
+			var cd=this.object.children[0].rotation.y;
+			var quadrant=getRegion(cd);
+			var da=5*Math.PI/180;
+			var pai=Math.PI;
 			if ( this.moveForward || ( this.autoForward && !this.moveBackward ) ){
-				//this.object.rotation.y += 10*Math.PI/180;
-				this.object.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
+				
+				if((cd<pai/2+da&&cd>pai/2-da)||(cd<-1.5*pai+da&&cd>-1.5*pai-da))
+					this.object.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
+				else
+				{			
+					if(quadrant==1||quadrant==4)
+						this.object.children[0].rotation.y=(this.object.children[0].rotation.y+10*Math.PI/180)%(2*pai);
+					else 
+						this.object.children[0].rotation.y=(this.object.children[0].rotation.y-10*Math.PI/180)%(2*pai);
+				}		
+				console.log("angle = "+cd+"quadratn="+quadrant);	
+				
+				console.log("actualMoveSpeed = "+actualMoveSpeed);
+			 	console.log("delta = "+delta);
 				console.log("moveForward " + this.object.z);
 			} 
 			
-			if ( this.moveBackward ) {				
-			 	this.object.translateZ( actualMoveSpeed );
-			 	this.object.rotation.y += -10*Math.PI/180;
+			if ( this.moveBackward ) 
+			{				
+				if((cd>1.5*pai-da&&cd<1.5*pai+da)||(cd<-0.5*pai+da&&cd>-0.5*pai-da))
+					this.object.translateZ( actualMoveSpeed );
+			 	else
+			 	{			
+					if(quadrant==2||quadrant==3)
+						this.object.children[0].rotation.y=(this.object.children[0].rotation.y+10*Math.PI/180)%(2*pai);
+					else 
+						this.object.children[0].rotation.y=(this.object.children[0].rotation.y-10*Math.PI/180)%(2*pai);
+				}	
+			 	console.log("angle = "+cd+"quadratn="+quadrant);	
+			 	console.log("actualMoveSpeed = "+actualMoveSpeed);
+			 	console.log("delta = "+delta);
 			 	console.log("move backward " + this.object.z);
 			}
 
-			if ( this.moveLeft ) {
-				//this.object.translateY( -actualMoveSpeed );
-			 	this.object.translateX( - actualMoveSpeed );
-			 	this.object.rotation.y += -10*Math.PI/180;
+			if ( this.moveRight ) {
+				
+				if((cd>0&&(cd<da||cd>2*pai-da))||(cd<0&&(cd>-da||cd<-2*pai+da))||cd==0)
+					this.object.translateX( actualMoveSpeed );
+				else
+			 	{			
+					if(quadrant==1||quadrant==2)
+						this.object.children[0].rotation.y=(this.object.children[0].rotation.y-10*Math.PI/180)%(2*pai);
+					else 
+						this.object.children[0].rotation.y=(this.object.children[0].rotation.y+10*Math.PI/180)%(2*pai);
+				}	
+			
+			
+			
+				console.log("angle = "+cd+"quadratn="+quadrant);
+			 	console.log("actualMoveSpeed = "+actualMoveSpeed);
+			 	console.log("direction = "+this.object.children[0].rotation.y);
+			 	console.log("delta = "+delta);
+			 	
+				 
+					
 			}
-			if ( this.moveRight ){
-				//this.object.rotation(new THREE.Vector3(0,10*Math.PI/180, 0));
-				//this.object.translateY( actualMoveSpeed );
-				this.object.translateX( actualMoveSpeed );
-				//if(this.object.rotation.y + 10*Math.PI/180 < 2*Math.PI)
-				this.object.rotation.y += 10*Math.PI/180;
-				// else 
-				// 	this.object.rotation.y = this.object.rotation.y + 10*Math.PI/180 - 2*Math.PI;
+			if ( this.moveLeft ){
+				if((cd>pai-da&&cd<pai+da)||(cd>-pai-da&&cd<-pai+da)||cd==pai||cd==-pai)
+					this.object.translateX( -actualMoveSpeed );
+				else
+			 	{			
+					if(quadrant==3||quadrant==4)
+						this.object.children[0].rotation.y=(this.object.children[0].rotation.y-10*Math.PI/180)%(2*pai);
+					else 
+						this.object.children[0].rotation.y=(this.object.children[0].rotation.y+10*Math.PI/180)%(2*pai);
+				}	
+			
+			
+			
+				console.log("angle = "+cd+"quadratn="+quadrant);
+			 	console.log("actualMoveSpeed = "+actualMoveSpeed);
+			 	console.log("direction = "+this.object.children[0].rotation.y);
+			 	console.log("delta = "+delta);
+
+			
+			
+			
+			
+			
+			
+			
+			
+				console.log("actualMoveSpeed = "+actualMoveSpeed);
+				console.log("direction = "+this.object.children[0].rotation.y);
+			 	console.log("delta = "+delta);
 			} 
 
 			if ( this.moveUp ) this.object.translateY( actualMoveSpeed );
@@ -314,6 +379,18 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 	this.domElement.addEventListener( 'keydown', bind( this, this.onKeyDown ), false );
 	this.domElement.addEventListener( 'keyup', bind( this, this.onKeyUp ), false );
 
+	function getRegion(angle)
+	{
+		if(((angle>0&&angle<Math.PI/2)||(angle<0&&angle>-2*Math.PI&&angle<-1.5*Math.PI))||angle==0||angle==-2*Math.PI)
+			return 1;
+		else if(((angle>0&&angle<Math.PI&&angle>0.5*Math.PI)||(angle<0&&angle<-Math.PI&&angle>-1.5*Math.PI))||angle==Math.PI/2||angle==-1.5*Math.PI)
+			return 2;
+		else if(((angle>0&&angle>Math.PI&&angle<1.5*Math.PI)||(angle<0&&angle>-Math.PI&&angle<-0.5*Math.PI))||angle==Math.PI||angle==-Math.PI)
+			return 3;
+		else 
+			return 4;	
+			
+	};
 	function bind( scope, fn ) {
 
 		return function () {
