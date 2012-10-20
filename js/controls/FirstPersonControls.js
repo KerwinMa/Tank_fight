@@ -297,23 +297,6 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 				console.log("angle = "+cd+"quadratn="+quadrant);
 			 	console.log("actualMoveSpeed = "+actualMoveSpeed);
 			 	console.log("direction = "+this.object.children[0].rotation.y);
-<<<<<<< HEAD
-			 	console.log("delta = "+delta);
-
-			
-			
-			
-			
-			
-			
-			
-			
-				console.log("actualMoveSpeed = "+actualMoveSpeed);
-				console.log("direction = "+this.object.children[0].rotation.y);
-			 	console.log("delta = "+delta);
-=======
-			 	console.log("delta = "+delta);	
->>>>>>> Map adjustments + clean up
 			} 
 
 			if ( this.moveUp ) this.object.translateY( actualMoveSpeed );
