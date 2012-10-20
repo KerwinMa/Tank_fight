@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - collada</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #8A4117;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				color: #ffffff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+
+			}
+
+			a { color: skyblue }
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			Tank!
+		</div>
+		<script src="build/three.js"></script>
+		<script src="js/loaders/ColladaLoader.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/jquery.js"></script>
+		<script src="js/controls/FirstPersonControls.js"></script>
+		<script src="js/controls/PointerLockControls.js"></script>
+		<script src="js/controls/FullScreen.js"></script>
+		<script src="js/Detector.js"></script>
+		<script>
+			if ( !Detector.webgl ) Detector.addGetWebGLMessage();
+		</script>
+
+		<script type="text/javascript" src="TankClient.js"></script>
+	</body>
+</html>
