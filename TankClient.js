@@ -220,14 +220,22 @@ function render() {
 	//particleLight.position.z = Math.cos( timer * 4 ) * 3009;
 
 	//Simple bullet moving
-	for(var i = 0; i <bullets.length; i++)
+	for(var i = bullets.length-1; i >= 0; i--)
 	{
 		var b=bullets[i];
-		var d=b.ray.direction;
-		b.translateX(b.velX);
-		b.translateZ(b.velZ);
+		if (checkWallCollision(b.position)) 
+		{
+			bullets.splice(i, 1);
+			scene.remove(b);
+			continue;
+		}
+		else
+		{
+			b.translateX(b.velX);
+			b.translateZ(b.velZ);
+		}
 	}
-	
+
 
 
 	renderer.render( scene, camera );
@@ -236,7 +244,7 @@ function render() {
 //Creating bullets
 var bullets = [];
 var sphereMaterial = new THREE.MeshBasicMaterial({color: 0x333333});
-var sphereGeo = new THREE.SphereGeometry(10, 30, 30);
+var sphereGeo = new THREE.SphereGeometry(5, 30, 30);
 function createBullet() {
 	
 	
@@ -305,6 +313,16 @@ function setupScene() {
 	directionalLight2.position.set( -0.5, -1, -0.5 );
 	scene.add( directionalLight2 ); */
 }
+function getMapSector(v) {
+	var x = Math.floor((v.x + UNITSIZE / 2-100) / UNITSIZE + mapW/2);
+	var z = Math.floor((v.z + UNITSIZE / 2-100) / UNITSIZE + mapW/2);
+	return {x: x, z: z};
+}
+function checkWallCollision(v) {
+	var c = getMapSector(v);
+	return map[c.x][c.z] > 0;
+}
+
 
 
 
