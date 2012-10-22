@@ -102,7 +102,7 @@ function init() {
 	if(obj2.visible)
 		console.log("dae visible");
 
-	controls = new THREE.FirstPersonControls(obj2);
+	controls = new THREE.FirstPersonControls(obj);
 	controls.movementSpeed = 3000;
 	controls.lookSpeed = 0;
 	controls.lookVertical = false; 
