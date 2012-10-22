@@ -54,7 +54,7 @@ THREE.ColladaLoader = function () {
 
 	var TO_RADIANS = Math.PI / 180;
 
-	function load ( url, readyCallback, progressCallback ) {
+	function load (url, readyCallback, progressCallback) {
 
 		var length = 0;
 

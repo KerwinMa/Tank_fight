@@ -2,7 +2,7 @@ var container, stats;
 
 var camera, scene, renderer, objects, controls,projector;
 var particleLight, pointLight;
-var dae, skin, obj, mouse = { x: 0, y: 0 };
+var dae, skin, obj, dae2, skin2, obj2, mouse = { x: 0, y: 0 };
 var WIDTH = window.innerWidth,
 	HEIGHT = window.innerHeight;
 var vel=7,velX, velZ;
@@ -29,31 +29,142 @@ HEIGHT = window.innerHeight,
 ASPECT = WIDTH / HEIGHT,
 UNITSIZE = 200,
 WALLHEIGHT = UNITSIZE / 5;
-// Global vars
-//var t = THREE, scene, cam, renderer, controls, clock, projector, model, skin;
 
-// End of Map part
+var t = 0;
+var clock = new THREE.Clock();
+
+// init();
+// animate();
+
 
 loader.options.convertUpAxis = true;
+var loader2 = new THREE.ColladaLoader();
+loader2.options.convertUpAxis = true;
+// loader2.addEventListener('load', function ( collada ) {
+// 	obj2 = new THREE.Object3D();
+// 	dae2 = collada.scene;
+// 	skin2 = collada.skins[1];
+// 	dae2.scale.x = dae2.scale.y = dae2.scale.z = 25;
+// 	dae2.position.x = 0;
+// 	dae2.position.y = 0;
+// 	dae2.position.z = 0;
+// 	dae2.rotation.y=0;
+// 	dae2.updateMatrix();
+// 	dae2.id=1;
+// 	obj2.add(dae2);
+// 	dae2.rotation.y =  Math.PI/2;	
+// } );
+
+// function LoadModel(x, y, z){
+// 	var loader = new THREE.ColladaLoader();
+// 	var tank;
+// 	loader.convertUpAxis = true;
+// 	loader.load('./models/simple_tank1.dae', function colladaReady( collada ) {
+// 		tank = collada.scene;
+// 		//skin = collada.skins[1];
+// 		tank.scale.x = tank.scale.y = tank.scale.z = 25;
+// 		tank.position.x = x;
+// 		tank.position.y = y;
+// 		tank.position.z = z;
+// 		tank.rotation.y=0;
+// 		tank.updateMatrix();
+// 		// dae.id=1;
+// 		// obj.add(dae);
+// 		// dae.rotation.y =  Math.PI/2;	
+// 	} );
+// 	return tank;
+// }
+
+
 loader.load( './models/simple_tank1.dae', function ( collada ) {
 	obj = new THREE.Object3D();
-	dae = collada.scene;
-	skin = collada.skins[1];
+	// obj2 = new THREE.Object3D();
+	// dae2 = collada.scene;
+	// skin2 = collada.skins[1];
+	// dae2.scale.x = dae2.scale.y = dae2.scale.z = 25;
+	// dae2.position.x = 0;
+	// dae2.position.y = 0;
+	// dae2.position.z = 0;
+	// dae2.rotation.y=0;
+	// dae2.updateMatrix();
+	// obj2.add(dae);
+	// dae2.rotation.y =  Math.PI/2;
+	// dae2.id = 2;
+	//clone 2nd object
+	// dae = dae2.clone();
+	// dae.id = 1;
+	// dae.scale.x = dae.scale.y = dae.scale.z = 25;
+	// dae.position.x = -500;
+	// dae.position.y = 0;
+	// dae.position.z = -500;
+	// dae.rotation.y=0;
+	// dae.updateMatrix();
+	// obj.add(dae);
+	// dae.rotation.y = Math.PI/2;
+	// var geometry = collada.scene.children[2].geometry;
+	// var material = collada.scene.children[2].material;
+	console.log(collada.scene.children);
+	// console.log(geometry);
+	// console.log(material);
+	dae = new THREE.Object3D();
+	dae2 = new THREE.Object3D();
+	for(var i = 0; i < collada.scene.children.length; i++)
+	{
+		if(collada.scene.children[i] instanceof THREE.Mesh) {
+			dae.add(new THREE.Mesh(collada.scene.children[i].geometry, collada.scene.children[i].material));
+			dae2.add(new THREE.Mesh(collada.scene.children[i].geometry, collada.scene.children[i].material));
+		} 
+		// else 
+		// {
+		// 	dae.add(collada.scene.children[i]);
+		// 	dae2.add(collada.scene.children[i]);
+		// }
+	}
+
+	// for ( var i = 0; i < 10; i ++ ) {
+	//     var mesh = new THREE.Mesh( geometry, material );
+	//     mesh.position.set( i * 100, 0, 0 );
+	//     scene.add( mesh );
+	// }
+	// dae = collada.scene;
+	// skin = collada.skins[1];
+	//dae = new THREE.Mesh(geometry, material);
 	dae.scale.x = dae.scale.y = dae.scale.z = 25;
 	dae.position.x = -500;
 	dae.position.y = 0;
 	dae.position.z = -500;
 	dae.rotation.y=0;
 	dae.updateMatrix();
+	dae.id=1;
 	obj.add(dae);
 	dae.rotation.y =  Math.PI/2;
-	
+
+	//loader2.load('./models/simple_tank1.dae', function ( collada ) {
+		obj2 = new THREE.Object3D();
+		//dae.clone(dae2);
+		//obj.clone(obj2);
+		//dae2 = new THREE.Mesh(geometry, material);
+		//skin2 = collada.skins[1];
+		dae2.scale.x = dae2.scale.y = dae2.scale.z = 25;
+		dae2.position.x = 0;
+		dae2.position.y = 0;	
+		dae2.position.z = 0;
+		dae2.rotation.y=0;
+		dae2.updateMatrix();
+		dae2.id=2;
+		obj2.add(dae2);
+		dae2.rotation.y =  Math.PI/2;	
+		console.log(dae);
+		console.log(dae2);
+	//} );
+
 	init();
 	animate();
 } );
 
+
 function init() {
-	container = document.createElement( 'div' );
+	container = document.createElement('div');
 	document.body.appendChild( container );
 	
 	camera = new THREE.OrthographicCamera( window.innerWidth/-1 , window.innerWidth/1, window.innerHeight/1, window.innerHeight/-1, -1000, 1000 );
@@ -62,15 +173,13 @@ function init() {
 	camera.position.z = 0;
 
 	scene = new THREE.Scene();
-	//scene = new t.Scene();
 	setupScene();
 	if(THREEx.FullScreen.available()) {
 		THREEx.FullScreen.request();
 		console.log("FullScreen");
 	}
 	projector = new THREE.Projector();
-	document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-	//Event listener for shooting
+
 	
 	$(document).click(function(e) {
 		e.preventDefault;
@@ -79,73 +188,33 @@ function init() {
 			}
 	});
 
-	
-	
-	
-	// Grid
-
-/*	var size = 500, step = 50;
-
-	var geometry = new THREE.Geometry();
-
-	for ( var i = - size; i <= size; i += step ) {
-
-		geometry.vertices.push( new THREE.Vector3( - size, 0, i ) );
-		geometry.vertices.push( new THREE.Vector3(   size, 0, i ) );
-
-		geometry.vertices.push( new THREE.Vector3( i, 0, - size ) );
-		geometry.vertices.push( new THREE.Vector3( i, 0,   size ) );
-
-	}
-
-	var line = new THREE.Line( geometry, material, THREE.LinePieces );
-	scene.add( line );
-
-	particleLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x008000 } ) );
-	scene.add( particleLight );
-
-	var geometry2 = new THREE.CubeGeometry( 50, 50, 50);
-	var material = new THREE.MeshLambertMaterial( { color: 0xfff000, shading: THREE.FlatShading, overdraw: false	 } );
-
-	for ( var i = 0; i < 10; i ++ ) {
-
-		var cube = new THREE.Mesh( geometry2, material );
-
-		cube.scale.y = Math.floor( Math.random() * 2 + 1 );
-
-		cube.position.x = Math.floor( ( Math.random() * 1000 - 500 ) / 50 ) * 50 + 25;
-		cube.position.y = ( cube.scale.y * 50 ) / 2;
-		cube.position.z = Math.floor( ( Math.random() * 1000 - 500 ) / 50 ) * 50 + 25;
-
-		scene.add( cube );
-	}
-*/
+	// dae = LoadModel(-500, 0, -500);
+	// dae2 = LoadModel(0, 0, 0);
+	// obj = new THREE.Object3D();
+	// obj2 = new THREE.Object3D();
+	// obj.add(dae);
+	// obj2.add(dae2);
 	scene.add(obj);
+	scene.add(obj2);
+	if(obj2.visible)
+		console.log("dae visible");
 
 	controls = new THREE.FirstPersonControls(obj);
 	controls.movementSpeed = 3000;
 	controls.lookSpeed = 0;
-	controls.lookVertical = false; // Temporary solution; play on flat surfaces only
+	controls.lookVertical = false; 
 	controls.noFly = true;
 	controls.activeLook = false;
 
 	// Lights
-
-	scene.add( new THREE.AmbientLight( 0xcccccc ) );
+	scene.add( new THREE.AmbientLight(0xcccccc) );
 
 	var directionalLight = new THREE.DirectionalLight(/*Math.random() * 0xffffff*/0xeeeeee );
-	// directionalLight.position.x = Math.random() - 0.5;
-	// directionalLight.position.y = Math.random() - 0.5;
-	// directionalLight.position.z = Math.random() - 0.5;
 	directionalLight.position.x = -150;
 	directionalLight.position.y = 150;
 	directionalLight.position.z = -150;
 	directionalLight.position.normalize();
 	scene.add( directionalLight );
-
-	pointLight = new THREE.PointLight( 0xffffff, 4 );
-	//pointLight.position = particleLight.position;
-	//scene.add( pointLight );
 
 	renderer = new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
@@ -168,8 +237,6 @@ function onWindowResize() {
 	renderer.setSize( window.innerWidth, window.innerHeight );
 }
 
-var t = 0;
-var clock = new THREE.Clock();
 
 function animate() {
 
@@ -209,15 +276,9 @@ function render() {
 	var delta = clock.getDelta();
 	scene.remove(obj);
 	controls.update(0.001);
-	//if(controls.moveLeft)	dae.rotation.y += -10*Math.PI/180;
-	//if(controls.moveRight)	dae.rotation.y +=10*Math.PI/180;
 				
 	scene.add(obj);
-	camera.lookAt( scene.position );
-
-	//particleLight.position.x = Math.sin( timer * 4 ) * 3009;
-	//particleLight.position.y = Math.cos( timer * 5 ) * 4000;
-	//particleLight.position.z = Math.cos( timer * 4 ) * 3009;
+	camera.lookAt(scene.position);
 
 	//Simple bullet moving
 	for(var i = bullets.length-1; i >= 0; i--)
@@ -236,8 +297,6 @@ function render() {
 		}
 	}
 
-
-
 	renderer.render( scene, camera );
 
 }
@@ -245,11 +304,12 @@ function render() {
 var bullets = [];
 var sphereMaterial = new THREE.MeshBasicMaterial({color: 0x333333});
 var sphereGeo = new THREE.SphereGeometry(5, 30, 30);
+
 function createBullet() {
 	
 	
 	var sphere = new THREE.Mesh(sphereGeo, sphereMaterial);
-		sphere.position.set(obj.position.x+dae.position.x, obj.position.y+dae.position.y+25, obj.position.z-dae.position.z);
+	sphere.position.set(obj.position.x+dae.position.x, obj.position.y+dae.position.y+25, obj.position.z-dae.position.z);
 	
 	var vector = new THREE.Vector3(mouse.x, 1, mouse.y);
 	var dirVector = new THREE.Vector3();
@@ -267,12 +327,6 @@ function createBullet() {
 	scene.add(sphere);
 	return sphere;
 }
-function onDocumentMouseMove(e) {
-	e.preventDefault();
-	mouse.x = e.clientX;
-	mouse.y = e.clientY;
-	
-	}
 
 function setupScene() {
 	var units = mapW;
@@ -282,8 +336,6 @@ function setupScene() {
 			new THREE.CubeGeometry(units * UNITSIZE, 1, units * UNITSIZE),
 			new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture('images/wall-2.jpg')})
 	);
-	// floor.position.x =-100;
-	// floor.position.z = -100;
 	scene.add(floor);
  	
 	// Geometry: walls
@@ -303,15 +355,6 @@ function setupScene() {
 			}
 		}
 	}
-	
-
-	/*/ Lighting
-	var directionalLight1 = new THREE.DirectionalLight( 0xF7EFBE, 0.7 );
-	directionalLight1.position.set( 0.5, 1, 0.5 );
-	scene.add( directionalLight1 );
-	var directionalLight2 = new THREE.DirectionalLight( 0xF7EFBE, 0.5 );
-	directionalLight2.position.set( -0.5, -1, -0.5 );
-	scene.add( directionalLight2 ); */
 }
 function getMapSector(v) {
 	var x = Math.floor((v.x + UNITSIZE / 2-100) / UNITSIZE + mapW/2);
@@ -322,7 +365,3 @@ function checkWallCollision(v) {
 	var c = getMapSector(v);
 	return map[c.x][c.z] > 0;
 }
-
-
-
-
