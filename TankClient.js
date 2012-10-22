@@ -106,12 +106,12 @@ loader.load( './models/simple_tank1.dae', function ( collada ) {
 	console.log(collada.scene.children);
 	// console.log(geometry);
 	// console.log(material);
-	dae = new THREE.Object3D();
+	dae = collada.scene;
 	dae2 = new THREE.Object3D();
 	for(var i = 0; i < collada.scene.children.length; i++)
 	{
 		if(collada.scene.children[i] instanceof THREE.Mesh) {
-			dae.add(new THREE.Mesh(collada.scene.children[i].geometry, collada.scene.children[i].material));
+			//dae.add(new THREE.Mesh(collada.scene.children[i].geometry, collada.scene.children[i].material));
 			dae2.add(new THREE.Mesh(collada.scene.children[i].geometry, collada.scene.children[i].material));
 		} 
 		// else 
