@@ -33,102 +33,17 @@ WALLHEIGHT = UNITSIZE / 5;
 var t = 0;
 var clock = new THREE.Clock();
 
-// init();
-// animate();
-
-
 loader.options.convertUpAxis = true;
 var loader2 = new THREE.ColladaLoader();
 loader2.options.convertUpAxis = true;
-// loader2.addEventListener('load', function ( collada ) {
-// 	obj2 = new THREE.Object3D();
-// 	dae2 = collada.scene;
-// 	skin2 = collada.skins[1];
-// 	dae2.scale.x = dae2.scale.y = dae2.scale.z = 25;
-// 	dae2.position.x = 0;
-// 	dae2.position.y = 0;
-// 	dae2.position.z = 0;
-// 	dae2.rotation.y=0;
-// 	dae2.updateMatrix();
-// 	dae2.id=1;
-// 	obj2.add(dae2);
-// 	dae2.rotation.y =  Math.PI/2;	
-// } );
-
-// function LoadModel(x, y, z){
-// 	var loader = new THREE.ColladaLoader();
-// 	var tank;
-// 	loader.convertUpAxis = true;
-// 	loader.load('./models/simple_tank1.dae', function colladaReady( collada ) {
-// 		tank = collada.scene;
-// 		//skin = collada.skins[1];
-// 		tank.scale.x = tank.scale.y = tank.scale.z = 25;
-// 		tank.position.x = x;
-// 		tank.position.y = y;
-// 		tank.position.z = z;
-// 		tank.rotation.y=0;
-// 		tank.updateMatrix();
-// 		// dae.id=1;
-// 		// obj.add(dae);
-// 		// dae.rotation.y =  Math.PI/2;	
-// 	} );
-// 	return tank;
-// }
-
 
 loader.load( './models/simple_tank1.dae', function ( collada ) {
 	obj = new THREE.Object3D();
-	// obj2 = new THREE.Object3D();
-	// dae2 = collada.scene;
-	// skin2 = collada.skins[1];
-	// dae2.scale.x = dae2.scale.y = dae2.scale.z = 25;
-	// dae2.position.x = 0;
-	// dae2.position.y = 0;
-	// dae2.position.z = 0;
-	// dae2.rotation.y=0;
-	// dae2.updateMatrix();
-	// obj2.add(dae);
-	// dae2.rotation.y =  Math.PI/2;
-	// dae2.id = 2;
-	//clone 2nd object
-	// dae = dae2.clone();
-	// dae.id = 1;
-	// dae.scale.x = dae.scale.y = dae.scale.z = 25;
-	// dae.position.x = -500;
-	// dae.position.y = 0;
-	// dae.position.z = -500;
-	// dae.rotation.y=0;
-	// dae.updateMatrix();
-	// obj.add(dae);
-	// dae.rotation.y = Math.PI/2;
-	// var geometry = collada.scene.children[2].geometry;
-	// var material = collada.scene.children[2].material;
-	console.log(collada.scene.children);
-	// console.log(geometry);
-	// console.log(material);
+	console.log(collada.scene);
 	dae = collada.scene;
 	dae2 = new THREE.Object3D();
-	for(var i = 0; i < collada.scene.children.length; i++)
-	{
-		if(collada.scene.children[i] instanceof THREE.Mesh) {
-			//dae.add(new THREE.Mesh(collada.scene.children[i].geometry, collada.scene.children[i].material));
-			dae2.add(new THREE.Mesh(collada.scene.children[i].geometry, collada.scene.children[i].material));
-		} 
-		// else 
-		// {
-		// 	dae.add(collada.scene.children[i]);
-		// 	dae2.add(collada.scene.children[i]);
-		// }
-	}
+	dae.clone(dae2);
 
-	// for ( var i = 0; i < 10; i ++ ) {
-	//     var mesh = new THREE.Mesh( geometry, material );
-	//     mesh.position.set( i * 100, 0, 0 );
-	//     scene.add( mesh );
-	// }
-	// dae = collada.scene;
-	// skin = collada.skins[1];
-	//dae = new THREE.Mesh(geometry, material);
 	dae.scale.x = dae.scale.y = dae.scale.z = 25;
 	dae.position.x = -500;
 	dae.position.y = 0;
@@ -139,24 +54,18 @@ loader.load( './models/simple_tank1.dae', function ( collada ) {
 	obj.add(dae);
 	dae.rotation.y =  Math.PI/2;
 
-	//loader2.load('./models/simple_tank1.dae', function ( collada ) {
-		obj2 = new THREE.Object3D();
-		//dae.clone(dae2);
-		//obj.clone(obj2);
-		//dae2 = new THREE.Mesh(geometry, material);
-		//skin2 = collada.skins[1];
-		dae2.scale.x = dae2.scale.y = dae2.scale.z = 25;
-		dae2.position.x = 0;
-		dae2.position.y = 0;	
-		dae2.position.z = 0;
-		dae2.rotation.y=0;
-		dae2.updateMatrix();
-		dae2.id=2;
-		obj2.add(dae2);
-		dae2.rotation.y =  Math.PI/2;	
-		console.log(dae);
-		console.log(dae2);
-	//} );
+	obj2 = new THREE.Object3D();
+	dae2.scale.x = dae2.scale.y = dae2.scale.z = 25;
+	dae2.position.x = 0;
+	dae2.position.y = 0;	
+	dae2.position.z = 0;
+	dae2.rotation.y=0;
+	dae2.updateMatrix();
+	dae2.id=2;
+	obj2.add(dae2);
+	dae2.rotation.y =  Math.PI/2;	
+	console.log(dae);
+	console.log(dae2);
 
 	init();
 	animate();
@@ -188,18 +97,12 @@ function init() {
 			}
 	});
 
-	// dae = LoadModel(-500, 0, -500);
-	// dae2 = LoadModel(0, 0, 0);
-	// obj = new THREE.Object3D();
-	// obj2 = new THREE.Object3D();
-	// obj.add(dae);
-	// obj2.add(dae2);
 	scene.add(obj);
 	scene.add(obj2);
 	if(obj2.visible)
 		console.log("dae visible");
 
-	controls = new THREE.FirstPersonControls(obj);
+	controls = new THREE.FirstPersonControls(obj2);
 	controls.movementSpeed = 3000;
 	controls.lookSpeed = 0;
 	controls.lookVertical = false; 
@@ -209,7 +112,7 @@ function init() {
 	// Lights
 	scene.add( new THREE.AmbientLight(0xcccccc) );
 
-	var directionalLight = new THREE.DirectionalLight(/*Math.random() * 0xffffff*/0xeeeeee );
+	var directionalLight = new THREE.DirectionalLight(0xeeeeee );
 	directionalLight.position.x = -150;
 	directionalLight.position.y = 150;
 	directionalLight.position.z = -150;
@@ -218,7 +121,6 @@ function init() {
 
 	renderer = new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
-	//renderer.domElement.style.backgroundColor = '#D6F1FF';
 	container.appendChild( renderer.domElement );
 
 	stats = new Stats();
@@ -248,13 +150,6 @@ function animate() {
 
 	if ( skin ) {
 
-		// guess this can be done smarter...
-
-		// (Indeed, there are way more frames than needed and interpolation is not used at all
-		//  could be something like - one morph per each skinning pose keyframe, or even less,
-		//  animation could be resampled, morphing interpolation handles sparse keyframes quite well.
-		//  Simple animation cycles like this look ok with 10-15 frames instead of 100 ;)
-
 		for ( var i = 0; i < skin.morphTargetInfluences.length; i++ ) {
 			skin.morphTargetInfluences[ i ] = 0;
 		}
@@ -274,10 +169,8 @@ function render() {
 
 	var timer = Date.now() * 0.0005;
 	var delta = clock.getDelta();
-	scene.remove(obj);
 	controls.update(0.001);
-				
-	scene.add(obj);
+	
 	camera.lookAt(scene.position);
 
 	//Simple bullet moving
@@ -356,11 +249,13 @@ function setupScene() {
 		}
 	}
 }
+
 function getMapSector(v) {
 	var x = Math.floor((v.x + UNITSIZE / 2-100) / UNITSIZE + mapW/2);
 	var z = Math.floor((v.z + UNITSIZE / 2-100) / UNITSIZE + mapW/2);
 	return {x: x, z: z};
 }
+
 function checkWallCollision(v) {
 	var c = getMapSector(v);
 	return map[c.x][c.z] > 0;
