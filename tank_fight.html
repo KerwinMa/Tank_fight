@@ -25,11 +25,11 @@
 
 			a { color: skyblue }
 		</style>
-	</head>
-	<body>
-		<div id="info">
-			Tank!
-		</div>
+		<script type="text/javascript">
+			var global = {}; // For node.js require
+		</script>
+		<script type="text/javascript" src="./scriptLoader.js"></script>
+		<script type="text/javascript" src="./Game.js"></script>
 		<script src="build/three.min.js"></script>
 		<script src="js/loaders/ColladaLoader.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -37,10 +37,24 @@
 		<script src="js/controls/FirstPersonControls.js"></script>
 		<script src="js/controls/FullScreen.js"></script>
 		<script src="js/Detector.js"></script>
+
+		<script type="text/javascript" src="TankClient.js"></script>
+	</head>
+	<body onload="loadScript('', 'TankClient.js')">
+		<div id="info">
+			Tank!
+		</div>
+		
 		<script>
 			if ( !Detector.webgl ) Detector.addGetWebGLMessage();
 		</script>
-
-		<script type="text/javascript" src="TankClient.js"></script>
+		<!-- <p>
+			Click the game area to start.
+		</p> -->
+		<!-- <p id="delay">Delay to Server: 0 ms</p>
+		<p> <input type="checkbox" id="pauseCheck"/>Pause game if too laggy (>200ms)</p>
+		<canvas id ="playArea"></canvas>
+		<p id="serverMsg"></p> -->
 	</body>
+
 </html>

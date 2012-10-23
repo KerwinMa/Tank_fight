@@ -78,11 +78,20 @@ function TankServer() {
 		try {
 			// Initialization
 			port = Game.PORT;
-			
+			var http = require('http');
+
 			// change log level to 3 for debugging messages
-			io = require('socket.io').listen(port, {
-					'log level':2 
+			
+			//.listen(port, { 'log level':3  );
+
+			var server = http.createServer().listen(port, function() {
+				console.log('Listening at: http://localhost:8080');
 			});
+			io = require('socket.io').listen(server, {'log level':3});
+			// function(req, res) { 
+			// 	res.writeHead(200, { 'Content-type': 'text/html'});
+			// }
+
 
 			count = 0;
 			nextPID = 1;
@@ -122,7 +131,7 @@ function TankServer() {
 					players[socket.id] = new Player(socket.id, nextPID, startPosX. startPosY, startPosZ);
 
 					// Updates the nextPID to issue (flip-flop between 1 and 2)
-					nextPID = ((nextPID + 1) % 2 === 0) ? 2 : 1;
+					nextPID = (nextPID + 1 === 5) ? 1 : nextPID + 1;
 				}
 
 				// When the client closes the connection to the server/closes the window
