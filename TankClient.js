@@ -9,7 +9,6 @@ var vel=7,velX, velZ;
 var loader = new THREE.ColladaLoader();
 
 // Map part
-
 var map = [ // 1 2 3 4 5 6 7 8 9
            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1,], // 0
            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 1
@@ -44,7 +43,7 @@ loader.load( './models/simple_tank1.dae', function ( collada ) {
 	dae2 = new THREE.Object3D();
 	dae.clone(dae2);
 
-	dae.scale.x = dae.scale.y = dae.scale.z = 25;
+	dae.scale.x = dae.scale.y = dae.scale.z = 30;
 	dae.position.x = -500;
 	dae.position.y = 0;
 	dae.position.z = -500;
@@ -55,7 +54,7 @@ loader.load( './models/simple_tank1.dae', function ( collada ) {
 	dae.rotation.y =  Math.PI/2;
 
 	obj2 = new THREE.Object3D();
-	dae2.scale.x = dae2.scale.y = dae2.scale.z = 25;
+	dae2.scale.x = dae2.scale.y = dae2.scale.z = 30;
 	dae2.position.x = 0;
 	dae2.position.y = 0;	
 	dae2.position.z = 0;
@@ -77,8 +76,8 @@ function init() {
 	document.body.appendChild( container );
 	
 	camera = new THREE.OrthographicCamera( window.innerWidth/-1 , window.innerWidth/1, window.innerHeight/1, window.innerHeight/-1, -1000, 1000 );
-	camera.position.x = 60;
-	camera.position.y = 45;
+	camera.position.x = 55; //60
+	camera.position.y = 45; //45
 	camera.position.z = 0;
 
 	scene = new THREE.Scene();
