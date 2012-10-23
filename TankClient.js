@@ -1,5 +1,4 @@
 var container, stats;
-
 var camera, scene, renderer, objects, controls,projector;
 var particleLight, pointLight;
 var dae, skin, obj, dae2, skin2, obj2, mouse = { x: 0, y: 0 };
