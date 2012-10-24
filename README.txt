@@ -1,0 +1,31 @@
+Tank Fight: CS4344 Project Specifications
+
+Players: 4 (2 minimum)
+Rounds: 5/6
+Multi-player, Real-time, 3D.
+Players wait in the lobby. New players cannot join an existing game. 
+Used Libraries: Node.js, Socket.io, three.js
+
+Aim: More Responsive, Efficient, Fair and Cheat proof; compensate on consistency (players having same view of game state) and scalability (addition of players)
+
+Network Specifications:
+
+1) Architecture: Client-Server. Server ultimate authority. 
+2) Transport Protocol: UDP?
+3) Client Side Prediction. Predict Local states and send to server. Predict the opponents state from previous update (dead reckoning concept).
+4) Dead Reckoning. Send velocity, position, (acceleration?). Update server only if the current position is above a error threshold (TBD). Implies need to predict or extrapolate the position of the opponents as well, till a correction is received from the server. (inconsistency in position, but reduces network usage - tradeoff)
+5) Convergence. Converge to a point in the future. Time - TBD, Style - quadratic
+6) Short circuiting with a local lag (client side) - Update local state continuously, before getting an acknowledgement from the server, after a certain acceptable lag (TBD)
+7) Artificial Server Delay (if needed) - Delay sending of updates from server based on the network delays of different client. 
+8) Time Stamping of packets. 
+9) Time synchronisation: Game clock - runs behind the server by an amount of time equal to the one time delay (RTT/2). Store initial game start time of server. Server could send update packet with time-stamp. Client can do the math to calculate the predicted position/convergence. 
+10) Audio/Visual Effects. To hide discrepencies in the game play and give it a polished finish. 
+11) One Master Server. Many Game Servers (static or dynamic). Server Discovery at the Client. 
+12) Cheat Prevention.
+13) Bandwidth Reduction - dead reckoning on client side. Server side - optimise the sending interval.
+
+Specifications to be considered:
+1) Time warp
+2) Local perception filter - Render objects within real time interaction range in real time, other objects in delayed time. 
+3) Player Management. 
+4) Power saving?
