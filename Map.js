@@ -24,6 +24,8 @@ function Map()
 			           [1, 1, 1, 1, 1, 1, 1, 1, 1, 1,], // 9
 			           ];
 	this.mapW = this.map.length, this.mapH = this.map[0].length;
+	this.tankHalfW=30;
+	this.tankHalfH=55;
 	this.UNITSIZE = 200;		           
 	this.WALLHEIGHT = this.UNITSIZE / 5;
 	this.tankHeight=110;

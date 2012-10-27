@@ -19,7 +19,8 @@ function TankClient(){
 	var vel=7,velX, velZ;
 	var loader = new THREE.ColladaLoader();
 	var myMap=new Map();
-	// Map part
+	//ai part
+	var aispeed=10;
 	
 	// Semi-constants
 	var WIDTH = window.innerWidth,
@@ -226,6 +227,8 @@ function TankClient(){
 		//Simple bullet moving
 		for(var i = bullets.length-1; i >= 0; i--)
 		{
+			
+			
 			var b=bullets[i];
 			if (myMap.checkWallCollision(b.position)) 
 			{
@@ -233,12 +236,32 @@ function TankClient(){
 				scene.remove(b);
 				continue;
 			}
+			
+			
+			
+			
+			
 			else
 			{
 				b.translateX(b.velX);
 				b.translateZ(b.velZ);
 			}
 		}
+		//move the bots
+		var r = Math.random();
+		obj2.lastRandomX = Math.random() * 2 - 1;
+		obj2.lastRandomZ = Math.random() * 2 - 1;
+		
+		obj2.translateX(aispeed * obj2.lastRandomX);
+		obj2.translateZ(aispeed * obj2.lastRandomZ);
+		//var c = myMap.getMapSector(obj2.position);
+		//if (c.x < 0 || c.x >= myMap.mapW || c.y < 0 || c.y >= myMap.mapH || myMap.checkWallCollision(obj2.position)) {
+		//	obj2.translateX(-2 * aispeed * obj2.lastRandomX);
+		//	obj2.translateZ(-2 * aispeed * obj2.lastRandomZ);
+		//	obj2.lastRandomX = Math.random() * 2 - 1;
+		//	obj2.lastRandomZ = Math.random() * 2 - 1;
+		//}
+
 
 		renderer.render( scene, camera );
 
