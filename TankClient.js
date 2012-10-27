@@ -18,28 +18,13 @@ function TankClient(){
 		HEIGHT = window.innerHeight;
 	var vel=7,velX, velZ;
 	var loader = new THREE.ColladaLoader();
-
+	var myMap=new Map();
 	// Map part
-	var map = [ // 1 2 3 4 5 6 7 8 9
-	           [1, 1, 1, 1, 1, 1, 1, 1, 1, 1,], // 0
-	           [1, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 1
-	           [1, 0, 0, 0, 2, 0, 0, 0, 0, 1,], // 2
-	           [1, 0, 0, 0, 0, 2, 0, 0, 0, 1,], // 3
-	           [1, 0, 0, 2, 0, 0, 2, 0, 0, 1,], // 4
-	           [1, 0, 0, 0, 2, 0, 0, 0, 0, 1,], // 5
-	           [1, 0, 0, 0, 0, 1, 0, 0, 0, 1,], // 6
-	           [1, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 7
-	           [1, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 8
-	           [1, 1, 1, 1, 1, 1, 1, 1, 1, 1,], // 9
-	           ], mapW = map.length, mapH = map[0].length;
-
+	
 	// Semi-constants
 	var WIDTH = window.innerWidth,
 	HEIGHT = window.innerHeight,
-	ASPECT = WIDTH / HEIGHT,
-	UNITSIZE = 200,
-	WALLHEIGHT = UNITSIZE / 5;
-
+	ASPECT = WIDTH / HEIGHT;
 	var t = 0;
 	var clock = new THREE.Clock();
 
@@ -242,7 +227,7 @@ function TankClient(){
 		for(var i = bullets.length-1; i >= 0; i--)
 		{
 			var b=bullets[i];
-			if (checkWallCollision(b.position)) 
+			if (myMap.checkWallCollision(b.position)) 
 			{
 				bullets.splice(i, 1);
 				scene.remove(b);
@@ -268,14 +253,14 @@ function TankClient(){
 		
 		var sphere = new THREE.Mesh(sphereGeo, sphereMaterial);
 		sphere.position.set(obj.position.x+dae.position.x, obj.position.y+dae.position.y+25, obj.position.z-dae.position.z);
-		
-		var vector = new THREE.Vector3(mouse.x, 1, mouse.y);
-		var dirVector = new THREE.Vector3();
-		dirVector.sub(vector,sphere.position.clone());
-		sphere.ray = new THREE.Ray(
-					sphere.position.clone(),
-					dirVector.normalize(),0,1000
-			);
+		console.log("shooted at x= "+sphere.position.x+" z = "+sphere.position.z);
+		console.log("mypos is  at x= "+obj.position.x+" z = "+obj.position.z);
+		var vector = new THREE.Vector3(mouse.x, 1, mouse.y);myMap.WALLHEIGHT
+		//dirVector.sub(vector,sphere.position.clone());
+		//sphere.ray = new THREE.Ray(
+		//			sphere.position.clone(),
+		//			dirVector.normalize(),0,1000
+		//	);
 		//bullets direction
 		var degree=Math.ceil((dae.rotation.y%(2*Math.PI))*(180/Math.PI));	
 		sphere.velX=-vel*Math.sin(dae.rotation.y%(2*Math.PI));
@@ -287,45 +272,35 @@ function TankClient(){
 	}
 
 	function setupScene() {
-		var units = mapW;
+		var units = myMap.mapW;
 	 
 		// Geometry: floor
 		var floor = new THREE.Mesh(
-				new THREE.CubeGeometry(units * UNITSIZE, 1, units * UNITSIZE),
+				new THREE.CubeGeometry(units * (myMap.UNITSIZE), 1, units * (myMap.UNITSIZE)),
 				new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture('images/wall-2.jpg')})
 		);
 		scene.add(floor);
 	 	
 		// Geometry: walls
-		var cube = new THREE.CubeGeometry(UNITSIZE, WALLHEIGHT, UNITSIZE);
+		var cube = new THREE.CubeGeometry(myMap.UNITSIZE, myMap.WALLHEIGHT, myMap.UNITSIZE);
 		var materials = [
 		                 new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture('images/wall-1.jpg')}),
 		                 new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture('images/wall-1.jpg')}),
 		                 ];
-		for (var i = 0; i < mapW; i++) {
-			for (var j = 0, m = map[i].length; j < m; j++) {
-				if (map[i][j]) {
-					var wall = new THREE.Mesh(cube, materials[map[i][j]-1]);
-					wall.position.x = (i - units/2) * UNITSIZE + 100;
-					wall.position.y = WALLHEIGHT/2;
-					wall.position.z = (j - units/2) * UNITSIZE + 100;
+		for (var i = 0; i < myMap.mapW; i++) {
+			for (var j = 0, m = myMap.map[i].length; j < m; j++) {
+				if (myMap.map[i][j]) {
+					var wall = new THREE.Mesh(cube, materials[myMap.map[i][j]-1]);
+					wall.position.x = (i - units/2) * myMap.UNITSIZE + 100;
+					wall.position.y = myMap.WALLHEIGHT/2;
+					wall.position.z = (j - units/2) * myMap.UNITSIZE + 100;
 					scene.add(wall);
 				}
 			}
 		}
 	}
 
-	function getMapSector(v) {
-		var x = Math.floor((v.x + UNITSIZE / 2-100) / UNITSIZE + mapW/2);
-		var z = Math.floor((v.z + UNITSIZE / 2-100) / UNITSIZE + mapW/2);
-		return {x: x, z: z};
-	}
-
-	function checkWallCollision(v) {
-		var c = getMapSector(v);
-		return map[c.x][c.z] > 0;
-	}
-
+	
 	/*==================
 	  start [Privileged]
 	  ==================*/

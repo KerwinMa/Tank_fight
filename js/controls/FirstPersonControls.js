@@ -5,7 +5,7 @@
  */
 
 THREE.FirstPersonControls = function ( object, domElement ) {
-
+	
 	this.object = object;
 	this.target = new THREE.Vector3( 0, 0, 0 );
 
@@ -49,7 +49,12 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	this.viewHalfX = 0;
 	this.viewHalfY = 0;
-
+	
+	
+	//map object
+	var myMap=new Map();
+	var tankHalfW=30;
+	var tankHalfH=55;
 	if ( this.domElement !== document ) {
 
 		this.domElement.setAttribute( 'tabindex', -1 );
@@ -227,7 +232,27 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 			if ( this.moveForward || ( this.autoForward && !this.moveBackward ) ){
 				
 				if((cd<pai/2+da&&cd>pai/2-da)||(cd<-1.5*pai+da&&cd>-1.5*pai-da))
-					this.object.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
+				{
+					
+					var corner1=this.object.position.clone();
+					var corner2=this.object.position.clone();
+					//need to fix later to adjust 
+					corner1.x-=500;corner2.x-=500;
+					corner1.z+=500;corner2.z+=500;
+					//tank dimensions
+					corner1.x-=tankHalfH;corner1.z-=tankHalfW;
+					corner2.x-=tankHalfH;corner2.z+=tankHalfW;
+					if(!myMap.checkWallCollision(corner1)&&!myMap.checkWallCollision(corner2))
+					{
+						
+						this.object.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
+					}
+
+					
+					
+					
+						
+				}
 				else
 				{			
 					if(quadrant==1||quadrant==4)
@@ -245,7 +270,22 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 			if ( this.moveBackward ) 
 			{				
 				if((cd>1.5*pai-da&&cd<1.5*pai+da)||(cd<-0.5*pai+da&&cd>-0.5*pai-da))
-					this.object.translateZ( actualMoveSpeed );
+				{
+					var corner1=this.object.position.clone();
+					var corner2=this.object.position.clone();
+					//need to fix later to adjust 
+					corner1.x-=500;corner2.x-=500;
+					corner1.z+=500;corner2.z+=500;
+					//tank dimensions
+					corner1.x+=tankHalfH;corner1.z-=tankHalfW;
+					corner2.x+=tankHalfH;corner2.z+=tankHalfW;
+					if(!myMap.checkWallCollision(corner1)&&!myMap.checkWallCollision(corner2))
+					{
+						
+						this.object.translateZ( actualMoveSpeed );
+					}
+				}
+		
 			 	else
 			 	{			
 					if(quadrant==2||quadrant==3)
@@ -262,7 +302,22 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 			if ( this.moveRight ) {
 				
 				if((cd>0&&(cd<da||cd>2*pai-da))||(cd<0&&(cd>-da||cd<-2*pai+da))||cd==0)
-					this.object.translateX( actualMoveSpeed );
+				{
+					
+					var corner1=this.object.position.clone();
+					var corner2=this.object.position.clone();
+					//need to fix later to adjust 
+					corner1.x-=500;corner2.x-=500;
+					corner1.z+=500;corner2.z+=500;
+					//tank dimensions
+					corner1.z-=tankHalfH;corner1.x-=tankHalfW;
+					corner2.z-=tankHalfH;corner2.x+=tankHalfW;
+					console.log("right");
+					if(!myMap.checkWallCollision(corner1)&&!myMap.checkWallCollision(corner2))
+					{
+						this.object.translateX( actualMoveSpeed );
+					}
+				}	
 				else
 			 	{			
 					if(quadrant==1||quadrant==2)
@@ -283,7 +338,20 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 			}
 			if ( this.moveLeft ){
 				if((cd>pai-da&&cd<pai+da)||(cd>-pai-da&&cd<-pai+da)||cd==pai||cd==-pai)
-					this.object.translateX( -actualMoveSpeed );
+				{
+					var corner1=this.object.position.clone();
+					var corner2=this.object.position.clone();
+					//need to fix later to adjust 
+					corner1.x-=500;corner2.x-=500;
+					corner1.z+=500;corner2.z+=500;
+					//tank dimensions
+					corner1.z+=tankHalfH;corner1.x-=tankHalfW;
+					corner2.z+=tankHalfH;corner2.x+=tankHalfW;
+					if(!myMap.checkWallCollision(corner1)&&!myMap.checkWallCollision(corner2))
+					{
+							this.object.translateX( -actualMoveSpeed );
+					}
+				}
 				else
 			 	{			
 					if(quadrant==3||quadrant==4)
