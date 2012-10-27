@@ -4,7 +4,6 @@ loadScript(lib_path, "Tank.js");
 loadScript("", "http://" + Game.SERVER_NAME + ":" + Game.PORT + "/socket.io/socket.io.js");
 
 function TankClient(){
-
 	//network
 	var socket;			// socket used to connect to server
 	var delay;			// delay simulated on current client
@@ -61,8 +60,8 @@ function TankClient(){
 		console.log(dae);
 		console.log(dae2);
 
-		init();
-		animate();
+		// init();
+		// animate();
 	} );
 
 	/*=====================
@@ -71,7 +70,7 @@ function TankClient(){
 	var initNetwork = function() {
 		// Attempts to connect to game server
 		try {
-			socket = io.connect("http://" + Pong.SERVER_NAME + ":" + Pong.PORT);
+			socket = io.connect("http://" + Game.SERVER_NAME + ":" + Game.PORT);
 
 			//pinging and stuff like that.
 			// var curTime = Date.now();
@@ -116,7 +115,7 @@ function TankClient(){
 			});
 
 		} catch (e) {
-			console.log("Failed to connect to " + "http://" + Pong.SERVER_NAME + ":" + Pong.PORT);
+			console.log("Failed to connect to " + "http://" + Game.SERVER_NAME + ":" + Game.PORT);
 			console.log("e");
 			//appendLog("Failed to connect to " + "http://" + Pong.SERVER_NAME + ":" + Pong.PORT + ". Please refresh.");
 		}
@@ -348,6 +347,6 @@ function TankClient(){
 
 // Run Client. Give leeway of 0.1 second for libraries to load
 var client = new TankClient();
-//setTimeout(function() {client.start();}, 1000);
+setTimeout(function() {client.start();}, 1000);
 
 // vim:ts=4

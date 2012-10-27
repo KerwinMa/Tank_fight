@@ -84,24 +84,31 @@ function TankServer() {
 			// change log level to 3 for debugging messages
 			
 			//.listen(port, { 'log level':3  );
-
+			var mimeTypes = {
+			    ".html": "text/html",
+			    ".jpeg": "image/jpeg",
+			    ".jpg": "image/jpeg",
+			    ".png": "image/png",
+			    ".js": "text/javascript",
+			    ".css": "text/css" };
 			var server = http.createServer(function(request, response) {
 				console.log("starting request");
-				console.log(request);
+				//console.log(request);
 				var filePath = '.' + request.url;
 				if(filePath == './')
 					filePath = './tank_fight.html';
 
 				var extname = path.extname(filePath);
-				var contentType = 'text/html';
-				switch (extname) {
-					case '.js':
-						contentType = 'text/javascript';
-						break;
-					case '.css':
-						contentType = 'text/css';
-						break;
-				}
+				// var contentType = 'text/html';
+				// switch (extname) {
+				// 	case '.js':
+				// 		contentType = 'text/javascript';
+				// 		break;
+				// 	case '.css':
+				// 		contentType = 'text/css';
+				// 		break;
+				// }
+				var contentType = mimeTypes[extname];
 				path.exists(filePath, function(exists){
 					if (exists) {
 						fs.readFile(filePath, function(error, content) {
@@ -112,6 +119,7 @@ function TankServer() {
 							else {
 								response.writeHead(200, {"Content-Type": contentType});
 		 						response.end(content, 'utf-8');
+		 						console.log(filePath);
 							}
 						});
 					}
@@ -119,18 +127,20 @@ function TankServer() {
 						response.writeHead(404);
 						response.end();
 					}
+					if(filePath.indexOf(".jpg")) {
+						//console.log(request);
+						//console.log(response);
+					}
 				});				
 			});
 
 			server.listen(port);
 			console.log('Listening at: http://localhost:8080');
 
-			io = require('socket.io').listen(server, {'log level':3});
+			io = require('socket.io').listen(server, {'log level':2});
 			// function(req, res) { 
 			// 	res.writeHead(200, { 'Content-type': 'text/html'});
 			// }
-
-
 			count = 0;
 			nextPID = 1;
 			gameInterval = undefined;
@@ -156,18 +166,13 @@ function TankServer() {
 				} else {
 					// Sends to everyone connected to server except the client
 					socket.broadcast.emit('serverMsg', {msg: "There is now " + count + " players."});
-					
 					var startPosX = 500/nextPID;
 					var startPosY = 0;
 					var startPosZ = -500/nextPID;
-					
-
 					// Send message to new player (the current client)
 					socket.emit('serverMsg', {msg: "You are Player " + nextPID});				
-
 					// Create player object and insert into players with key = socket.id
 					players[socket.id] = new Player(socket.id, nextPID, startPosX. startPosY, startPosZ);
-
 					// Updates the nextPID to issue (flip-flop between 1 and 2)
 					nextPID = (nextPID + 1 === 5) ? 1 : nextPID + 1;
 				}
@@ -179,16 +184,12 @@ function TankServer() {
 						if (gameInterval != undefined) {
 							resetGame();
 						}
-
 						// Decrease count
 						count--;
-
 						// Set nextPID to quitting player's PID
 						nextPID = players[socket.id].pid;
-
 						// Remove player who wants to quit/closed the window
 						delete players[socket.id];
-
 						// Sends to everyone connected to server except the client
 						socket.broadcast.emit('serverMsg', {msg: "There is now " + count + " players."});
 					});
