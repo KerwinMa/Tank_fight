@@ -95,6 +95,7 @@ function TankServer() {
 			  .use(connect.favicon())
 			  .use(connect.static(__dirname))
 			  .use(connect.logger())
+			  .use(connect.logger('dev'))
 			  .use(function(request, response){
 			    var filePath = '.' + request.url;
 						if(filePath == './')
