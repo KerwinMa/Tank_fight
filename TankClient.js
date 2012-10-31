@@ -149,8 +149,6 @@ function TankClient(){
 
 		scene.add(obj);
 		scene.add(obj2);
-		if(obj2.visible)
-			console.log("dae visible");
 
 		controls = new THREE.FirstPersonControls(obj);
 		controls.movementSpeed = 3000;

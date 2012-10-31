@@ -6,7 +6,6 @@ function TankServer() {
 	/*=========
 	  Variables
 	  =========*/
-
 	//private	
 	//network
 	var port;						// Game port
@@ -19,8 +18,7 @@ function TankServer() {
 	var gameInterval = undefined;	// Interval variable used for gameLoop
 	var players;					// Associative array for players, indexed via sid
 									// To get a Player object, do "players[sid]"
-									// Can extend to more players if needed
-									
+									// Can extend to more players if needed			
 	/*===================
 	  getPlayer [Private]
 	  ===================*/
@@ -81,6 +79,7 @@ function TankServer() {
 			var http = require('http');
 			var fs = require('fs');
 			var path = require('path');
+			var connect = require('connect');
 			// change log level to 3 for debugging messages
 			
 			//.listen(port, { 'log level':3  );
@@ -91,7 +90,76 @@ function TankServer() {
 			    ".png": "image/png",
 			    ".js": "text/javascript",
 			    ".css": "text/css" };
-			var server = http.createServer(function(request, response) {
+
+			var app = connect()
+			  .use(connect.favicon())
+			  .use(connect.static(__dirname))
+			  .use(connect.logger())
+			  .use(function(request, response){
+			    var filePath = '.' + request.url;
+						if(filePath == './')
+							filePath = './tank_fight.html';
+
+						var extname = path.extname(filePath);
+						var contentType = mimeTypes[extname];
+						fs.exists(filePath, function(exists){
+						if (exists) {
+							fs.readFile(filePath, function(error, content) {
+								if(error) {
+									response.writeHead(500);
+									response.end();
+								}
+								else {
+									response.writeHead(200, {"Content-Type": contentType});
+			 						response.end(content);
+			 						console.log(filePath);
+								}
+							});
+						}
+						else {
+							response.writeHead(404);
+							response.end();
+						}
+					});
+  });
+
+var server = http.createServer(app).listen(8080);
+			/*var app = connect.createServer(
+					connect.static(__dirname + '/public', {maxAge: 0}),
+					function(request, response){
+						var filePath = '.' + request.url;
+						if(filePath == './')
+							filePath = './tank_fight.html';
+
+						var extname = path.extname(filePath);
+						var contentType = mimeTypes[extname];
+						fs.exists(filePath, function(exists){
+						if (exists) {
+							fs.readFile(filePath, function(error, content) {
+								if(error) {
+									response.writeHead(500);
+									response.end();
+								}
+								else {
+									response.writeHead(200, {"Content-Type": contentType});
+			 						response.end(content);
+			 						console.log(filePath);
+								}
+							});
+						}
+						else {
+							response.writeHead(404);
+							response.end();
+						}
+						if(filePath.indexOf(".jpg")) {
+							//console.log(request);
+							//console.log(response);
+						}
+					});
+				}).listen(8080);*/
+
+			//Normal Http server
+			/*var server = http.createServer(function(request, response) {
 				console.log("starting request");
 				//console.log(request);
 				var filePath = '.' + request.url;
@@ -99,15 +167,6 @@ function TankServer() {
 					filePath = './tank_fight.html';
 
 				var extname = path.extname(filePath);
-				// var contentType = 'text/html';
-				// switch (extname) {
-				// 	case '.js':
-				// 		contentType = 'text/javascript';
-				// 		break;
-				// 	case '.css':
-				// 		contentType = 'text/css';
-				// 		break;
-				// }
 				var contentType = mimeTypes[extname];
 				path.exists(filePath, function(exists){
 					if (exists) {
@@ -135,12 +194,11 @@ function TankServer() {
 			});
 
 			server.listen(port);
-			console.log('Listening at: http://localhost:8080');
+			console.log('Listening at: http://localhost:8080');*/
 
 			io = require('socket.io').listen(server, {'log level':2});
-			// function(req, res) { 
-			// 	res.writeHead(200, { 'Content-type': 'text/html'});
-			// }
+			
+
 			count = 0;
 			nextPID = 1;
 			gameInterval = undefined;
