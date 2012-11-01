@@ -1,0 +1,19 @@
+1/11/2012
+
+Ayan
+- port to blackberry + add controls  
+
+vd
+-link tank and player
+-create tanks only after init network
+
+serik
+-separate UI and control in FirstPersonControl 
+[Suggestion: Add another funtion to tank.js, with the logic in firstpersoncontrols. Here no translateX or rotateX, just add to the position/rotation of the tank. Position.x/z & rotation.y]
+
+
+-client should notify server
+-run the game on server
+
+Later
+-collision between bullet and tank & between tank and tank

@@ -8,7 +8,7 @@ function TankClient(){
 	var socket;			// socket used to connect to server
 	var delay;			// delay simulated on current client
 	var pause = false;
-
+	var setted=false;
 	var container, stats;
 	var camera, scene, renderer, objects, controls,projector;
 	var particleLight, pointLight;
@@ -26,6 +26,9 @@ function TankClient(){
 	HEIGHT = window.innerHeight,
 	ASPECT = WIDTH / HEIGHT;
 	var t = 0;
+	var bullets = [];
+	var sphereMaterial = new THREE.MeshBasicMaterial({color: 0x333333});
+	var sphereGeo = new THREE.SphereGeometry(5, 30, 30);
 	var clock = new THREE.Clock();
 
 	loader.options.convertUpAxis = true;
@@ -60,8 +63,8 @@ function TankClient(){
 		console.log(dae);
 		console.log(dae2);
 
-		// init();
-		// animate();
+		init();
+		animate();
 	} );
 
 	/*=====================
@@ -132,7 +135,11 @@ function TankClient(){
 		camera.position.z = 0;
 
 		scene = new THREE.Scene();
-		setupScene();
+		if(!setted)
+		{
+			setupScene();
+			setted=true;
+		}
 		if(THREEx.FullScreen.available()) {
 			THREEx.FullScreen.request();
 			console.log("FullScreen");
@@ -210,7 +217,6 @@ function TankClient(){
 
 		render();
 		stats.update();
-
 	}
 
 	function render() {
@@ -232,12 +238,7 @@ function TankClient(){
 				bullets.splice(i, 1);
 				scene.remove(b);
 				continue;
-			}
-			
-			
-			
-			
-			
+			}			
 			else
 			{
 				b.translateX(b.velX);
@@ -263,10 +264,7 @@ function TankClient(){
 		renderer.render( scene, camera );
 
 	}
-	//Creating bullets
-	var bullets = [];
-	var sphereMaterial = new THREE.MeshBasicMaterial({color: 0x333333});
-	var sphereGeo = new THREE.SphereGeometry(5, 30, 30);
+	
 
 	function createBullet() {
 		
@@ -275,7 +273,7 @@ function TankClient(){
 		sphere.position.set(obj.position.x+dae.position.x, obj.position.y+dae.position.y+25, obj.position.z-dae.position.z);
 		console.log("shooted at x= "+sphere.position.x+" z = "+sphere.position.z);
 		console.log("mypos is  at x= "+obj.position.x+" z = "+obj.position.z);
-		var vector = new THREE.Vector3(mouse.x, 1, mouse.y);myMap.WALLHEIGHT
+		var vector = new THREE.Vector3(mouse.x, 1, mouse.y);//myMap.WALLHEIGHT
 		//dirVector.sub(vector,sphere.position.clone());
 		//sphere.ray = new THREE.Ray(
 		//			sphere.position.clone(),
@@ -293,19 +291,19 @@ function TankClient(){
 
 	function setupScene() {
 		var units = myMap.mapW;
-	 
+	 	console.log("setup scene");
 		// Geometry: floor
 		var floor = new THREE.Mesh(
 				new THREE.CubeGeometry(units * (myMap.UNITSIZE), 1, units * (myMap.UNITSIZE)),
-				new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture('images/wall-2.jpg')})
+				new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture('wall-2.jpg')})
 		);
 		scene.add(floor);
 	 	
 		// Geometry: walls
 		var cube = new THREE.CubeGeometry(myMap.UNITSIZE, myMap.WALLHEIGHT, myMap.UNITSIZE);
 		var materials = [
-		                 new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture('images/wall-1.jpg')}),
-		                 new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture('images/wall-1.jpg')}),
+		                 new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture('wall-1.jpg')}),
+		                 new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture('wall-1.jpg')}),
 		                 ];
 		for (var i = 0; i < myMap.mapW; i++) {
 			for (var j = 0, m = myMap.map[i].length; j < m; j++) {
@@ -335,8 +333,8 @@ function TankClient(){
 
 		// Initialize network and GUI
 		initNetwork();
-		init();
-		animate();
+		//init();
+		//animate();
 	}
 }
 

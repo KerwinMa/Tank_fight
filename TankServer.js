@@ -98,33 +98,34 @@ function TankServer() {
 			  .use(connect.logger('dev'))
 			  .use(function(request, response){
 			    var filePath = '.' + request.url;
-						if(filePath == './')
-							filePath = './tank_fight.html';
+				if(filePath == './')
+					filePath = './tank_fight.html';
 
-						var extname = path.extname(filePath);
-						var contentType = mimeTypes[extname];
-						fs.exists(filePath, function(exists){
-						if (exists) {
-							fs.readFile(filePath, function(error, content) {
-								if(error) {
-									response.writeHead(500);
-									response.end();
-								}
-								else {
-									response.writeHead(200, {"Content-Type": contentType});
-			 						response.end(content);
-			 						console.log(filePath);
-								}
-							});
-						}
-						else {
-							response.writeHead(404);
-							response.end();
-						}
-					});
-  });
+				var extname = path.extname(filePath);
+				var contentType = mimeTypes[extname];
 
-var server = http.createServer(app).listen(8080);
+				fs.exists(filePath, function(exists){
+					console.log(filePath);
+					if (exists) {
+						fs.readFile(filePath, function(error, content) {
+							if(error) {
+								response.writeHead(500);
+								response.end();
+							}
+							else {
+								response.writeHead(200, {"Content-Type": contentType});
+		 						response.end(content);
+							}
+						});
+					}
+					else {
+						response.writeHead(404);
+						response.end();
+					}
+			});
+  		});
+
+		var server = http.createServer(app).listen(8080);
 			/*var app = connect.createServer(
 					connect.static(__dirname + '/public', {maxAge: 0}),
 					function(request, response){
@@ -197,7 +198,7 @@ var server = http.createServer(app).listen(8080);
 			server.listen(port);
 			console.log('Listening at: http://localhost:8080');*/
 
-			io = require('socket.io').listen(server, {'log level':2});
+			io = require('socket.io').listen(server, {'log level':3});
 			
 
 			count = 0;
