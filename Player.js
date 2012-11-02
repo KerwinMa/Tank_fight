@@ -1,4 +1,4 @@
-function Player(sid, pid, xPos, yPos, zPos) {
+function Player(sid, pid, xPos, zPos) {
     /*=========
 	  Variables
 	  =========*/
@@ -10,9 +10,10 @@ function Player(sid, pid, xPos, yPos, zPos) {
     /*===========
 	  Constructor
 	  ===========*/
+    
     this.sid = sid;
     this.pid = pid;
-    this.tank = new Tank(xPos, yPos, zPos);
+    this.tank = new Tank(xPos, zPos);
     var delay = 0;
 
     this.setDelay = function(newDelay) {

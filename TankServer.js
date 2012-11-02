@@ -92,50 +92,20 @@ function TankServer() {
 			    ".css": "text/css" };
 
 			var app = connect()
-			  .use(connect.favicon())
-			  .use(connect.static(__dirname))
-			  .use(connect.logger())
-			  .use(connect.logger('dev'))
-			  .use(function(request, response){
-			    var filePath = '.' + request.url;
-				if(filePath == './')
-					filePath = './tank_fight.html';
+				.use(connect.favicon())
+				.use(connect.static(__dirname))
+				.use(connect.logger())
+				.use(connect.logger('dev'))
+				.use(function(request, response){
+				    var filePath = '.' + request.url;
+					if(filePath == './')
+						filePath = './tank_fight.html';
 
-				var extname = path.extname(filePath);
-				var contentType = mimeTypes[extname];
+					var extname = path.extname(filePath);
+					var contentType = mimeTypes[extname];
 
-				fs.exists(filePath, function(exists){
-					console.log(filePath);
-					if (exists) {
-						fs.readFile(filePath, function(error, content) {
-							if(error) {
-								response.writeHead(500);
-								response.end();
-							}
-							else {
-								response.writeHead(200, {"Content-Type": contentType});
-		 						response.end(content);
-							}
-						});
-					}
-					else {
-						response.writeHead(404);
-						response.end();
-					}
-			});
-  		});
-
-		var server = http.createServer(app).listen(8080);
-			/*var app = connect.createServer(
-					connect.static(__dirname + '/public', {maxAge: 0}),
-					function(request, response){
-						var filePath = '.' + request.url;
-						if(filePath == './')
-							filePath = './tank_fight.html';
-
-						var extname = path.extname(filePath);
-						var contentType = mimeTypes[extname];
-						fs.exists(filePath, function(exists){
+					fs.exists(filePath, function(exists){
+						console.log(filePath);
 						if (exists) {
 							fs.readFile(filePath, function(error, content) {
 								if(error) {
@@ -145,7 +115,6 @@ function TankServer() {
 								else {
 									response.writeHead(200, {"Content-Type": contentType});
 			 						response.end(content);
-			 						console.log(filePath);
 								}
 							});
 						}
@@ -153,54 +122,13 @@ function TankServer() {
 							response.writeHead(404);
 							response.end();
 						}
-						if(filePath.indexOf(".jpg")) {
-							//console.log(request);
-							//console.log(response);
-						}
 					});
-				}).listen(8080);*/
+  				});
 
-			//Normal Http server
-			/*var server = http.createServer(function(request, response) {
-				console.log("starting request");
-				//console.log(request);
-				var filePath = '.' + request.url;
-				if(filePath == './')
-					filePath = './tank_fight.html';
+			var server = http.createServer(app).listen(8080);
 
-				var extname = path.extname(filePath);
-				var contentType = mimeTypes[extname];
-				path.exists(filePath, function(exists){
-					if (exists) {
-						fs.readFile(filePath, function(error, content) {
-							if(error) {
-								response.writeHead(500);
-								response.end();
-							}
-							else {
-								response.writeHead(200, {"Content-Type": contentType});
-		 						response.end(content, 'utf-8');
-		 						console.log(filePath);
-							}
-						});
-					}
-					else {
-						response.writeHead(404);
-						response.end();
-					}
-					if(filePath.indexOf(".jpg")) {
-						//console.log(request);
-						//console.log(response);
-					}
-				});				
-			});
-
-			server.listen(port);
-			console.log('Listening at: http://localhost:8080');*/
-
-			io = require('socket.io').listen(server, {'log level':3});
+			io = require('socket.io').listen(server, {'log level':2});
 			
-
 			count = 0;
 			nextPID = 1;
 			gameInterval = undefined;
@@ -216,7 +144,7 @@ function TankServer() {
 				// Sends to client
 				socket.emit('serverMsg', {msg: "There is now " + count + " players."});
 
-				if (count > 4) {
+				if (count > 2) {
 					// Send back message that game is full
 					socket.emit('serverMsg', {msg: "Sorry, game full. Come back another time!"});
 
@@ -226,15 +154,27 @@ function TankServer() {
 				} else {
 					// Sends to everyone connected to server except the client
 					socket.broadcast.emit('serverMsg', {msg: "There is now " + count + " players."});
-					var startPosX = 500/nextPID;
-					var startPosY = 0;
-					var startPosZ = -500/nextPID;
+					var startPosX, startPosZ, oppStartPosX, oppStartPosZ;
+					startPosX1 = -500;
+					startPosZ1 = -500;
+					startPosX2 = 0;
+					startPosZ2 = 0;
+
 					// Send message to new player (the current client)
-					socket.emit('serverMsg', {msg: "You are Player " + nextPID});				
+					socket.emit('serverMsg', {msg: "You are Player " + nextPID});
+					socket.emit('playerDetails', {playerNo: nextPID,
+												xValue1: startPosX1,
+												zValue1: startPosZ1,
+												xValue2: startPosX2,
+												zValue2: startPosZ2 });				
 					// Create player object and insert into players with key = socket.id
-					players[socket.id] = new Player(socket.id, nextPID, startPosX. startPosY, startPosZ);
+					if(nextPID === 1)
+						players[socket.id] = new Player(socket.id, nextPID, startPosX1. startPosZ1);
+					else 
+						players[socket.id] = new Player(socket.id, nextPID, startPosX2. startPosZ2);
 					// Updates the nextPID to issue (flip-flop between 1 and 2)
-					nextPID = (nextPID + 1 === 5) ? 1 : nextPID + 1;
+					//nextPID = (nextPID + 1 === 5) ? 1 : nextPID + 1;
+					nextPID = ((nextPID + 1) % 2 === 0) ? 2 : 1;
 				}
 
 				// When the client closes the connection to the server/closes the window

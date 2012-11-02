@@ -1,4 +1,4 @@
-function Tank(posX, posY, posZ){
+function Tank(posX, posZ){
 	/*=========
 	  Variables
 	  =========*/
@@ -7,12 +7,11 @@ function Tank(posX, posY, posZ){
 	this.z; 	//z-coordinate of tank's position [Public]
 	this.rotationY; //tank's rotation along y axis
 
-
 	/*===========
 	  Constructor
 	  ===========*/
 	this.x = posX;
-	this.y = posY;
+	this.y = 0;
 	this.z = posZ;
 	this.rotationY = Math.PI/2;
 }
@@ -23,7 +22,7 @@ function Tank(posX, posY, posZ){
   Tank.ScaleX = 30;
   Tank.ScaleY = 30;
   Tank.ScaleZ = 30;
-
+  Tank.Scale = 30;
 /*=============
   move [Public]
   =============*/

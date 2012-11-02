@@ -12,24 +12,33 @@ function TankClient(){
 	var container, stats;
 	var camera, scene, renderer, objects, controls,projector;
 	var particleLight, pointLight;
+	var clock = new THREE.Clock();
+	var network_init = false;
+
+	var sMyTank, sOppTank, cMyTank; //Tank objects in game 
+
+	//for loading tank
 	var dae, skin, obj, dae2, skin2, obj2, mouse = { x: 0, y: 0 };
-	var WIDTH = window.innerWidth,
-		HEIGHT = window.innerHeight;
+
 	var vel=7,velX, velZ;
 	var loader = new THREE.ColladaLoader();
 	var myMap=new Map();
-	//ai part
+
+	//AI for tanks
 	var aispeed=10;
 	
 	// Semi-constants
 	var WIDTH = window.innerWidth,
 	HEIGHT = window.innerHeight,
 	ASPECT = WIDTH / HEIGHT;
+
 	var t = 0;
+
+	//Bullets
 	var bullets = [];
 	var sphereMaterial = new THREE.MeshBasicMaterial({color: 0x333333});
 	var sphereGeo = new THREE.SphereGeometry(5, 30, 30);
-	var clock = new THREE.Clock();
+	
 
 	loader.options.convertUpAxis = true;
 
@@ -74,7 +83,7 @@ function TankClient(){
 		// Attempts to connect to game server
 		try {
 			socket = io.connect("http://" + Game.SERVER_NAME + ":" + Game.PORT);
-
+			network_init = true;
 			//pinging and stuff like that.
 			// var curTime = Date.now();
 			// socket.emit("ping", {x: curTime});)
@@ -87,15 +96,62 @@ function TankClient(){
 			// Upon receiving a message tagged with "serverMsg", along with an obj "data"
 			socket.on("serverMsg", function(data) {
 				console.log("serverMsg " + data.msg);
-				//animate();
 			});
 
 			// // Getting player info upon connection to server
-			// socket.on("playerDetails", function(data) {
-			// get details about player and opponents
-			// 	// Start gameCycle
-			// 	animate();
-			// });
+			socket.on("playerDetails", function(data) {
+				if(data.playerNo === 1) {
+					sMyTank = new Tank(data.xValue1, data.zValue1);
+					sOppTank = new Tank(data.xValue2, data.zValue2);
+					cMyTank = new Tank(data.xValue1, data.zValue1);
+				} else {
+					sMyTank = new Tank(data.xValue2, data.zValue2);
+					sOppTank = new Tank(data.xValue1, data.zValue1);
+					cMyTank = new Tank(data.xValue2, data.zValue2);
+				}
+				// Start gameCycle
+				// var loader = new THREE.ColladaLoader();
+				// loader.options.convertUpAxis = true;
+
+				// loader.load( './models/simple_tank1.dae', function ( collada ) {
+				// 	obj = new THREE.Object3D();
+				// 	console.log(collada.scene);
+				// 	dae = collada.scene;
+				// 	dae2 = new THREE.Object3D();
+				// 	dae.clone(dae2);
+
+				// 	dae.scale.x = dae.scale.y = dae.scale.z = Tank.Scale;
+
+					if(data.playerNo ===1) {
+						dae.position.x = data.xValue1;
+						dae.position.z = data.zValue1;
+						dae2.position.x = data.xValue2;
+						dae2.position.z = data.zValue2;
+					} else {
+						dae.position.x = data.xValue2;
+						dae.position.z = data.zValue2;
+						dae2.position.x = data.xValue1;
+						dae2.position.z = data.zValue1;						
+					}
+					// dae.position.y = 0;
+					dae.updateMatrix();
+					// obj.add(dae);
+					// dae.rotation.y =  Math.PI/2;
+
+					// obj2 = new THREE.Object3D();
+					// dae2.scale.x = dae2.scale.y = dae2.scale.z = Tank.Scale;
+					// dae2.position.y = 0;	
+					dae2.updateMatrix();
+				// 	obj2.add(dae2);
+				// 	dae2.rotation.y =  Math.PI/2;	
+				// 	console.log(dae);
+				// 	console.log(dae2);
+
+				// 	init();
+				// 	animate();
+				// } );
+				
+			});
 
 			// Upon receiving a message tagged with "update", along with an obj "data"
 			socket.on("update", function(data) {
@@ -252,15 +308,6 @@ function TankClient(){
 		
 		obj2.translateX(aispeed * obj2.lastRandomX);
 		obj2.translateZ(aispeed * obj2.lastRandomZ);
-		//var c = myMap.getMapSector(obj2.position);
-		//if (c.x < 0 || c.x >= myMap.mapW || c.y < 0 || c.y >= myMap.mapH || myMap.checkWallCollision(obj2.position)) {
-		//	obj2.translateX(-2 * aispeed * obj2.lastRandomX);
-		//	obj2.translateZ(-2 * aispeed * obj2.lastRandomZ);
-		//	obj2.lastRandomX = Math.random() * 2 - 1;
-		//	obj2.lastRandomZ = Math.random() * 2 - 1;
-		//}
-
-
 		renderer.render( scene, camera );
 
 	}
@@ -273,13 +320,7 @@ function TankClient(){
 		sphere.position.set(obj.position.x+dae.position.x, obj.position.y+dae.position.y+25, obj.position.z-dae.position.z);
 		console.log("shooted at x= "+sphere.position.x+" z = "+sphere.position.z);
 		console.log("mypos is  at x= "+obj.position.x+" z = "+obj.position.z);
-		var vector = new THREE.Vector3(mouse.x, 1, mouse.y);//myMap.WALLHEIGHT
-		//dirVector.sub(vector,sphere.position.clone());
-		//sphere.ray = new THREE.Ray(
-		//			sphere.position.clone(),
-		//			dirVector.normalize(),0,1000
-		//	);
-		//bullets direction
+		var vector = new THREE.Vector3(mouse.x, 1, mouse.y);
 		var degree=Math.ceil((dae.rotation.y%(2*Math.PI))*(180/Math.PI));	
 		sphere.velX=-vel*Math.sin(dae.rotation.y%(2*Math.PI));
 		sphere.velZ=-vel*Math.cos(dae.rotation.y%(2*Math.PI));
@@ -292,6 +333,7 @@ function TankClient(){
 	function setupScene() {
 		var units = myMap.mapW;
 	 	console.log("setup scene");
+
 		// Geometry: floor
 		var floor = new THREE.Mesh(
 				new THREE.CubeGeometry(units * (myMap.UNITSIZE), 1, units * (myMap.UNITSIZE)),
@@ -318,7 +360,6 @@ function TankClient(){
 		}
 	}
 
-	
 	/*==================
 	  start [Privileged]
 	  ==================*/
@@ -330,17 +371,13 @@ function TankClient(){
 
 		// rendInterval = undefined;
 		// simInterval = undefined;
-
 		// Initialize network and GUI
-		initNetwork();
-		//init();
-		//animate();
+		if(network_init == false)
+			initNetwork();
 	}
 }
 
-// "public static void main(String[] args)"
 // This will auto run after this script is loaded
-
 // Run Client. Give leeway of 0.1 second for libraries to load
 var client = new TankClient();
 setTimeout(function() {client.start();}, 1000);

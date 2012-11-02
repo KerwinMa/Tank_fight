@@ -5,7 +5,7 @@ Ayan
 
 vd
 -link tank and player
--create tanks only after init network
+-create tanks only after init network 
 
 serik
 -separate UI and control in FirstPersonControl 
