@@ -247,11 +247,6 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 						
 						this.object.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
 					}
-
-					
-					
-					
-						
 				}
 				else
 				{			
@@ -260,11 +255,11 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 					else 
 						this.object.children[0].rotation.y=(this.object.children[0].rotation.y-10*Math.PI/180)%(2*pai);
 				}		
-				console.log("angle = "+cd+"quadratn="+quadrant);	
+				// console.log("angle = "+cd+"quadrant="+quadrant);	
 				
-				console.log("actualMoveSpeed = "+actualMoveSpeed);
-			 	console.log("delta = "+delta);
-				console.log("moveForward " + this.object.z);
+				// console.log("actualMoveSpeed = "+actualMoveSpeed);
+			 // 	console.log("delta = "+delta);
+				// console.log("moveForward " + this.object.z);
 			} 
 			
 			if ( this.moveBackward ) 
@@ -293,10 +288,10 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 					else 
 						this.object.children[0].rotation.y=(this.object.children[0].rotation.y-10*Math.PI/180)%(2*pai);
 				}	
-			 	console.log("angle = "+cd+"quadratn="+quadrant);	
-			 	console.log("actualMoveSpeed = "+actualMoveSpeed);
-			 	console.log("delta = "+delta);
-			 	console.log("move backward " + this.object.z);
+			 	// console.log("angle = "+cd+"quadrant="+quadrant);	
+			 	// console.log("actualMoveSpeed = "+actualMoveSpeed);
+			 	// console.log("delta = "+delta);
+			 	// console.log("move backward " + this.object.z);
 			}
 
 			if ( this.moveRight ) {
@@ -328,10 +323,10 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 			
 			
 			
-				console.log("angle = "+cd+"quadratn="+quadrant);
-			 	console.log("actualMoveSpeed = "+actualMoveSpeed);
-			 	console.log("direction = "+this.object.children[0].rotation.y);
-			 	console.log("delta = "+delta);
+				// console.log("angle = "+cd+"quadratn="+quadrant);
+			 // 	console.log("actualMoveSpeed = "+actualMoveSpeed);
+			 // 	console.log("direction = "+this.object.children[0].rotation.y);
+			 // 	console.log("delta = "+delta);
 			 	
 				 
 					
@@ -359,12 +354,10 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 					else 
 						this.object.children[0].rotation.y=(this.object.children[0].rotation.y+10*Math.PI/180)%(2*pai);
 				}	
-			
-			
-			
-				console.log("angle = "+cd+"quadratn="+quadrant);
-			 	console.log("actualMoveSpeed = "+actualMoveSpeed);
-			 	console.log("direction = "+this.object.children[0].rotation.y);
+				
+				// console.log("angle = "+cd+"quadratn="+quadrant);
+			 // 	console.log("actualMoveSpeed = "+actualMoveSpeed);
+			 // 	console.log("direction = "+this.object.children[0].rotation.y);
 			} 
 
 			if ( this.moveUp ) this.object.translateY( actualMoveSpeed );

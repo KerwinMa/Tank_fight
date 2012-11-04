@@ -50,9 +50,9 @@ function TankClient(){
 		dae.clone(dae2);
 
 		dae.scale.x = dae.scale.y = dae.scale.z = 30;
-		dae.position.x = -500;
+		dae.position.x = 0;
 		dae.position.y = 0;
-		dae.position.z = -500;
+		dae.position.z = 0;
 		dae.rotation.y=0;
 		dae.updateMatrix();
 		dae.id=1;
@@ -134,14 +134,16 @@ function TankClient(){
 						dae2.position.z = data.zValue1;						
 					}
 					// dae.position.y = 0;
-					dae.updateMatrix();
+					//dae.updateMatrix();
+					obj.updateMatrix();
 					// obj.add(dae);
 					// dae.rotation.y =  Math.PI/2;
 
 					// obj2 = new THREE.Object3D();
 					// dae2.scale.x = dae2.scale.y = dae2.scale.z = Tank.Scale;
-					// dae2.position.y = 0;	
-					dae2.updateMatrix();
+					// dae2.position.y = 0;
+					//dae2.updateMatrix();	
+					obj2.updateMatrix();
 				// 	obj2.add(dae2);
 				// 	dae2.rotation.y =  Math.PI/2;	
 				// 	console.log(dae);
@@ -280,7 +282,8 @@ function TankClient(){
 		var timer = Date.now() * 0.0005;
 		var delta = clock.getDelta();
 		controls.update(0.001);
-		
+		console.log("x = " + dae.position.x + "; z = " + dae.position.z);
+		console.log("obj x = " + obj.position.x + "; obj z = " + obj.position.z);
 		camera.lookAt(scene.position);
 
 		//Simple bullet moving
@@ -302,12 +305,12 @@ function TankClient(){
 			}
 		}
 		//move the bots
-		var r = Math.random();
-		obj2.lastRandomX = Math.random() * 2 - 1;
-		obj2.lastRandomZ = Math.random() * 2 - 1;
+		// var r = Math.random();
+		// obj2.lastRandomX = Math.random() * 2 - 1;
+		// obj2.lastRandomZ = Math.random() * 2 - 1;
 		
-		obj2.translateX(aispeed * obj2.lastRandomX);
-		obj2.translateZ(aispeed * obj2.lastRandomZ);
+		// obj2.translateX(aispeed * obj2.lastRandomX);
+		// obj2.translateZ(aispeed * obj2.lastRandomZ);
 		renderer.render( scene, camera );
 
 	}
