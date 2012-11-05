@@ -14,7 +14,7 @@ function TankClient(){
 	var particleLight, pointLight;
 	var clock = new THREE.Clock();
 	var network_init = false;
-
+	var cID;
 	var sMyTank, sOppTank, cMyTank; //Tank objects in game 
 
 	//for loading tank
@@ -22,7 +22,7 @@ function TankClient(){
 
 	var vel=7,velX, velZ;
 	var loader = new THREE.ColladaLoader();
-	var myMap=new Map();
+	var myMap = new Map();
 
 	//AI for tanks
 	var aispeed=10;
@@ -71,7 +71,6 @@ function TankClient(){
 		dae2.rotation.y =  Math.PI/2;	
 		console.log(dae);
 		console.log(dae2);
-
 		init();
 		animate();
 	} );
@@ -100,6 +99,7 @@ function TankClient(){
 
 			// // Getting player info upon connection to server
 			socket.on("playerDetails", function(data) {
+				cID = data.playerNo;
 				if(data.playerNo === 1) {
 					sMyTank = new Tank(data.xValue1, data.zValue1);
 					sOppTank = new Tank(data.xValue2, data.zValue2);
@@ -122,37 +122,51 @@ function TankClient(){
 
 				// 	dae.scale.x = dae.scale.y = dae.scale.z = Tank.Scale;
 
-					if(data.playerNo ===1) {
-						dae.position.x = data.xValue1;
-						dae.position.z = data.zValue1;
-						dae2.position.x = data.xValue2;
-						dae2.position.z = data.zValue2;
-					} else {
-						dae.position.x = data.xValue2;
-						dae.position.z = data.zValue2;
-						dae2.position.x = data.xValue1;
-						dae2.position.z = data.zValue1;						
-					}
-					// dae.position.y = 0;
-					//dae.updateMatrix();
-					obj.updateMatrix();
-					// obj.add(dae);
-					// dae.rotation.y =  Math.PI/2;
+				// if(data.playerNo ===1) {
+					dae.position.x = data.xValue1;
+					dae.position.z = data.zValue1;
+					dae.startX = data.xValue1;
+					dae.startZ = data.zValue1;
 
-					// obj2 = new THREE.Object3D();
-					// dae2.scale.x = dae2.scale.y = dae2.scale.z = Tank.Scale;
-					// dae2.position.y = 0;
-					//dae2.updateMatrix();	
-					obj2.updateMatrix();
+					dae2.position.x = data.xValue2;
+					dae2.position.z = data.zValue2;
+					dae2.startX = data.xValue2;
+					dae2.startZ = data.zValue2;
+				// } else {
+				// 	dae.position.x = data.xValue2;
+				// 	dae.position.z = data.zValue2;
+				// 	dae.startX = data.xValue2;
+				// 	dae.startZ = data.zValue2;
+				// 	dae2.position.x = data.xValue1;
+				// 	dae2.position.z = data.zValue1;						
+				// }
+
+				if(data.playerNo === 2) {
+					controls = new THREE.FirstPersonControls(obj2);
+					controls.movementSpeed = 5000;
+					controls.lookSpeed = 0;
+					controls.lookVertical = false; 
+					controls.noFly = true;
+					controls.activeLook = false;
+				}
+				// dae.position.y = 0;
+				//dae.updateMatrix();
+				//obj.updateMatrix();
+				// obj.add(dae);
+				// dae.rotation.y =  Math.PI/2;
+
+				// obj2 = new THREE.Object3D();
+				// dae2.scale.x = dae2.scale.y = dae2.scale.z = Tank.Scale;
+				// dae2.position.y = 0;
+				//dae2.updateMatrix();	
+				//obj2.updateMatrix();
 				// 	obj2.add(dae2);
 				// 	dae2.rotation.y =  Math.PI/2;	
 				// 	console.log(dae);
 				// 	console.log(dae2);
-
 				// 	init();
 				// 	animate();
 				// } );
-				
 			});
 
 			// Upon receiving a message tagged with "update", along with an obj "data"
@@ -216,7 +230,7 @@ function TankClient(){
 		scene.add(obj2);
 
 		controls = new THREE.FirstPersonControls(obj);
-		controls.movementSpeed = 3000;
+		controls.movementSpeed = 5000;
 		controls.lookSpeed = 0;
 		controls.lookVertical = false; 
 		controls.noFly = true;
@@ -282,8 +296,6 @@ function TankClient(){
 		var timer = Date.now() * 0.0005;
 		var delta = clock.getDelta();
 		controls.update(0.001);
-		console.log("x = " + dae.position.x + "; z = " + dae.position.z);
-		console.log("obj x = " + obj.position.x + "; obj z = " + obj.position.z);
 		camera.lookAt(scene.position);
 
 		//Simple bullet moving
@@ -316,7 +328,7 @@ function TankClient(){
 	}
 	
 
-	function createBullet() {
+	function createBullet(obj, dae) {
 		
 		
 		var sphere = new THREE.Mesh(sphereGeo, sphereMaterial);
@@ -335,8 +347,6 @@ function TankClient(){
 
 	function setupScene() {
 		var units = myMap.mapW;
-	 	console.log("setup scene");
-
 		// Geometry: floor
 		var floor = new THREE.Mesh(
 				new THREE.CubeGeometry(units * (myMap.UNITSIZE), 1, units * (myMap.UNITSIZE)),

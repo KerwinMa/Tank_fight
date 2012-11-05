@@ -23,10 +23,11 @@ function Tank(posX, posZ){
   Tank.ScaleY = 30;
   Tank.ScaleZ = 30;
   Tank.Scale = 30;
+  
 /*=============
   move [Public]
   =============*/
-/*Tank.prototype.move = function(newx) {
+/*Tank.prototype.move = function(newx, newz) {
 	if (newx < Paddle.WIDTH/2)
 		this.x = Paddle.WIDTH/2;
 	else if (newx > Pong.WIDTH - Paddle.WIDTH/2)
