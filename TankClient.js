@@ -328,9 +328,7 @@ function TankClient(){
 	}
 	
 
-	function createBullet(obj, dae) {
-		
-		
+	function createBullet() {
 		var sphere = new THREE.Mesh(sphereGeo, sphereMaterial);
 		sphere.position.set(obj.position.x+dae.position.x, obj.position.y+dae.position.y+25, obj.position.z-dae.position.z);
 		console.log("shooted at x= "+sphere.position.x+" z = "+sphere.position.z);
