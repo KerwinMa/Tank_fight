@@ -126,7 +126,7 @@ function TankClient(){
 
 				// 	dae.scale.x = dae.scale.y = dae.scale.z = Tank.Scale;
 				console.log(data);
-				if(data.playerNo ===1) {					
+				//if(data.playerNo ===1) {					
 					dae.position.x = data.xValue1;
 					dae.position.z = data.zValue1;
 					dae.startX = data.xValue1;
@@ -135,16 +135,18 @@ function TankClient(){
 					dae2.position.z = data.zValue2;
 					dae2.startX = data.xValue2;
 					dae2.startZ = data.zValue2;
-				} else {
+				//}
+				/* else 
+				{
 					dae.position.x = data.xValue2;
 					dae.position.z = data.zValue2;
 					dae.startX = data.xValue2;
 					dae.startZ = data.zValue2;
 					dae2.position.x = data.xValue1;
 					dae2.position.z = data.zValue1;						
-				}
+				}*/
 				console.log(obj);
-/*				
+				
 				if(data.playerNo === 2) {
 					controls = new THREE.FirstPersonControls(obj2);
 					controls.movementSpeed = 5000;
@@ -152,7 +154,7 @@ function TankClient(){
 					controls.lookVertical = false; 
 					controls.noFly = true;
 					controls.activeLook = false;
-				}*/
+				}
 
 				setInterval(function() {
 					updateServer();
@@ -327,14 +329,28 @@ function TankClient(){
 	
 
 	function createBullet() {
+		
 		var sphere = new THREE.Mesh(sphereGeo, sphereMaterial);
 		sphere.position.set(obj.position.x+dae.position.x, obj.position.y+dae.position.y+25, obj.position.z-dae.position.z);
-		console.log("shooted at x= "+sphere.position.x+" z = "+sphere.position.z);
-		console.log("mypos is  at x= "+obj.position.x+" z = "+obj.position.z);
-		var vector = new THREE.Vector3(mouse.x, 1, mouse.y);
+		
 		var degree=Math.ceil((dae.rotation.y%(2*Math.PI))*(180/Math.PI));	
+		
 		sphere.velX=-vel*Math.sin(dae.rotation.y%(2*Math.PI));
 		sphere.velZ=-vel*Math.cos(dae.rotation.y%(2*Math.PI));
+		
+		if(cID==2)
+		{
+		sphere.position.set(obj2.position.x+dae2.position.x, obj2.position.y+dae2.position.y+25, obj2.position.z-dae2.position.z);
+		var degree=Math.ceil((dae2.rotation.y%(2*Math.PI))*(180/Math.PI));	
+		
+		sphere.velX=-vel*Math.sin(dae2.rotation.y%(2*Math.PI));
+		sphere.velZ=-vel*Math.cos(dae2.rotation.y%(2*Math.PI));
+
+			
+		}
+		
+		console.log("shooted at x= "+sphere.position.x+" z = "+sphere.position.z);
+		console.log("mypos is  at x= "+obj.position.x+" z = "+obj.position.z);
 		bullets.push(sphere);
 		scene.add(sphere);
 		return sphere;
