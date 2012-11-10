@@ -18,7 +18,7 @@ function TankClient(){
 	var that = this;
 	//for loading tank
 	var dae, skin, obj, dae2, skin2, obj2;
-
+	var objects=[];
 	var vel=7,velX, velZ;
 	this.loader = new THREE.ColladaLoader();
 	var myMap = new Map();
@@ -58,7 +58,9 @@ function TankClient(){
 		dae.id=1;
 		obj.add(dae);
 		dae.rotation.y =  Math.PI/2;
-
+		
+		objects.push(obj);
+		
 		obj2 = new THREE.Object3D();
 		dae2.scale.x = dae2.scale.y = dae2.scale.z = 30;
 		dae2.position.x = 0;
@@ -73,6 +75,7 @@ function TankClient(){
 		console.log(dae2);
 		that.init();
 		that.animate();
+		objects.push(obj2);
 		//cloaded = true;
 	} );
 
@@ -134,7 +137,7 @@ function TankClient(){
 				console.log(obj);
 				
 				if(data.playerNo === 2) {
-					controls = new THREE.FirstPersonControls(obj2);
+					controls = new THREE.FirstPersonControls(objects,2);
 					controls.movementSpeed = 5000;
 					controls.lookSpeed = 0;
 					controls.lookVertical = false; 
@@ -193,7 +196,7 @@ function TankClient(){
 		scene.add(obj);
 		scene.add(obj2);
 
-		controls = new THREE.FirstPersonControls(obj);
+		controls = new THREE.FirstPersonControls(objects,1 );
 		controls.movementSpeed = 5000;
 		controls.lookSpeed = 0;
 		controls.lookVertical = false; 
@@ -284,26 +287,15 @@ function TankClient(){
 	function createBullet() {
 		
 		var sphere = new THREE.Mesh(sphereGeo, sphereMaterial);
-		sphere.position.set(obj.position.x+dae.position.x, obj.position.y+dae.position.y+25, obj.position.z-dae.position.z);
+		sphere.position.set( objects[cID-1].position.x+objects[cID-1].children[0].position.x,
+							 objects[cID-1].position.y+objects[cID-1].children[0].position.y+25,
+							 objects[cID-1].position.z-objects[cID-1].children[0].position.z);
 		
-		var degree=Math.ceil((dae.rotation.y%(2*Math.PI))*(180/Math.PI));	
+		var degree=Math.ceil((objects[cID-1].children[0].rotation.y%(2*Math.PI))*(180/Math.PI));	
 		
-		sphere.velX=-vel*Math.sin(dae.rotation.y%(2*Math.PI));
-		sphere.velZ=-vel*Math.cos(dae.rotation.y%(2*Math.PI));
+		sphere.velX=-vel*Math.sin(objects[cID-1].children[0].rotation.y%(2*Math.PI));
+		sphere.velZ=-vel*Math.cos(objects[cID-1].children[0].rotation.y%(2*Math.PI));
 		
-		if(cID==2)
-		{
-		sphere.position.set(obj2.position.x+dae2.position.x, obj2.position.y+dae2.position.y+25, obj2.position.z-dae2.position.z);
-		var degree=Math.ceil((dae2.rotation.y%(2*Math.PI))*(180/Math.PI));	
-		
-		sphere.velX=-vel*Math.sin(dae2.rotation.y%(2*Math.PI));
-		sphere.velZ=-vel*Math.cos(dae2.rotation.y%(2*Math.PI));
-
-			
-		}
-		
-		console.log("shooted at x= "+sphere.position.x+" z = "+sphere.position.z);
-		console.log("mypos is  at x= "+obj.position.x+" z = "+obj.position.z);
 		bullets.push(sphere);
 		scene.add(sphere);
 		return sphere;
