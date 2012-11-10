@@ -41,14 +41,10 @@ function TankClient(){
 	this.loader.options.convertUpAxis = true;
 
 	this.loader.load( './models/simple_tank1.dae', function ( collada ) {
-		// if(cloaded) {
-		// 	return;
-		// }
 		obj = new THREE.Object3D();
 		dae = collada.scene;
 		dae2 = new THREE.Object3D();
 		dae.clone(dae2);
-
 		dae.scale.x = dae.scale.y = dae.scale.z = 30;
 		dae.position.x = 0;
 		dae.position.y = 0;
@@ -58,7 +54,6 @@ function TankClient(){
 		dae.id=1;
 		obj.add(dae);
 		dae.rotation.y =  Math.PI/2;
-
 		obj2 = new THREE.Object3D();
 		dae2.scale.x = dae2.scale.y = dae2.scale.z = 30;
 		dae2.position.x = 0;
@@ -69,11 +64,8 @@ function TankClient(){
 		dae2.id=2;
 		obj2.add(dae2);
 		dae2.rotation.y =  Math.PI/2;	
-		console.log(dae);
-		console.log(dae2);
 		that.init();
 		that.animate();
-		//cloaded = true;
 	} );
 
 	/*=====================
@@ -110,18 +102,6 @@ function TankClient(){
 					sOppTank = new Tank(data.xValue1, data.zValue1);
 					cMyTank = new Tank(data.xValue2, data.zValue2);
 				}
-				// Start gameCycle
-				// var loader = new THREE.ColladaLoader();
-				// loader.options.convertUpAxis = true;
-
-				// loader.load( './models/simple_tank1.dae', function ( collada ) {
-				// 	obj = new THREE.Object3D();
-				// 	console.log(collada.scene);
-				// 	dae = collada.scene;
-				// 	dae2 = new THREE.Object3D();
-				// 	dae.clone(dae2);
-
-				// 	dae.scale.x = dae.scale.y = dae.scale.z = Tank.Scale;
 				console.log(data);				
 				dae.position.x = data.xValue1;
 				dae.position.z = data.zValue1;
@@ -164,7 +144,6 @@ function TankClient(){
 		} catch (e) {
 			console.log("Failed to connect to " + "http://" + Game.SERVER_NAME + ":" + Game.PORT);
 			console.log(e);
-			//appendLog("Failed to connect to " + "http://" + Pong.SERVER_NAME + ":" + Pong.PORT + ". Please refresh.");
 		}
 	}
 
@@ -301,9 +280,6 @@ function TankClient(){
 
 			
 		}
-		
-		console.log("shooted at x= "+sphere.position.x+" z = "+sphere.position.z);
-		console.log("mypos is  at x= "+obj.position.x+" z = "+obj.position.z);
 		bullets.push(sphere);
 		scene.add(sphere);
 		return sphere;
@@ -355,7 +331,6 @@ function TankClient(){
 
 	function updateServer() {
 		socket.emit("move", {newX: obj.position.x, newZ: obj.position.z, rotY: obj.rotation.y});
-		//console.log("move");
 	}
 }
 

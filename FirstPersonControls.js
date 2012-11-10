@@ -142,9 +142,6 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 	};
 
 	this.onKeyDown = function ( event ) {
-
-		//event.preventDefault();
-		console.log(event.keyCode);
 		switch ( event.keyCode ) {
 
 			case 38: /*up*/
@@ -207,7 +204,6 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 		if ( this.freeze ) {
 			console.log("this.freeze");
 			return;
-
 		} else {
 
 			if ( this.heightSpeed ) {
@@ -224,12 +220,10 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 			}
 
 			actualMoveSpeed = delta * this.movementSpeed;
-			//console.log("actualMoveSpeed = "+actualMoveSpeed);
 			var cd=this.object.children[0].rotation.y;
 			var quadrant=getRegion(cd);
 			var da=5*Math.PI/180;
 			var pai=Math.PI;
-			//console.log("Cornerx" + this.object.children[0].startX);
 			if ( this.moveForward || ( this.autoForward && !this.moveBackward ) ){
 				
 				if((cd<pai/2+da&&cd>pai/2-da)||(cd<-1.5*pai+da&&cd>-1.5*pai-da))
@@ -239,10 +233,6 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 					var corner2=this.object.position.clone();
 					corner1.x+=this.object.children[0].startX; corner2.x+=this.object.children[0].startX;
 					corner1.z-=this.object.children[0].startZ;corner2.z-=this.object.children[0].startZ;
-					//need to fix later to adjust 
-					//corner1.x-=500;corner2.x-=500;
-					//corner1.z+=500;corner2.z+=500;
-					//tank dimensions
 					corner1.x-=tankHalfH;corner1.z-=tankHalfW;
 					corner2.x-=tankHalfH;corner2.z+=tankHalfW;
 					if(!myMap.checkWallCollision(corner1)&&!myMap.checkWallCollision(corner2))
@@ -256,12 +246,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 						this.object.children[0].rotation.y=(this.object.children[0].rotation.y+10*Math.PI/180)%(2*pai);
 					else 
 						this.object.children[0].rotation.y=(this.object.children[0].rotation.y-10*Math.PI/180)%(2*pai);
-				}		
-				// console.log("angle = "+cd+"quadrant="+quadrant);	
-				
-				// console.log("actualMoveSpeed = "+actualMoveSpeed);
-			 // 	console.log("delta = "+delta);
-				// console.log("moveForward " + this.object.z);
+				}
 			} 
 			
 			if ( this.moveBackward ) 
@@ -270,9 +255,6 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 				{
 					var corner1=this.object.position.clone();
 					var corner2=this.object.position.clone();
-					//need to fix later to adjust 
-					//corner1.x-=500;corner2.x-=500;
-					//corner1.z+=500;corner2.z+=500;
 					corner1.x+=this.object.children[0].startX; corner2.x+=this.object.children[0].startX;
 					corner1.z-=this.object.children[0].startZ;corner2.z-=this.object.children[0].startZ;
 
@@ -292,11 +274,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 						this.object.children[0].rotation.y=(this.object.children[0].rotation.y+10*Math.PI/180)%(2*pai);
 					else 
 						this.object.children[0].rotation.y=(this.object.children[0].rotation.y-10*Math.PI/180)%(2*pai);
-				}	
-			 	// console.log("angle = "+cd+"quadrant="+quadrant);	
-			 	// console.log("actualMoveSpeed = "+actualMoveSpeed);
-			 	// console.log("delta = "+delta);
-			 	// console.log("move backward " + this.object.z);
+				}
 			}
 
 			if ( this.moveRight ) {
@@ -306,15 +284,11 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 					
 					var corner1=this.object.position.clone();
 					var corner2=this.object.position.clone();
-					//need to fix later to adjust 
-					//corner1.x-=500;corner2.x-=500;
-					//corner1.z+=500;corner2.z+=500;
 					corner1.x+=this.object.children[0].startX; corner2.x+=this.object.children[0].startX;
 					corner1.z-=this.object.children[0].startZ;corner2.z-=this.object.children[0].startZ;
 					//tank dimensions
 					corner1.z-=tankHalfH;corner1.x-=tankHalfW;
 					corner2.z-=tankHalfH;corner2.x+=tankHalfW;
-					console.log("right");
 					if(!myMap.checkWallCollision(corner1)&&!myMap.checkWallCollision(corner2))
 					{
 						this.object.translateX( actualMoveSpeed );
@@ -326,26 +300,13 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 						this.object.children[0].rotation.y=(this.object.children[0].rotation.y-10*Math.PI/180)%(2*pai);
 					else 
 						this.object.children[0].rotation.y=(this.object.children[0].rotation.y+10*Math.PI/180)%(2*pai);
-				}	
-			
-			
-			
-				// console.log("angle = "+cd+"quadratn="+quadrant);
-			 // 	console.log("actualMoveSpeed = "+actualMoveSpeed);
-			 // 	console.log("direction = "+this.object.children[0].rotation.y);
-			 // 	console.log("delta = "+delta);
-			 	
-				 
-					
+				}			
 			}
 			if ( this.moveLeft ){
 				if((cd>pai-da&&cd<pai+da)||(cd>-pai-da&&cd<-pai+da)||cd==pai||cd==-pai)
 				{
 					var corner1=this.object.position.clone();
 					var corner2=this.object.position.clone();
-					//need to fix later to adjust 
-					//corner1.x-=500;corner2.x-=500;
-					//corner1.z+=500;corner2.z+=500;
 					corner1.x+=this.object.children[0].startX; corner2.x+=this.object.children[0].startX;
 					corner1.z-=this.object.children[0].startZ;corner2.z-=this.object.children[0].startZ;
 					//tank dimensions
@@ -362,11 +323,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 						this.object.children[0].rotation.y=(this.object.children[0].rotation.y-10*Math.PI/180)%(2*pai);
 					else 
 						this.object.children[0].rotation.y=(this.object.children[0].rotation.y+10*Math.PI/180)%(2*pai);
-				}	
-				
-				// console.log("angle = "+cd+"quadratn="+quadrant);
-			 // 	console.log("actualMoveSpeed = "+actualMoveSpeed);
-			 // 	console.log("direction = "+this.object.children[0].rotation.y);
+				}
 			} 
 
 			if ( this.moveUp ) this.object.translateY( actualMoveSpeed );
