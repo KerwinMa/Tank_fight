@@ -57,16 +57,34 @@ function TankServer() {
 	  ===================*/
 	var gameLoop = function() {
 		// Check if ball is moving
-		if (ball.isMoving()) {
+		//if (ball.isMoving()) {
 			// Grab players
-			var p1 = getPlayer(1);
-			var p2 = getPlayer(2);
+		var p1 = getPlayer(1);
+		var p2 = getPlayer(2);
 
-		} else {
-			// Reset
-			console.log("resetGame");
-			resetGame();
-		}
+		var send1 = {
+			myX: p1.tank.x,
+			myZ: p1.tank.z,
+			myRot: p1.tank.rotationY,
+			oppX: p2.tank.x,
+			oppZ: p2.tank.z,
+			oppRot: p2.tank.rotationY,
+		};
+		var send2 = {
+			myX: p2.tank.x,
+			myZ: p2.tank.z,
+			myRot: p2.tank.rotationY,
+			oppX: p1.tank.x,
+			oppZ: p1.tank.z,
+			oppRot: p1.tank.rotationY,
+		};
+		io.sockets.socket(p1.sid).emit('update', send1);
+		io.sockets.socket(p2.sid).emit('update', send2);
+		// } else {
+		// 	// Reset
+		// 	console.log("resetGame");
+		// 	resetGame();
+		// }
 	}
 
 	/*==================
@@ -154,7 +172,6 @@ function TankServer() {
 				} else {
 					// Sends to everyone connected to server except the client
 					socket.broadcast.emit('serverMsg', {msg: "There is now " + count + " players."});
-					//var startPosX, startPosZ, oppStartPosX, oppStartPosZ;
 					var startPosX1 = -500;
 					var startPosZ1 = -500;
 					var startPosX2 = 0;
@@ -203,17 +220,18 @@ function TankServer() {
 							console.log("Not enough players!");
 							socket.emit('serverMsg', {msg: "Not enough players!"});
 						} else {						
-							console.log("Let the games begin!");
+							console.log("Let the games begin!");							
 							startTime = Date.now();
-							gameInterval = setInterval(function() {gameLoop();}, 1000/Game.FRAME_RATE);
+							io.sockets.emit('startGame', {sTime: startTime});
+							gameInterval = setInterval(function() {gameLoop();}, 100);
 						}
 					});
 
 				// Upon receiving a message tagged with "move", along with an obj "data"
 				socket.on('move',
 					function(data) {
+						console.log(data);
 						players[socket.id].tank.move(data.newX, data.newZ, data.rotY);
-						//console.log("move to new position");
 					});
 
 				// Upon receiving a message tagged with "delay", along with an obj "data"

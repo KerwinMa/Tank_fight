@@ -36,7 +36,9 @@ function TankClient(){
 	var bullets = [];
 	var sphereMaterial = new THREE.MeshBasicMaterial({color: 0x333333});
 	var sphereGeo = new THREE.SphereGeometry(5, 30, 30);
-	
+
+	var gameStarted = false;
+	var gameStartTime = 0;
 
 	this.loader.options.convertUpAxis = true;
 
@@ -46,24 +48,22 @@ function TankClient(){
 		dae2 = new THREE.Object3D();
 		dae.clone(dae2);
 		dae.scale.x = dae.scale.y = dae.scale.z = 30;
-		dae.position.x = 0;
+		dae.position.x = dae.startX = -500;
 		dae.position.y = 0;
-		dae.position.z = 0;
+		dae.position.z = dae.startZ = -500;
 		dae.rotation.y=0;
 		dae.updateMatrix();
 		dae.id=1;
 		obj.add(dae);
-		dae.rotation.y =  Math.PI/2;
 		obj2 = new THREE.Object3D();
 		dae2.scale.x = dae2.scale.y = dae2.scale.z = 30;
-		dae2.position.x = 0;
+		dae2.position.x = dae2.startX = 0;
 		dae2.position.y = 0;	
-		dae2.position.z = 0;
+		dae2.position.z = dae2.startZ= 0;
 		dae2.rotation.y=0;
 		dae2.updateMatrix();
 		dae2.id=2;
 		obj2.add(dae2);
-		dae2.rotation.y =  Math.PI/2;	
 		that.init();
 		that.animate();
 	} );
@@ -75,7 +75,6 @@ function TankClient(){
 		// Attempts to connect to game server
 		try {
 			socket = io.connect("http://" + Game.SERVER_NAME + ":" + Game.PORT);
-			//network_init = true;
 			//pinging and stuff like that.
 			// var curTime = Date.now();
 			// socket.emit("ping", {x: curTime});)
@@ -102,26 +101,21 @@ function TankClient(){
 					sOppTank = new Tank(data.xValue1, data.zValue1);
 					cMyTank = new Tank(data.xValue2, data.zValue2);
 				}
-				console.log(data);				
-				dae.position.x = data.xValue1;
-				dae.position.z = data.zValue1;
-				dae.startX = data.xValue1;
-				dae.startZ = data.zValue1;
-				dae2.position.x = data.xValue2;
-				dae2.position.z = data.zValue2;
-				dae2.startX = data.xValue2;
-				dae2.startZ = data.zValue2;
-				console.log(obj);
+				console.log("obj rot" + obj2.rotation.y);
+				console.log("dae rot" + dae2.rotation.y);
 				
-				if(data.playerNo === 2) {
+				if(cID === 2) {
 					controls = new THREE.FirstPersonControls(obj2);
-					controls.movementSpeed = 5000;
+					controls.movementSpeed = 0;
 					controls.lookSpeed = 0;
 					controls.lookVertical = false; 
 					controls.noFly = true;
 					controls.activeLook = false;
+					dae2.rotation.y=Math.PI/2;
 				}
 
+				console.log("obj rot" + obj2.rotation.y);
+				console.log("dae rot" + dae2.rotation.y);
 				setInterval(function() {
 					updateServer();
 				}, 50);
@@ -129,7 +123,23 @@ function TankClient(){
 
 			// Upon receiving a message tagged with "update", along with an obj "data"
 			socket.on("update", function(data) {
-				//updateStates(data);
+				if(cID===1) {
+					obj2.position.x = data.oppX;
+					obj2.position.z = data.oppZ;
+					dae2.rotation.y = data.oppRot + Math.PI/2;
+				}
+				else {
+					obj.position.x = data.oppX;
+					obj.position.z = data.oppZ;
+					dae.rotation.y = data.oppRot;
+				}				
+			});
+
+			socket.on("startGame", function(data) {
+				gameStarted = true;
+				controls.movementSpeed = 5000;
+				gameStartTime = data.sTime;
+				console.log("Game started!");
 			});
 
 			socket.on("endGame", function(data) {
@@ -164,16 +174,21 @@ function TankClient(){
 
 		document.addEventListener("click", function(e) {
 			e.preventDefault;
-			if (e.which === 1) { // Left click only
-				createBullet();
+			if(gameStarted) {
+				if (e.which === 1) { // Left click only
+					createBullet();
 				}
-			}, false);
+			} else {
+				socket.emit("start", {});
+			}
+			
+		}, false);
 
 		scene.add(obj);
 		scene.add(obj2);
 
 		controls = new THREE.FirstPersonControls(obj);
-		controls.movementSpeed = 5000;
+		controls.movementSpeed = 0;
 		controls.lookSpeed = 0;
 		controls.lookVertical = false; 
 		controls.noFly = true;
@@ -272,13 +287,11 @@ function TankClient(){
 		
 		if(cID==2)
 		{
-		sphere.position.set(obj2.position.x+dae2.position.x, obj2.position.y+dae2.position.y+25, obj2.position.z-dae2.position.z);
-		var degree=Math.ceil((dae2.rotation.y%(2*Math.PI))*(180/Math.PI));	
-		
-		sphere.velX=-vel*Math.sin(dae2.rotation.y%(2*Math.PI));
-		sphere.velZ=-vel*Math.cos(dae2.rotation.y%(2*Math.PI));
-
+			sphere.position.set(obj2.position.x+dae2.position.x, obj2.position.y+dae2.position.y+25, obj2.position.z-dae2.position.z);
+			var degree=Math.ceil((dae2.rotation.y%(2*Math.PI))*(180/Math.PI));	
 			
+			sphere.velX=-vel*Math.sin(dae2.rotation.y%(2*Math.PI));
+			sphere.velZ=-vel*Math.cos(dae2.rotation.y%(2*Math.PI));			
 		}
 		bullets.push(sphere);
 		scene.add(sphere);
@@ -287,6 +300,7 @@ function TankClient(){
 
 	function setupScene() {
 		var units = myMap.mapW;
+
 		// Geometry: floor
 		var floor = new THREE.Mesh(
 				new THREE.CubeGeometry(units * (myMap.UNITSIZE), 1, units * (myMap.UNITSIZE)),
@@ -300,6 +314,7 @@ function TankClient(){
 		                 new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture('wall-1.jpg')}),
 		                 new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture('wall-1.jpg')}),
 		                 ];
+
 		for (var i = 0; i < myMap.mapW; i++) {
 			for (var j = 0, m = myMap.map[i].length; j < m; j++) {
 				if (myMap.map[i][j]) {
@@ -330,7 +345,10 @@ function TankClient(){
 	}
 
 	function updateServer() {
-		socket.emit("move", {newX: obj.position.x, newZ: obj.position.z, rotY: obj.rotation.y});
+		if(cID===1)
+			socket.emit("move", {newX: obj.position.x, newZ: obj.position.z, rotY: dae.rotation.y});
+		else
+			socket.emit("move", {newX: obj2.position.x, newZ: obj2.position.z, rotY: dae2.rotation.y});
 	}
 }
 
