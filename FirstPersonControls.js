@@ -207,16 +207,11 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 		} else {
 
 			if ( this.heightSpeed ) {
-
 				var y = THREE.Math.clamp( this.object.position.y, this.heightMin, this.heightMax );
 				var heightDelta = y - this.heightMin;
-
 				this.autoSpeedFactor = delta * ( heightDelta * this.heightCoef );
-
 			} else {
-
 				this.autoSpeedFactor = 0.0;
-
 			}
 
 			actualMoveSpeed = delta * this.movementSpeed;
@@ -228,7 +223,6 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 				
 				if((cd<pai/2+da&&cd>pai/2-da)||(cd<-1.5*pai+da&&cd>-1.5*pai-da))
 				{
-					
 					var corner1=this.object.position.clone();
 					var corner2=this.object.position.clone();
 					corner1.x+=this.object.children[0].startX; corner2.x+=this.object.children[0].startX;
@@ -287,8 +281,10 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 					corner1.x+=this.object.children[0].startX; corner2.x+=this.object.children[0].startX;
 					corner1.z-=this.object.children[0].startZ;corner2.z-=this.object.children[0].startZ;
 					//tank dimensions
-					corner1.z-=tankHalfH;corner1.x-=tankHalfW;
-					corner2.z-=tankHalfH;corner2.x+=tankHalfW;
+					corner1.z-=tankHalfH;
+					corner1.x-=tankHalfW;
+					corner2.z-=tankHalfH;
+					corner2.x+=tankHalfW;
 					if(!myMap.checkWallCollision(corner1)&&!myMap.checkWallCollision(corner2))
 					{
 						this.object.translateX( actualMoveSpeed );
@@ -307,8 +303,10 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 				{
 					var corner1=this.object.position.clone();
 					var corner2=this.object.position.clone();
-					corner1.x+=this.object.children[0].startX; corner2.x+=this.object.children[0].startX;
-					corner1.z-=this.object.children[0].startZ;corner2.z-=this.object.children[0].startZ;
+					corner1.x+=this.object.children[0].startX; 
+					corner2.x+=this.object.children[0].startX;
+					corner1.z-=this.object.children[0].startZ;
+					corner2.z-=this.object.children[0].startZ;
 					//tank dimensions
 					corner1.z+=tankHalfH;corner1.x-=tankHalfW;
 					corner2.z+=tankHalfH;corner2.x+=tankHalfW;

@@ -228,18 +228,22 @@ function TankServer() {
 					});
 
 				// Upon receiving a message tagged with "move", along with an obj "data"
-				socket.on('move',
-					function(data) {
+				socket.on('move', function(data) {
 						//console.log(data);
-						players[socket.id].tank.move(data.newX, data.newZ, data.rotY);
-					});
+					players[socket.id].tank.move(data.newX, data.newZ, data.rotY);
+				});
+
+				// socket.on('bullet',
+				// 	function(data) {
+				// 		//console.log(data);
+				// 		socket.broadcast.emit("bullet",{bullets: data.bullets});
+				// 	});
 
 				// Upon receiving a message tagged with "delay", along with an obj "data"
-				socket.on('delay',
-					function(data) {
-						players[socket.id].setDelay(data.delay);
-						pause = data.pause;
-					});
+				socket.on('delay', function(data) {
+					players[socket.id].setDelay(data.delay);
+					pause = data.pause;
+				});
 			});
 		} catch (e) {
 			console.log("Cannot listen to " + port + "\n" + e);

@@ -13,7 +13,7 @@ function TankClient(){
 	var camera, scene, renderer, objects, controls,projector;
 	var particleLight, pointLight;
 	var clock = new THREE.Clock();
-	var cID;
+	var cID = 1;
 	var sMyTank, sOppTank, cMyTank; //Tank objects in game 
 
 	//for loading tank
@@ -39,6 +39,8 @@ function TankClient(){
 
 	var gameStarted = false;
 	var gameStartTime = 0;
+
+	var disconnected = false;
 
 	$(document).ready(function() {
 		$('body').append('<div id="intro">Click to start</div>');
@@ -70,7 +72,9 @@ function TankClient(){
 		dae2.id=2;
 		obj2.add(dae2);
 		init();
-		animate();
+		setInterval(function() {
+				render();
+			}, 1000/60); //Request animation frame is 60fps
 	} );
 
 	/*=====================
@@ -146,6 +150,16 @@ function TankClient(){
 				$('#intro').fadeOut();
 			});
 
+			socket.on("bullet", function(data){
+				// console.log("before concat: ");
+				// console.log(bullets);
+				// console.log(data.bullets);
+
+				// bullets=bullets.concat(data.bullets);
+				// console.log("after concat: ");
+				// console.log(bullets);
+			});
+
 			socket.on("endGame", function(data) {
 
 			});
@@ -153,6 +167,7 @@ function TankClient(){
 			// Upon disconnecting from server
 			socket.on("disconnect", function() {
 				console.log("You have disconnected from game server.");
+				disconnected = true;
 			});
 
 		} catch (e) {
@@ -166,7 +181,7 @@ function TankClient(){
 		container = document.createElement('div');
 		document.body.appendChild(container);
 		
-		camera = new THREE.OrthographicCamera( window.innerWidth/-1 , window.innerWidth/1, window.innerHeight/1, window.innerHeight/-1, -1000, 1000 );
+		camera = new THREE.OrthographicCamera(window.innerWidth/-1 , window.innerWidth/1, window.innerHeight/1, window.innerHeight/-1, -1000, 1000 );
 		camera.position.x = 55; //60
 		camera.position.y = 45; //45
 		camera.position.z = 0;
@@ -180,12 +195,22 @@ function TankClient(){
 			e.preventDefault;
 			if(gameStarted) {
 				if (e.which === 1) { // Left click only
-					createBullet();
+					createBullet(cID);
+					console.log("click");
+					//socket.emit("bullet",{bullets: bullets});
 				}
 			} else {
 				socket.emit("start", {});
-			}
-			
+			}			
+		}, false);
+
+		document.addEventListener("keydown", function(e) {
+			e.preventDefault;
+			console.log(e.keyCode);
+			if(gameStarted && e.keyCode === 32) {
+				createBullet(cID);
+				//socket.emit("bullet",{bullets: bullets});
+			}		
 		}, false);
 
 		scene.add(obj);
@@ -221,36 +246,20 @@ function TankClient(){
 	}
 
 	function onWindowResize() {
-
 		camera.aspect = window.innerWidth / window.innerHeight;
 		camera.updateProjectionMatrix();
 
 		renderer.setSize( window.innerWidth, window.innerHeight );
-	}
-
-
-	function animate() {
-
-		var delta = clock.getDelta();
-
-		requestAnimationFrame(animate);
-
-		if ( t > 1 ) t = 0;
-
-		if ( skin ) {
-			for ( var i = 0; i < skin.morphTargetInfluences.length; i++ ) {
-				skin.morphTargetInfluences[ i ] = 0;
-			}
-			skin.morphTargetInfluences[ Math.floor( t * 30 ) ] = 1;
-			t += delta;
-		}
-
-		render();
-		stats.update();
+		$('#intro, #hurt').css({width: window.innerWidth, height: window.innerHeight});
 	}
 
 	function render() {
-
+		if(disconnected) {
+			$(renderer.domElement).fadeOut();
+			$('#intro').fadeIn();
+			$('#intro').html('You have been disconnected!');
+			return;
+		}
 		var timer = Date.now() * 0.0005;
 		var delta = clock.getDelta();
 		controls.update(0.001);
@@ -273,29 +282,31 @@ function TankClient(){
 			}
 			console.log(bullets);
 		}
-		renderer.render( scene, camera );
-
+		renderer.render(scene, camera);
+		stats.update();		
 	}
 	
 
-	function createBullet() {
-		
+	function createBullet(player) {
 		var sphere = new THREE.Mesh(sphereGeo, sphereMaterial);
-		sphere.position.set(obj.position.x+dae.position.x, obj.position.y+dae.position.y+25, obj.position.z-dae.position.z);
-		
-		var degree=Math.ceil((dae.rotation.y%(2*Math.PI))*(180/Math.PI));	
-		
-		sphere.velX=-vel*Math.sin(dae.rotation.y%(2*Math.PI));
-		sphere.velZ=-vel*Math.cos(dae.rotation.y%(2*Math.PI));
-		
-		if(cID==2)
-		{
-			sphere.position.set(obj2.position.x+dae2.position.x, obj2.position.y+dae2.position.y+25, obj2.position.z-dae2.position.z);
-			var degree=Math.ceil((dae2.rotation.y%(2*Math.PI))*(180/Math.PI));	
-			
-			sphere.velX=-vel*Math.sin(dae2.rotation.y%(2*Math.PI));
-			sphere.velZ=-vel*Math.cos(dae2.rotation.y%(2*Math.PI));			
+		var sphX, sphY, sphZ, degree;
+
+		if(player===1) {
+			sphX = obj.position.x+dae.position.x;
+			sphY = obj.position.y+dae.position.y+25;
+			sphZ = obj.position.z-dae.position.z;
+			degree = dae.rotation.y%(2*Math.PI)
 		}
+		else {
+			sphX = obj2.position.x+dae2.position.x;
+			sphY = obj2.position.y+dae2.position.y+25;
+			sphZ = obj2.position.z-dae2.position.z;
+			degree = dae2.rotation.y%(2*Math.PI)
+		}
+		
+		sphere.position.set(sphX, sphY, sphZ);
+		sphere.velX = -vel*Math.sin(degree);
+		sphere.velZ = -vel*Math.cos(degree);
 		bullets.push(sphere);
 		scene.add(sphere);
 		return sphere;
@@ -306,17 +317,17 @@ function TankClient(){
 
 		// Geometry: floor
 		var floor = new THREE.Mesh(
-				new THREE.CubeGeometry(units * (myMap.UNITSIZE), 1, units * (myMap.UNITSIZE)),
-				new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture('wall-2.jpg')})
+			new THREE.CubeGeometry(units * (myMap.UNITSIZE), 1, units * (myMap.UNITSIZE)),
+			new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture('wall-2.jpg')})
 		);
 		scene.add(floor);
 	 	
 		// Geometry: walls
 		var cube = new THREE.CubeGeometry(myMap.UNITSIZE, myMap.WALLHEIGHT, myMap.UNITSIZE);
 		var materials = [
-		                 new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture('wall-1.jpg')}),
-		                 new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture('wall-1.jpg')}),
-		                 ];
+             new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture('wall-1.jpg')}),
+             new THREE.MeshLambertMaterial({map: THREE.ImageUtils.loadTexture('wall-1.jpg')}),
+        ];
 
 		for (var i = 0; i < myMap.mapW; i++) {
 			for (var j = 0, m = myMap.map[i].length; j < m; j++) {
@@ -352,21 +363,6 @@ function TankClient(){
 		else
 			socket.emit("move", {newX: obj2.position.x, newZ: obj2.position.z, rotY: dae2.rotation.y});
 	}
-
-	// // Handle window resizing
-	// $(window).resize(function() {
-	// 	WIDTH = window.innerWidth;
-	// 	HEIGHT = window.innerHeight;
-	// 	ASPECT = WIDTH / HEIGHT;
-	// 	if (camera) {
-	// 		camera.aspect = ASPECT;
-	// 		camera.updateProjectionMatrix();
-	// 	}
-	// 	if (renderer) {
-	// 		renderer.setSize(WIDTH, HEIGHT);
-	// 	}
-	// 	$('#intro, #hurt').css({width: WIDTH, height: HEIGHT,});
-	// });
 }
 
 // This will auto run after this script is loaded
