@@ -15,12 +15,12 @@ function TankClient(){
 	var clock = new THREE.Clock();
 	var cID;
 	var sMyTank, sOppTank, cMyTank; //Tank objects in game 
-	var that = this;
+
 	//for loading tank
 	var dae, skin, obj, dae2, skin2, obj2;
 
 	var vel=7,velX, velZ;
-	this.loader = new THREE.ColladaLoader();
+	var loader = new THREE.ColladaLoader();
 	var myMap = new Map();
 
 	//AI for tanks
@@ -40,9 +40,14 @@ function TankClient(){
 	var gameStarted = false;
 	var gameStartTime = 0;
 
-	this.loader.options.convertUpAxis = true;
+	$(document).ready(function() {
+		$('body').append('<div id="intro">Click to start</div>');
+		$('#intro').css({width: WIDTH, height: HEIGHT});
+	});
 
-	this.loader.load( './models/simple_tank1.dae', function ( collada ) {
+	loader.options.convertUpAxis = true;
+
+	loader.load( './models/simple_tank1.dae', function ( collada ) {
 		obj = new THREE.Object3D();
 		dae = collada.scene;
 		dae2 = new THREE.Object3D();
@@ -64,8 +69,8 @@ function TankClient(){
 		dae2.updateMatrix();
 		dae2.id=2;
 		obj2.add(dae2);
-		that.init();
-		that.animate();
+		init();
+		animate();
 	} );
 
 	/*=====================
@@ -101,8 +106,6 @@ function TankClient(){
 					sOppTank = new Tank(data.xValue1, data.zValue1);
 					cMyTank = new Tank(data.xValue2, data.zValue2);
 				}
-				console.log("obj rot" + obj2.rotation.y);
-				console.log("dae rot" + dae2.rotation.y);
 				
 				if(cID === 2) {
 					controls = new THREE.FirstPersonControls(obj2);
@@ -140,6 +143,7 @@ function TankClient(){
 				controls.movementSpeed = 5000;
 				gameStartTime = data.sTime;
 				console.log("Game started!");
+				$('#intro').fadeOut();
 			});
 
 			socket.on("endGame", function(data) {
@@ -158,7 +162,7 @@ function TankClient(){
 	}
 
 	//initGame
-	this.init = function() {
+	function init() {
 		container = document.createElement('div');
 		document.body.appendChild(container);
 		
@@ -225,11 +229,11 @@ function TankClient(){
 	}
 
 
-	this.animate = function() {
+	function animate() {
 
 		var delta = clock.getDelta();
 
-		requestAnimationFrame( that.animate );
+		requestAnimationFrame(animate);
 
 		if ( t > 1 ) t = 0;
 
@@ -254,9 +258,7 @@ function TankClient(){
 
 		//Simple bullet moving
 		for(var i = bullets.length-1; i >= 0; i--)
-		{
-			
-			
+		{			
 			var b=bullets[i];
 			if (myMap.checkWallCollision(b.position)) 
 			{
@@ -269,6 +271,7 @@ function TankClient(){
 				b.translateX(b.velX);
 				b.translateZ(b.velZ);
 			}
+			console.log(bullets);
 		}
 		renderer.render( scene, camera );
 
@@ -340,8 +343,7 @@ function TankClient(){
 		// rendInterval = undefined;
 		// simInterval = undefined;
 		// Initialize network and GUI
-		//if(network_init == false)
-			initNetwork();
+		initNetwork();
 	}
 
 	function updateServer() {
@@ -350,9 +352,25 @@ function TankClient(){
 		else
 			socket.emit("move", {newX: obj2.position.x, newZ: obj2.position.z, rotY: dae2.rotation.y});
 	}
+
+	// // Handle window resizing
+	// $(window).resize(function() {
+	// 	WIDTH = window.innerWidth;
+	// 	HEIGHT = window.innerHeight;
+	// 	ASPECT = WIDTH / HEIGHT;
+	// 	if (camera) {
+	// 		camera.aspect = ASPECT;
+	// 		camera.updateProjectionMatrix();
+	// 	}
+	// 	if (renderer) {
+	// 		renderer.setSize(WIDTH, HEIGHT);
+	// 	}
+	// 	$('#intro, #hurt').css({width: WIDTH, height: HEIGHT,});
+	// });
 }
 
 // This will auto run after this script is loaded
 // Run Client. Give leeway of 0.1 second for libraries to load
 var client = new TankClient();
 setTimeout(function() {client.start();}, 1000);
+

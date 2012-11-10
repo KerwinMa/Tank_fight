@@ -230,7 +230,7 @@ function TankServer() {
 				// Upon receiving a message tagged with "move", along with an obj "data"
 				socket.on('move',
 					function(data) {
-						console.log(data);
+						//console.log(data);
 						players[socket.id].tank.move(data.newX, data.newZ, data.rotY);
 					});
 
