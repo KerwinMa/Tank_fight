@@ -9,17 +9,15 @@ function TankClient(){
 	var socket;			// socket used to connect to server
 	var delay;			// delay simulated on current client
 	var pause = false;
-	var setted=false;
 	var container, stats;
 	var camera, scene, renderer, objects, controls,projector;
 	var particleLight, pointLight;
 	var clock = new THREE.Clock();
-	var network_init = false;
 	var cID;
 	var sMyTank, sOppTank, cMyTank; //Tank objects in game 
 	var that = this;
 	//for loading tank
-	var dae, skin, obj, dae2, skin2, obj2, mouse = { x: 0, y: 0 };
+	var dae, skin, obj, dae2, skin2, obj2;
 
 	var vel=7,velX, velZ;
 	this.loader = new THREE.ColladaLoader();
@@ -32,7 +30,6 @@ function TankClient(){
 	var WIDTH = window.innerWidth,
 	HEIGHT = window.innerHeight,
 	ASPECT = WIDTH / HEIGHT;
-	var cloaded = false;
 	var t = 0;
 
 	//Bullets
@@ -44,9 +41,9 @@ function TankClient(){
 	this.loader.options.convertUpAxis = true;
 
 	this.loader.load( './models/simple_tank1.dae', function ( collada ) {
-		if(cloaded) {
-			return;
-		}
+		// if(cloaded) {
+		// 	return;
+		// }
 		obj = new THREE.Object3D();
 		dae = collada.scene;
 		dae2 = new THREE.Object3D();
@@ -76,7 +73,7 @@ function TankClient(){
 		console.log(dae2);
 		that.init();
 		that.animate();
-		cloaded = true;
+		//cloaded = true;
 	} );
 
 	/*=====================
@@ -86,7 +83,7 @@ function TankClient(){
 		// Attempts to connect to game server
 		try {
 			socket = io.connect("http://" + Game.SERVER_NAME + ":" + Game.PORT);
-			network_init = true;
+			//network_init = true;
 			//pinging and stuff like that.
 			// var curTime = Date.now();
 			// socket.emit("ping", {x: curTime});)
@@ -125,26 +122,15 @@ function TankClient(){
 				// 	dae.clone(dae2);
 
 				// 	dae.scale.x = dae.scale.y = dae.scale.z = Tank.Scale;
-				console.log(data);
-				//if(data.playerNo ===1) {					
-					dae.position.x = data.xValue1;
-					dae.position.z = data.zValue1;
-					dae.startX = data.xValue1;
-					dae.startZ = data.zValue1;
-					dae2.position.x = data.xValue2;
-					dae2.position.z = data.zValue2;
-					dae2.startX = data.xValue2;
-					dae2.startZ = data.zValue2;
-				//}
-				/* else 
-				{
-					dae.position.x = data.xValue2;
-					dae.position.z = data.zValue2;
-					dae.startX = data.xValue2;
-					dae.startZ = data.zValue2;
-					dae2.position.x = data.xValue1;
-					dae2.position.z = data.zValue1;						
-				}*/
+				console.log(data);				
+				dae.position.x = data.xValue1;
+				dae.position.z = data.zValue1;
+				dae.startX = data.xValue1;
+				dae.startZ = data.zValue1;
+				dae2.position.x = data.xValue2;
+				dae2.position.z = data.zValue2;
+				dae2.startX = data.xValue2;
+				dae2.startZ = data.zValue2;
 				console.log(obj);
 				
 				if(data.playerNo === 2) {
@@ -159,24 +145,6 @@ function TankClient(){
 				setInterval(function() {
 					updateServer();
 				}, 50);
-				// dae.position.y = 0;
-				//dae.updateMatrix();
-				//obj.updateMatrix();
-				// obj.add(dae);
-				// dae.rotation.y =  Math.PI/2;
-
-				// obj2 = new THREE.Object3D();
-				// dae2.scale.x = dae2.scale.y = dae2.scale.z = Tank.Scale;
-				// dae2.position.y = 0;
-				//dae2.updateMatrix();	
-				//obj2.updateMatrix();
-				// 	obj2.add(dae2);
-				// 	dae2.rotation.y =  Math.PI/2;	
-				// 	console.log(dae);
-				// 	console.log(dae2);
-				// 	init();
-				// 	animate();
-				// } );
 			});
 
 			// Upon receiving a message tagged with "update", along with an obj "data"
@@ -211,24 +179,16 @@ function TankClient(){
 		camera.position.z = 0;
 
 		scene = new THREE.Scene();
-		if(!setted)
-		{
-			setupScene();
-			setted=true;
-		}
-		/*if(THREEx.FullScreen.available()) {
-			THREEx.FullScreen.request();
-			console.log("FullScreen");
-		}*/
+
+		setupScene();
 		projector = new THREE.Projector();
 
-		
-		$(document).click(function(e) {
+		document.addEventListener("click", function(e) {
 			e.preventDefault;
 			if (e.which === 1) { // Left click only
 				createBullet();
 				}
-		});
+			}, false);
 
 		scene.add(obj);
 		scene.add(obj2);
@@ -316,13 +276,6 @@ function TankClient(){
 				b.translateZ(b.velZ);
 			}
 		}
-		//move the bots
-		// var r = Math.random();
-		// obj2.lastRandomX = Math.random() * 2 - 1;
-		// obj2.lastRandomZ = Math.random() * 2 - 1;
-		
-		// obj2.translateX(aispeed * obj2.lastRandomX);
-		// obj2.translateZ(aispeed * obj2.lastRandomZ);
 		renderer.render( scene, camera );
 
 	}
@@ -396,7 +349,7 @@ function TankClient(){
 		// rendInterval = undefined;
 		// simInterval = undefined;
 		// Initialize network and GUI
-		if(network_init == false)
+		//if(network_init == false)
 			initNetwork();
 	}
 

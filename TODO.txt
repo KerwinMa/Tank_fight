@@ -1,16 +1,6 @@
-serik
--separate UI and control in FirstPersonControl 
-[Suggestion: Add another funtion to tank.js, with the logic in firstpersoncontrols. Here no translateX or rotateX, just add to the position/rotation of the tank. Position.x/z & rotation.y]
--bullets should start from current player
-
-
 -client should notify server of all moves, bullet creation
 -run the game on server
 -server should update the client
-
-Bug: 
--2 scenes are still being created. 
--bug in socket.
 
 
 Blackberry:
