@@ -1,5 +1,3 @@
-1/11/2012
-
 serik
 -separate UI and control in FirstPersonControl 
 [Suggestion: Add another funtion to tank.js, with the logic in firstpersoncontrols. Here no translateX or rotateX, just add to the position/rotation of the tank. Position.x/z & rotation.y]
@@ -12,6 +10,7 @@ serik
 
 Bug: 
 -2 scenes are still being created. 
+-bug in socket.
 
 
 Blackberry:

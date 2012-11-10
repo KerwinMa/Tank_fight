@@ -27,14 +27,11 @@ function Tank(posX, posZ){
 /*=============
   move [Public]
   =============*/
-/*Tank.prototype.move = function(newx, newz) {
-	if (newx < Paddle.WIDTH/2)
-		this.x = Paddle.WIDTH/2;
-	else if (newx > Pong.WIDTH - Paddle.WIDTH/2)
-		this.x = Pong.WIDTH - Paddle.WIDTH/2;
-	else
-		this.x = newx;
-}*/
+Tank.prototype.move = function(newx, newz, rotY) {
+	this.x = newx;
+	this.z = newz;
+	this.rotationY = rotY;
+}
 
 // For node.js require
 global.Tank = Tank;

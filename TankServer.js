@@ -154,11 +154,11 @@ function TankServer() {
 				} else {
 					// Sends to everyone connected to server except the client
 					socket.broadcast.emit('serverMsg', {msg: "There is now " + count + " players."});
-					var startPosX, startPosZ, oppStartPosX, oppStartPosZ;
-					startPosX1 = -500;
-					startPosZ1 = -500;
-					startPosX2 = 0;
-					startPosZ2 = 0;
+					//var startPosX, startPosZ, oppStartPosX, oppStartPosZ;
+					var startPosX1 = -500;
+					var startPosZ1 = -500;
+					var startPosX2 = 0;
+					var startPosZ2 = 0;
 
 					// Send message to new player (the current client)
 					socket.emit('serverMsg', {msg: "You are Player " + nextPID});
@@ -210,11 +210,11 @@ function TankServer() {
 					});
 
 				// Upon receiving a message tagged with "move", along with an obj "data"
-				// socket.on('move',
-				// 	function(data) {
-				// 		//do something to move
-				// 		//players[socket.id].getDelay());
-				// 	});
+				socket.on('move',
+					function(data) {
+						players[socket.id].tank.move(data.newX, data.newZ, data.rotY);
+						//console.log("move to new position");
+					});
 
 				// Upon receiving a message tagged with "delay", along with an obj "data"
 				socket.on('delay',

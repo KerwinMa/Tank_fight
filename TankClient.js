@@ -1,5 +1,6 @@
 // Load libraries
 var lib_path = "./";
+console.log("loading files...");
 loadScript(lib_path, "Tank.js");
 loadScript("", "http://" + Game.SERVER_NAME + ":" + Game.PORT + "/socket.io/socket.io.js");
 
@@ -16,12 +17,12 @@ function TankClient(){
 	var network_init = false;
 	var cID;
 	var sMyTank, sOppTank, cMyTank; //Tank objects in game 
-
+	var that = this;
 	//for loading tank
 	var dae, skin, obj, dae2, skin2, obj2, mouse = { x: 0, y: 0 };
 
 	var vel=7,velX, velZ;
-	var loader = new THREE.ColladaLoader();
+	this.loader = new THREE.ColladaLoader();
 	var myMap = new Map();
 
 	//AI for tanks
@@ -31,7 +32,7 @@ function TankClient(){
 	var WIDTH = window.innerWidth,
 	HEIGHT = window.innerHeight,
 	ASPECT = WIDTH / HEIGHT;
-
+	var cloaded = false;
 	var t = 0;
 
 	//Bullets
@@ -40,11 +41,13 @@ function TankClient(){
 	var sphereGeo = new THREE.SphereGeometry(5, 30, 30);
 	
 
-	loader.options.convertUpAxis = true;
+	this.loader.options.convertUpAxis = true;
 
-	loader.load( './models/simple_tank1.dae', function ( collada ) {
+	this.loader.load( './models/simple_tank1.dae', function ( collada ) {
+		if(cloaded) {
+			return;
+		}
 		obj = new THREE.Object3D();
-		console.log(collada.scene);
 		dae = collada.scene;
 		dae2 = new THREE.Object3D();
 		dae.clone(dae2);
@@ -71,8 +74,9 @@ function TankClient(){
 		dae2.rotation.y =  Math.PI/2;	
 		console.log(dae);
 		console.log(dae2);
-		init();
-		animate();
+		that.init();
+		that.animate();
+		cloaded = true;
 	} );
 
 	/*=====================
@@ -121,26 +125,26 @@ function TankClient(){
 				// 	dae.clone(dae2);
 
 				// 	dae.scale.x = dae.scale.y = dae.scale.z = Tank.Scale;
-
-				// if(data.playerNo ===1) {
+				console.log(data);
+				if(data.playerNo ===1) {					
 					dae.position.x = data.xValue1;
 					dae.position.z = data.zValue1;
 					dae.startX = data.xValue1;
 					dae.startZ = data.zValue1;
-
 					dae2.position.x = data.xValue2;
 					dae2.position.z = data.zValue2;
 					dae2.startX = data.xValue2;
 					dae2.startZ = data.zValue2;
-				// } else {
-				// 	dae.position.x = data.xValue2;
-				// 	dae.position.z = data.zValue2;
-				// 	dae.startX = data.xValue2;
-				// 	dae.startZ = data.zValue2;
-				// 	dae2.position.x = data.xValue1;
-				// 	dae2.position.z = data.zValue1;						
-				// }
-
+				} else {
+					dae.position.x = data.xValue2;
+					dae.position.z = data.zValue2;
+					dae.startX = data.xValue2;
+					dae.startZ = data.zValue2;
+					dae2.position.x = data.xValue1;
+					dae2.position.z = data.zValue1;						
+				}
+				console.log(obj);
+/*				
 				if(data.playerNo === 2) {
 					controls = new THREE.FirstPersonControls(obj2);
 					controls.movementSpeed = 5000;
@@ -148,7 +152,11 @@ function TankClient(){
 					controls.lookVertical = false; 
 					controls.noFly = true;
 					controls.activeLook = false;
-				}
+				}*/
+
+				setInterval(function() {
+					updateServer();
+				}, 50);
 				// dae.position.y = 0;
 				//dae.updateMatrix();
 				//obj.updateMatrix();
@@ -175,29 +183,23 @@ function TankClient(){
 			});
 
 			socket.on("endGame", function(data) {
-				//stoEnd = 1;
-				//remove event handlers
 
-				//appendLog("serverMsg", data.msg);
 			});
 
 			// Upon disconnecting from server
 			socket.on("disconnect", function() {
 				console.log("You have disconnected from game server.");
-
-				// Display information on HTML page
-				//appendLog("serverMsg", "You have disconnected from game server");
 			});
 
 		} catch (e) {
 			console.log("Failed to connect to " + "http://" + Game.SERVER_NAME + ":" + Game.PORT);
-			console.log("e");
+			console.log(e);
 			//appendLog("Failed to connect to " + "http://" + Pong.SERVER_NAME + ":" + Pong.PORT + ". Please refresh.");
 		}
 	}
 
 	//initGame
-	function init() {
+	this.init = function() {
 		container = document.createElement('div');
 		document.body.appendChild(container);
 		
@@ -212,10 +214,10 @@ function TankClient(){
 			setupScene();
 			setted=true;
 		}
-		if(THREEx.FullScreen.available()) {
+		/*if(THREEx.FullScreen.available()) {
 			THREEx.FullScreen.request();
 			console.log("FullScreen");
-		}
+		}*/
 		projector = new THREE.Projector();
 
 		
@@ -267,24 +269,20 @@ function TankClient(){
 	}
 
 
-	function animate() {
+	this.animate = function() {
 
 		var delta = clock.getDelta();
 
-		requestAnimationFrame( animate );
+		requestAnimationFrame( that.animate );
 
 		if ( t > 1 ) t = 0;
 
 		if ( skin ) {
-
 			for ( var i = 0; i < skin.morphTargetInfluences.length; i++ ) {
 				skin.morphTargetInfluences[ i ] = 0;
 			}
-
 			skin.morphTargetInfluences[ Math.floor( t * 30 ) ] = 1;
-
 			t += delta;
-
 		}
 
 		render();
@@ -337,7 +335,6 @@ function TankClient(){
 		var degree=Math.ceil((dae.rotation.y%(2*Math.PI))*(180/Math.PI));	
 		sphere.velX=-vel*Math.sin(dae.rotation.y%(2*Math.PI));
 		sphere.velZ=-vel*Math.cos(dae.rotation.y%(2*Math.PI));
-		
 		bullets.push(sphere);
 		scene.add(sphere);
 		return sphere;
@@ -386,11 +383,14 @@ function TankClient(){
 		if(network_init == false)
 			initNetwork();
 	}
+
+	function updateServer() {
+		socket.emit("move", {newX: obj.position.x, newZ: obj.position.z, rotY: obj.rotation.y});
+		//console.log("move");
+	}
 }
 
 // This will auto run after this script is loaded
 // Run Client. Give leeway of 0.1 second for libraries to load
 var client = new TankClient();
 setTimeout(function() {client.start();}, 1000);
-
-// vim:ts=4
