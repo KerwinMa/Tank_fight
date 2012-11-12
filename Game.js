@@ -11,5 +11,3 @@ var Game = {
 
 // For node.js require
 global.Game = Game;
-
-

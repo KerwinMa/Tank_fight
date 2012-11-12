@@ -367,4 +367,3 @@ function TankClient(){
 // Run Client. Give leeway of 0.1 second for libraries to load
 var client = new TankClient();
 setTimeout(function() {client.start();}, 1000);
-

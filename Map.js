@@ -2,12 +2,7 @@
 Note: To get actual position of the tank in map we must
 x-=500 and z+=500 from object's position.
 x increases downwards and z increases to the left.
-
-
-
 */
-
-
 
 function Map()
 {
