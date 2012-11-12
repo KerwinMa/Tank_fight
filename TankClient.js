@@ -212,7 +212,7 @@ function TankClient(){
 
 		document.addEventListener("keydown", function(e) {
 			e.preventDefault;
-			console.log(e.keyCode);
+			//console.log(e.keyCode);
 			if(gameStarted && e.keyCode === 32) {
 				createBullet(cID);
 				//socket.emit("bullet",{bullets: bullets});
@@ -286,7 +286,7 @@ function TankClient(){
 				b.translateX(b.velX);
 				b.translateZ(b.velZ);
 			}
-			console.log(bullets);
+			//console.log(bullets);
 		}
 		renderer.render(scene, camera);
 		stats.update();		
@@ -300,6 +300,7 @@ function TankClient(){
 							 objects[cID-1].position.z-objects[cID-1].children[0].position.z);
 		
 		var degree=Math.ceil((objects[cID-1].children[0].rotation.y%(2*Math.PI))*(180/Math.PI));	
+		
 		
 		sphere.velX=-vel*Math.sin(objects[cID-1].children[0].rotation.y%(2*Math.PI));
 		sphere.velZ=-vel*Math.cos(objects[cID-1].children[0].rotation.y%(2*Math.PI));

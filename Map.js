@@ -6,7 +6,7 @@ x increases downwards and z increases to the left.
 
 function Map()
 {
-	this.map = [ // 1 2 3 4 5 6 7 8 9
+	this.map = [      // 1 2 3 4 5 6 7 8 9
 			           [1, 1, 1, 1, 1, 1, 1, 1, 1, 1,], // 0
 			           [1, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 1
 			           [1, 0, 0, 0, 2, 0, 0, 0, 0, 1,], // 2
@@ -35,6 +35,7 @@ function Map()
 	this.checkWallCollision=function(v) 
 	{
 		var c = this.getMapSector(v);
+		//console.log("inside wall "+this.map[c.x][c.z] > 0);
 		return this.map[c.x][c.z] > 0;
 	}
 

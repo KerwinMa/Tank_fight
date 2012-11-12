@@ -56,7 +56,7 @@ THREE.FirstPersonControls = function ( objects,index,  domElement ) {
 	var myMap=new Map();
 	var tankHalfW=30;
 	var tankHalfH=55;
-	var tankCloseDistance=2*tankHalfH;
+	var tankCloseDistance=50;
 	if ( this.domElement !== document ) {
 
 		this.domElement.setAttribute( 'tabindex', -1 );
@@ -146,7 +146,7 @@ THREE.FirstPersonControls = function ( objects,index,  domElement ) {
 	this.onKeyDown = function ( event ) {
 
 		//event.preventDefault();
-		console.log(event.keyCode);
+		//console.log(event.keyCode);
 		switch ( event.keyCode ) {
 
 			case 38: /*up*/
@@ -231,16 +231,17 @@ THREE.FirstPersonControls = function ( objects,index,  domElement ) {
 			var quadrant=getRegion(cd);
 			var da=5*Math.PI/180;
 			var pai=Math.PI;
-			var corner1=this.object.position.clone();
-			var corner2=this.object.position.clone();
-			corner1.x-=tankHalfH;corner1.z-=tankHalfW;
-			corner2.x-=tankHalfH;corner2.z+=tankHalfW;
 			
-			corner1.x+=this.object.children[0].startX; corner2.x+=this.object.children[0].startX;
-			corner1.z-=this.object.children[0].startZ;corner2.z-=this.object.children[0].startZ;
 			
 				
 			if ( this.moveForward || ( this.autoForward && !this.moveBackward ) ){
+				var corner1=this.object.position.clone();
+				var corner2=this.object.position.clone();
+				corner1.x+=this.object.children[0].startX; corner2.x+=this.object.children[0].startX;
+				corner1.z-=this.object.children[0].startZ;corner2.z-=this.object.children[0].startZ;
+				
+				corner1.x-=tankHalfH;corner1.z+=tankHalfW;
+				corner2.x-=tankHalfH;corner2.z-=tankHalfW;
 				
 				if((cd<pai/2+da&&cd>pai/2-da)||(cd<-1.5*pai+da&&cd>-1.5*pai-da))
 				{
@@ -264,7 +265,19 @@ THREE.FirstPersonControls = function ( objects,index,  domElement ) {
 			} 
 			
 			if ( this.moveBackward ) 
-			{				
+			{	
+			var corner1=this.object.position.clone();
+			var corner2=this.object.position.clone();
+			
+			
+			corner1.x+=this.object.children[0].startX; corner2.x+=this.object.children[0].startX;
+			corner1.z-=this.object.children[0].startZ;corner2.z-=this.object.children[0].startZ;			
+				
+				corner1.x+=tankHalfH;corner1.z-=tankHalfW;
+				
+				corner2.x+=tankHalfH;corner2.z+=tankHalfW;
+				
+				
 				if((cd>1.5*pai-da&&cd<1.5*pai+da)||(cd<-0.5*pai+da&&cd>-0.5*pai-da))
 				{
 					if(!myMap.checkWallCollision(corner1)&&!myMap.checkWallCollision(corner2)&&!this.checkTankCollision(corner1))
@@ -285,6 +298,16 @@ THREE.FirstPersonControls = function ( objects,index,  domElement ) {
 
 			if ( this.moveRight ) {
 				
+				var corner1=this.object.position.clone();
+				var corner2=this.object.position.clone();
+			
+			
+			corner1.x+=this.object.children[0].startX; corner2.x+=this.object.children[0].startX;
+			corner1.z-=this.object.children[0].startZ;corner2.z-=this.object.children[0].startZ;
+				
+				corner1.x-=tankHalfW;corner1.z-=tankHalfH;
+				corner2.x+=tankHalfW;corner2.z-=tankHalfH;
+				
 				if((cd>0&&(cd<da||cd>2*pai-da))||(cd<0&&(cd>-da||cd<-2*pai+da))||cd==0)
 				{
 					
@@ -302,6 +325,14 @@ THREE.FirstPersonControls = function ( objects,index,  domElement ) {
 				}	
 			}
 			if ( this.moveLeft ){
+				var corner1=this.object.position.clone();
+			var corner2=this.object.position.clone();
+			
+			
+			corner1.x+=this.object.children[0].startX; corner2.x+=this.object.children[0].startX;
+			corner1.z-=this.object.children[0].startZ;corner2.z-=this.object.children[0].startZ;
+				corner1.x+=tankHalfW; corner1.z+=tankHalfH;
+				corner2.x-=tankHalfW; corner2.z+=tankHalfH;
 				if((cd>pai-da&&cd<pai+da)||(cd>-pai-da&&cd<-pai+da)||cd==pai||cd==-pai)
 				{
 					if(!myMap.checkWallCollision(corner1)&&!myMap.checkWallCollision(corner2)&&!this.checkTankCollision(corner1))
@@ -419,17 +450,22 @@ THREE.FirstPersonControls = function ( objects,index,  domElement ) {
 				continue;
 			else
 			{
+				
 				var center=this.objects[i].position.clone();
 				center.x+=this.objects[i].children[0].startX;
-				center.z+=this.objects[i].children[0].startZ;
-				console.log("Distance is " + getDistance(center,objects[i].position)) ;
+				center.z-=this.objects[i].children[0].startZ;
+				
+				console.log("Distance is " + getDistance(corner,center)) ;
 				console.log("Close is " + tankCloseDistance) ;
-				console.log("Object postion = "+objects[i].position.x);
-				console.log("Object postion = "+objects[i].position.z);
+				//console.log("Opp pos is "+ center)
+				
+				
 				if(getDistance(corner,center)<tankCloseDistance)
 					return true;
+					
 			}
 		}
+		
 		return false;	
 	}
 
