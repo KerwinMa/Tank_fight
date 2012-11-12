@@ -48,7 +48,6 @@ function TankClient(){
 	});
 
 	loader.options.convertUpAxis = true;
-
 	loader.load( './models/simple_tank1.dae', function ( collada ) {
 		obj = new THREE.Object3D();
 		dae = collada.scene;
@@ -136,8 +135,7 @@ function TankClient(){
 				});
 
 			// Upon receiving a message tagged with "update", along with an obj "data"
-			socket.on("update", function(data)
-			 {
+			socket.on("update", function(data) {
 				if(cID===1) {
 					obj2.position.x = data.oppX;
 					obj2.position.z = data.oppZ;
