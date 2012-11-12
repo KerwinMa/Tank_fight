@@ -23,6 +23,8 @@ function Tank(posX, posZ){
   Tank.ScaleY = 30;
   Tank.ScaleZ = 30;
   Tank.Scale = 30;
+  Tank.tankHalfW=30;
+  Tank.tankHalfH=55;
   
 /*=============
   move [Public]
