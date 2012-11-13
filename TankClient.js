@@ -5,35 +5,38 @@ loadScript(lib_path, "Tank.js");
 loadScript("", "http://" + Game.SERVER_NAME + ":" + Game.PORT + "/socket.io/socket.io.js");
 
 function TankClient(){
-	//network
+	//NETWORK
 	var socket;			// socket used to connect to server
 	var delay;			// delay simulated on current client
 	var pause = false;
-	var container, stats;
-	var camera, scene, renderer, objects, controls,projector;
-	var particleLight, pointLight;
 	var clock = new THREE.Clock();
 	var cID = 1;
 	
+	//THREEJS
+	var container, stats;
+	var camera, scene, renderer, objects, controls,projector;
+	var particleLight, pointLight;
+	var dae, skin, obj, dae2, skin2, obj2;
+	var loader = new THREE.ColladaLoader();
+	
+	//TANKS
 	var sMyTank, sOppTank, cMyTank; //Tank objects in game 
 
 	//for loading tank
-	var dae, skin, obj, dae2, skin2, obj2;
 	var objects=[];
 	var vel=7,velX, velZ;
-	var loader = new THREE.ColladaLoader();
-	var myMap = new Map();
-
-	//AI for tanks
+	
+	//AI
 	var aispeed=10;
 	
-	// Semi-constants
+	//MAP
+	var myMap = new Map();
 	var WIDTH = window.innerWidth,
 	HEIGHT = window.innerHeight,
 	ASPECT = WIDTH / HEIGHT;
 	var t = 0;
-
-	//Bullets
+	
+	//BULLETS
 	var bullets = [];
 	var tanks = [];
 	var sphereMaterial = new THREE.MeshBasicMaterial({color: 0x333333});
@@ -402,8 +405,10 @@ function TankClient(){
 		initNetwork();
 	}
 
-	function updateServer() {
+	function updateServer()
+	 {
 		if(cID===1)
+		
 			socket.emit("move", {newX: obj.position.x, newZ: obj.position.z, rotY: dae.rotation.y});
 		else
 			socket.emit("move", {newX: obj2.position.x, newZ: obj2.position.z, rotY: dae2.rotation.y});
