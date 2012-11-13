@@ -233,11 +233,19 @@ function TankServer() {
 					players[socket.id].tank.move(data.newX, data.newZ, data.rotY);
 				});
 
-				// socket.on('bullet',
-				// 	function(data) {
-				// 		//console.log(data);
-				// 		socket.broadcast.emit("bullet",{bullets: data.bullets});
-				// 	});
+				socket.on('bullet',
+					function(data) {
+						//console.log(data);
+						var p1 = getPlayer(1);
+						var p2 = getPlayer(2);
+						if(socket.id === p1.sid){
+							io.sockets.socket(p2.sid).emit("bullet",{playerID: data.playerID});
+						}
+						else {
+							io.sockets.socket(p1.sid).emit("bullet",{playerID: data.playerID});
+						}
+						console.log("create bullet");
+				});
 
 				// Upon receiving a message tagged with "delay", along with an obj "data"
 				socket.on('delay', function(data) {
