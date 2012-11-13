@@ -18,6 +18,9 @@ function TankClient(){
 	var particleLight, pointLight;
 	var dae, skin, obj, dae2, skin2, obj2;
 	var loader = new THREE.ColladaLoader();
+	var sphereMaterial = new THREE.MeshBasicMaterial({color: 0x333333});
+	var sphereGeo = new THREE.SphereGeometry(5, 30, 30);
+
 	
 	//TANKS
 	var sMyTank, sOppTank, cMyTank; //Tank objects in game 
@@ -38,14 +41,14 @@ function TankClient(){
 	
 	//BULLETS
 	var bullets = [];
+	
+	
+	//GAME
 	var tanks = [];
-	var sphereMaterial = new THREE.MeshBasicMaterial({color: 0x333333});
-	var sphereGeo = new THREE.SphereGeometry(5, 30, 30);
-
 	var gameStarted = false;
 	var gameStartTime = 0;
-
 	var disconnected = false;
+	var thresholdX=thresholdZ=10;
 
 	$(document).ready(function() 
 	{
@@ -67,7 +70,7 @@ function TankClient(){
 		dae.updateMatrix();
 		dae.id=1;
 		obj.add(dae);
-		//dae.rotation.y =  Math.PI/2;
+		dae.rotation.y =  Math.PI/2;
 		objects.push(obj);
 		obj2 = new THREE.Object3D();
 		dae2.scale.x = dae2.scale.y = dae2.scale.z = 30;
@@ -78,7 +81,7 @@ function TankClient(){
 		dae2.updateMatrix();
 		dae2.id=2;
 		obj2.add(dae2);
-		//dae2.rotation.y =  Math.PI/2;	
+		dae2.rotation.y =  Math.PI/2;	
 		console.log(dae);
 		console.log(dae2);
 		objects.push(obj2);
@@ -122,16 +125,25 @@ function TankClient(){
 					cMyTank = new Tank(data.xValue1, data.zValue1);
 					tanks.push(sMyTank);
 					tanks.push(sOppTank);
-				} else  {
+		
+					
+				
+				
+				} else
+				 {
+				 	
+				 	
 					sMyTank = new Tank(data.xValue2, data.zValue2);
 					sMyTank.cID=2;
 					sOppTank = new Tank(data.xValue1, data.zValue1);
 					sOppTank.cID=1;
 					cMyTank = new Tank(data.xValue2, data.zValue2);
 					tanks.push(sMyTank);
-					tanks.push(sOppTank);		
+					tanks.push(sOppTank);
+		
 				}
-
+				
+				
 				if(data.playerNo === 2) {
 					controls = new THREE.FirstPersonControls(objects,2);
 					controls.movementSpeed = 0;
@@ -139,6 +151,7 @@ function TankClient(){
 					controls.lookVertical = false; 
 					controls.noFly = true;
 					controls.activeLook = false;
+					dae2.rotation.y=Math.PI/2;
 				}
 
 				//console.log("obj rot" + obj2.rotation.y);
@@ -154,7 +167,6 @@ function TankClient(){
 					obj2.position.x = data.oppX;
 					obj2.position.z = data.oppZ;
 					dae2.rotation.y = data.oppRot + Math.PI/2;
-					//dae2.rotation.y = data.oppRot;
 				}
 				else {
 					obj.position.x = data.oppX;
@@ -176,9 +188,7 @@ function TankClient(){
 				// console.log("before concat: ");
 				// console.log(bullets);
 				// console.log(data.bullets);
-				//console.log("creating bullet for player " + data.playerID);
-				//socket.emit("bullet",{playerID: data.playerID});
-				createOppBullet(data.playerID);
+
 				// bullets=bullets.concat(data.bullets);
 				// console.log("after concat: ");
 				// console.log(bullets);
@@ -224,8 +234,8 @@ function TankClient(){
 			if(gameStarted) {
 				if (e.which === 1) { // Left click only
 					createBullet(cID);
-					socket.emit("bullet",{playerID: cID});
-					console.log("click");					
+					console.log("click");
+					//socket.emit("bullet",{bullets: bullets});
 				}
 			} else {
 				socket.emit("start", {});
@@ -237,8 +247,7 @@ function TankClient(){
 			//console.log(e.keyCode);
 			if(gameStarted && e.keyCode === 32) {
 				createBullet(cID);
-				socket.emit("bullet",{playerID: cID});
-				console.log("keydown");
+				//socket.emit("bullet",{bullets: bullets});
 			}		
 		}, false);
 
@@ -315,6 +324,11 @@ function TankClient(){
 							tanks[j].health-=10;
 							console.log("aim is  "+aim+" with health"+ tanks[j].health);
 						}
+						
+					
+					
+					
+					
 				}
 				continue;
 			}	
@@ -330,43 +344,21 @@ function TankClient(){
 	}
 	
 
-
-	function createBullet(cID) {
+	function createBullet(player)
+	 {
 		var sphere = new THREE.Mesh(sphereGeo, sphereMaterial);
 		sphere.position.set( objects[cID-1].position.x+objects[cID-1].children[0].position.x,
 							 objects[cID-1].position.y+objects[cID-1].children[0].position.y+25,
 							 objects[cID-1].position.z-objects[cID-1].children[0].position.z);
-				
+		
+		var degree=Math.ceil((objects[cID-1].children[0].rotation.y%(2*Math.PI))*(180/Math.PI));	
+		
+		
 		sphere.velX=-vel*Math.sin(objects[cID-1].children[0].rotation.y%(2*Math.PI));
 		sphere.velZ=-vel*Math.cos(objects[cID-1].children[0].rotation.y%(2*Math.PI));
 		
-		bullets.push(sphere);
-		// setTimeout(function() {
-		// 	bullets.push(sphere);
-		// }, 50);
-		scene.add(sphere);
-		return sphere;
-	}
-	function createOppBullet(player) {
-		var sphere = new THREE.Mesh(sphereGeo, sphereMaterial);
-		sphere.position.set( objects[player-1].position.x+objects[player-1].children[0].position.x,
-							 objects[player-1].position.y+objects[player-1].children[0].position.y+25,
-							 objects[player-1].position.z-objects[player-1].children[0].position.z);
-		var angle;
-		if(player === 1) {
-			angle=objects[player-1].children[0].rotation.y;	
-		}
-		else {
-			angle=objects[player-1].children[0].rotation.y-Math.PI/2;	
-		}
-		
-		sphere.velX=-vel*Math.sin(angle%(2*Math.PI));
-		sphere.velZ=-vel*Math.cos(angle%(2*Math.PI));
 		
 		bullets.push(sphere);
-		// setTimeout(function() {
-		// 	bullets.push(sphere);
-		// }, 50);
 		scene.add(sphere);
 		return sphere;
 	}
