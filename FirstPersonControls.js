@@ -247,7 +247,7 @@ THREE.FirstPersonControls = function ( objects,index,  domElement ) {
 				{
 					
 					
-					if(!myMap.checkWallCollision(corner1)&&!myMap.checkWallCollision(corner2)&&!this.checkTankCollision(corner1))
+					if(!myMap.checkWallCollision(corner1)&&!myMap.checkWallCollision(corner2)&&this.checkTankCollision(corner1)==-1)
 					{
 						this.object.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
 					}
@@ -280,7 +280,7 @@ THREE.FirstPersonControls = function ( objects,index,  domElement ) {
 				
 				if((cd>1.5*pai-da&&cd<1.5*pai+da)||(cd<-0.5*pai+da&&cd>-0.5*pai-da))
 				{
-					if(!myMap.checkWallCollision(corner1)&&!myMap.checkWallCollision(corner2)&&!this.checkTankCollision(corner1))
+					if(!myMap.checkWallCollision(corner1)&&!myMap.checkWallCollision(corner2)&&this.checkTankCollision(corner1)==-1)
 					{
 						
 						this.object.translateZ( actualMoveSpeed );
@@ -311,7 +311,7 @@ THREE.FirstPersonControls = function ( objects,index,  domElement ) {
 				if((cd>0&&(cd<da||cd>2*pai-da))||(cd<0&&(cd>-da||cd<-2*pai+da))||cd==0)
 				{
 					
-					if(!myMap.checkWallCollision(corner1)&&!myMap.checkWallCollision(corner2)&&!this.checkTankCollision(corner1))
+					if(!myMap.checkWallCollision(corner1)&&!myMap.checkWallCollision(corner2)&&this.checkTankCollision(corner1)==-1)
 					{
 						this.object.translateX( actualMoveSpeed );
 					}
@@ -335,7 +335,7 @@ THREE.FirstPersonControls = function ( objects,index,  domElement ) {
 				corner2.x-=tankHalfW; corner2.z+=tankHalfH;
 				if((cd>pai-da&&cd<pai+da)||(cd>-pai-da&&cd<-pai+da)||cd==pai||cd==-pai)
 				{
-					if(!myMap.checkWallCollision(corner1)&&!myMap.checkWallCollision(corner2)&&!this.checkTankCollision(corner1))
+					if(!myMap.checkWallCollision(corner1)&&!myMap.checkWallCollision(corner2)&&this.checkTankCollision(corner1)==-1)
 					{
 							this.object.translateX( -actualMoveSpeed );
 					}
@@ -455,18 +455,17 @@ THREE.FirstPersonControls = function ( objects,index,  domElement ) {
 				center.x+=this.objects[i].children[0].startX;
 				center.z-=this.objects[i].children[0].startZ;
 				
-				console.log("Distance is " + getDistance(corner,center)) ;
-				console.log("Close is " + tankCloseDistance) ;
-				//console.log("Opp pos is "+ center)
+			//	console.log("Distance is " + getDistance(corner,center)) ;
+			//	console.log("Close is " + tankCloseDistance) ;
 				
 				
 				if(getDistance(corner,center)<tankCloseDistance)
-					return true;
+					return i;
 					
 			}
 		}
 		
-		return false;	
+		return -1;	
 	}
 
 	this.handleResize();

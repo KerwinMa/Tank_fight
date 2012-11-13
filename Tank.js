@@ -14,6 +14,8 @@ function Tank(posX, posZ){
 	this.y = 0;
 	this.z = posZ;
 	this.rotationY = Math.PI/2;
+	this.health=100;
+	this.cID;
 }
 
 /*================

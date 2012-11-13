@@ -14,6 +14,7 @@ function TankClient(){
 	var particleLight, pointLight;
 	var clock = new THREE.Clock();
 	var cID = 1;
+	
 	var sMyTank, sOppTank, cMyTank; //Tank objects in game 
 
 	//for loading tank
@@ -34,6 +35,7 @@ function TankClient(){
 
 	//Bullets
 	var bullets = [];
+	var tanks = [];
 	var sphereMaterial = new THREE.MeshBasicMaterial({color: 0x333333});
 	var sphereGeo = new THREE.SphereGeometry(5, 30, 30);
 
@@ -42,7 +44,8 @@ function TankClient(){
 
 	var disconnected = false;
 
-	$(document).ready(function() {
+	$(document).ready(function() 
+	{
 		$('body').append('<div id="intro">Click to start</div>');
 		$('#intro').css({width: WIDTH, height: HEIGHT});
 	});
@@ -107,15 +110,33 @@ function TankClient(){
 			// // Getting player info upon connection to server
 			socket.on("playerDetails", function(data) {
 				cID = data.playerNo;
-				if(data.playerNo === 1) {
+				if(data.playerNo === 1) 
+				{
 					sMyTank = new Tank(data.xValue1, data.zValue1);
+					sMyTank.cID=1;
 					sOppTank = new Tank(data.xValue2, data.zValue2);
+					sOppTank.cID=2;
 					cMyTank = new Tank(data.xValue1, data.zValue1);
-				} else {
+					tanks.push(sMyTank);
+					tanks.push(sOppTank);
+		
+					
+				
+				
+				} else
+				 {
+				 	
+				 	
 					sMyTank = new Tank(data.xValue2, data.zValue2);
+					sMyTank.cID=2;
 					sOppTank = new Tank(data.xValue1, data.zValue1);
+					sOppTank.cID=1;
 					cMyTank = new Tank(data.xValue2, data.zValue2);
+					tanks.push(sMyTank);
+					tanks.push(sOppTank);
+		
 				}
+				
 				
 				if(data.playerNo === 2) {
 					controls = new THREE.FirstPersonControls(objects,2);
@@ -127,8 +148,8 @@ function TankClient(){
 					dae2.rotation.y=Math.PI/2;
 				}
 
-				console.log("obj rot" + obj2.rotation.y);
-				console.log("dae rot" + dae2.rotation.y);
+				//console.log("obj rot" + obj2.rotation.y);
+				//console.log("dae rot" + dae2.rotation.y);
 				setInterval(function() {
 					updateServer();
 				}, 50);
@@ -146,7 +167,8 @@ function TankClient(){
 					obj.position.z = data.oppZ;
 					dae.rotation.y = data.oppRot;
 				}				
-			});
+			}
+			);
 
 			socket.on("startGame", function(data) {
 				gameStarted = true;
@@ -176,7 +198,11 @@ function TankClient(){
 				disconnected = true;
 			});
 
-		} catch (e) {
+		
+			
+		} 
+		catch (e)
+		 {
 			console.log("Failed to connect to " + "http://" + Game.SERVER_NAME + ":" + Game.PORT);
 			console.log(e);
 		}
@@ -221,7 +247,8 @@ function TankClient(){
 
 		scene.add(obj);
 		scene.add(obj2);
-
+		
+		
 		controls = new THREE.FirstPersonControls(objects,1 );
 		controls.movementSpeed = 0;
 		controls.lookSpeed = 0;
@@ -275,25 +302,44 @@ function TankClient(){
 		for(var i = bullets.length-1; i >= 0; i--)
 		{			
 			var b=bullets[i];
-			if (myMap.checkWallCollision(b.position)) 
+			var aim=controls.checkTankCollision(b.position);
+			//console.log(tanks[0]);//+" "+tanks[1].health);
+			//console.log("aim is  "+aim);//+" with health"+ tanks[aim].health);
+			if (myMap.checkWallCollision(b.position)||aim!=-1) 
 			{
+			
 				bullets.splice(i, 1);
 				scene.remove(b);
+				if(aim!=-1)
+				{
+					for(j=0;j<tanks.length;j++)
+						if(tanks[j].cID==aim+1)
+						{
+							tanks[j].health-=10;
+							console.log("aim is  "+aim+" with health"+ tanks[j].health);
+						}
+						
+					
+					
+					
+					
+				}
 				continue;
-			}			
+			}	
 			else
 			{
 				b.translateX(b.velX);
 				b.translateZ(b.velZ);
 			}
-			//console.log(bullets);
+			
 		}
 		renderer.render(scene, camera);
 		stats.update();		
 	}
 	
 
-	function createBullet(player) {
+	function createBullet(player)
+	 {
 		var sphere = new THREE.Mesh(sphereGeo, sphereMaterial);
 		sphere.position.set( objects[cID-1].position.x+objects[cID-1].children[0].position.x,
 							 objects[cID-1].position.y+objects[cID-1].children[0].position.y+25,
