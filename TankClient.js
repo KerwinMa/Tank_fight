@@ -61,13 +61,19 @@ function TankClient() {
 		dae2 = new THREE.Object3D();
 		dae.clone(dae2);
 		dae.scale.x = dae.scale.y = dae.scale.z = 30;
-		dae.position.x = dae.startX = -500;
+		//dae.position.x = dae.startX = -500;
 		dae.position.y = 0;
-		dae.position.z = dae.startZ = -500;
+		//dae.position.z = dae.startZ = -500;
+		dae.position.x = 0;
+		dae.position.z = 0;
 		dae.rotation.y = 0;
+		dae.startX = dae.startZ = -500;
 		dae.updateMatrix();
 		dae.id = 1;
 		obj.add(dae);
+		obj.position.x = -500;
+		obj.position.z = -500;
+		obj.position.y = 0;
 		//dae.rotation.y =  Math.PI/2;
 		objects.push(obj);
 		obj2 = new THREE.Object3D();
@@ -79,6 +85,7 @@ function TankClient() {
 		dae2.updateMatrix();
 		dae2.id = 2;
 		obj2.add(dae2);
+		obj2.position.set(0, 0, 0);
 		//dae2.rotation.y =  Math.PI/2;
 		console.log(dae);
 		console.log(dae2);
@@ -297,6 +304,7 @@ function TankClient() {
 			var aim = checkTankCollision(b);
 			//console.log("aim is  " + aim); //+" with health"+ tanks[aim].health);
 			if(myMap.checkWallCollision(b.position) || aim != -1) {
+				console.log(b.position);
 				bullets.splice(i, 1);
 				scene.remove(b);
 				if(aim != -1) {
@@ -318,29 +326,27 @@ function TankClient() {
 
 	function createBullet(cID) {
 		var sphere = new THREE.Mesh(sphereGeo, sphereMaterial);
-		sphere.position.set(objects[cID - 1].position.x + objects[cID - 1].children[0].position.x, objects[cID - 1].position.y + objects[cID - 1].children[0].position.y + 25, objects[cID - 1].position.z - objects[cID - 1].children[0].position.z);
+		sphere.position.set(objects[cID - 1].position.x, objects[cID - 1].position.y + 25, objects[cID - 1].position.z);
 
 		sphere.velX = -vel * Math.sin(objects[cID - 1].children[0].rotation.y % (2 * Math.PI));
 		sphere.velZ = -vel * Math.cos(objects[cID - 1].children[0].rotation.y % (2 * Math.PI));
 		sphere.cID = cID;
 		//bullets.push(sphere);
-		sMyTank.x = objects[cID - 1].position.x + objects[cID - 1].children[0].position.x;
-		sMyTank.z = objects[cID - 1].position.z + objects[cID - 1].children[0].position.z;
-		sMyTank.rotationY = objects[cID - 1].children[0].rotation.y;
+		sMyTank.x = objects[cID - 1].position.x;
+		sMyTank.z = objects[cID - 1].position.z;
+		sMyTank.rotationY = objects[cID - 1].children[0].rotation.y % (2 * Math.PI);
 		//var corner = sMyTank.getCorners();
 		console.log("corner = " +sMyTank.getCorners());
-		console.log("roty = " + sMyTank.rotationY + " x = " + sMyTank.x + " z = " + sMyTank.z);
+		console.log("roty = " + (sMyTank.rotationY % (2 * Math.PI))*180/Math.PI + " x = " + sMyTank.x + " z = " + sMyTank.z);
 		setTimeout(function() {
 			bullets.push(sphere);
 		}, 50);
 		scene.add(sphere);
 	}
 
-
-
 	function createOppBullet(player) {
 		var sphere = new THREE.Mesh(sphereGeo, sphereMaterial);
-		sphere.position.set(objects[player - 1].position.x + objects[player - 1].children[0].position.x, objects[player - 1].position.y + objects[player - 1].children[0].position.y + 25, objects[player - 1].position.z - objects[player - 1].children[0].position.z);
+		sphere.position.set(objects[player - 1].position.x, objects[player - 1].position.y + 25, objects[player - 1].position.z);
 		var angle;
 		if(player === 1) {
 			angle = objects[player - 1].children[0].rotation.y;
@@ -383,6 +389,19 @@ function TankClient() {
 				}
 			}
 		}
+		var sphereGeo2 = new THREE.SphereGeometry(30, 30, 30);
+		var sphere1 = new THREE.Mesh(sphereGeo2, sphereMaterial);
+		sphere1.position.set(800,myMap.WALLHEIGHT, 800);
+		scene.add(sphere1);
+		var sphere2 = new THREE.Mesh(sphereGeo2, sphereMaterial);
+		sphere2.position.set(-800,myMap.WALLHEIGHT, -800);
+		scene.add(sphere2);
+		var sphere3 = new THREE.Mesh(sphereGeo2, sphereMaterial);
+		sphere3.position.set(800,myMap.WALLHEIGHT, -800);
+		scene.add(sphere3);
+		var sphere4 = new THREE.Mesh(sphereGeo2, sphereMaterial);
+		sphere4.position.set(-800,myMap.WALLHEIGHT, 800);
+		scene.add(sphere4);
 	}
 
 	/*==================
@@ -420,8 +439,8 @@ function TankClient() {
 			if(i == bullet.cID - 1) continue;
 			else {
 				var center = objects[i].position.clone();
-				center.x += objects[i].children[0].startX;
-				center.z -= objects[i].children[0].startZ;
+				// center.x += objects[i].children[0].startX;
+				// center.z -= objects[i].children[0].startZ;
 
 				//	console.log("Distance is " + getDistance(corner,center)) ;
 				//	console.log("Close is " + tankCloseDistance) ;
