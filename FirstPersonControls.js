@@ -317,9 +317,9 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 					
 				} else {
 					if (quadrant == 1 || quadrant == 4)
-						this.object.children[0].rotation.y = (this.object.children[0].rotation.y + 10 * Math.PI / 180) % (2 * pai);
+						this.object.children[0].rotation.y = (this.object.children[0].rotation.y + 1 * Math.PI / 180) % (2 * pai);
 					else
-						this.object.children[0].rotation.y = (this.object.children[0].rotation.y - 10 * Math.PI / 180) % (2 * pai);
+						this.object.children[0].rotation.y = (this.object.children[0].rotation.y - 1 * Math.PI / 180) % (2 * pai);
 				}
 			}
 			
@@ -345,9 +345,9 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 					}
 				} else {
 					if (quadrant == 2 || quadrant == 3)
-						this.object.children[0].rotation.y = (this.object.children[0].rotation.y + 10 * Math.PI / 180) % (2 * pai);
+						this.object.children[0].rotation.y = (this.object.children[0].rotation.y + 1 * Math.PI / 180) % (2 * pai);
 					else
-						this.object.children[0].rotation.y = (this.object.children[0].rotation.y - 10 * Math.PI / 180) % (2 * pai);
+						this.object.children[0].rotation.y = (this.object.children[0].rotation.y - 1 * Math.PI / 180) % (2 * pai);
 				}
 			}
 			
@@ -373,9 +373,9 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 					}
 				} else {
 					if (quadrant == 1 || quadrant == 2)
-						this.object.children[0].rotation.y = (this.object.children[0].rotation.y - 10 * Math.PI / 180) % (2 * pai);
+						this.object.children[0].rotation.y = (this.object.children[0].rotation.y - 1 * Math.PI / 180) % (2 * pai);
 					else
-						this.object.children[0].rotation.y = (this.object.children[0].rotation.y + 10 * Math.PI / 180) % (2 * pai);
+						this.object.children[0].rotation.y = (this.object.children[0].rotation.y + 1 * Math.PI / 180) % (2 * pai);
 				}
 			}
 			if (this.moveLeft) {
@@ -396,9 +396,9 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 					}
 				} else {
 					if (quadrant == 3 || quadrant == 4)
-						this.object.children[0].rotation.y = (this.object.children[0].rotation.y - 10 * Math.PI / 180) % (2 * pai);
+						this.object.children[0].rotation.y = (this.object.children[0].rotation.y - 1 * Math.PI / 180) % (2 * pai);
 					else
-						this.object.children[0].rotation.y = (this.object.children[0].rotation.y + 10 * Math.PI / 180) % (2 * pai);
+						this.object.children[0].rotation.y = (this.object.children[0].rotation.y + 1 * Math.PI / 180) % (2 * pai);
 				}
 				
 			}
