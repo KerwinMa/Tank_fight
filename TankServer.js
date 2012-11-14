@@ -249,17 +249,17 @@ function TankServer() {
 					});
 
 					socket.on('createBullet', function(data) {
-						//console.log(data);
+						console.log("createBullet");
 						var p1 = getPlayer(1);
 						var p2 = getPlayer(2);
 						if(socket.id === p1.sid) {
 							//p1.tank.endPoint();
-							io.sockets.socket(p2.sid).emit("bullet", {
+							io.sockets.socket(p2.sid).emit("createBullet", {
 								playerID: data.playerID
 							});
 						} else {
 							//p2.tank.endPoint();
-							io.sockets.socket(p1.sid).emit("bullet", {
+							io.sockets.socket(p1.sid).emit("createBullet", {
 								playerID: data.playerID
 							});
 						}

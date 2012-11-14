@@ -35,15 +35,15 @@ function Tank(posX, posZ) {
 	}
 
 	this.getCorners = function() {
-		var theta1 = Math.abs(Math.atan((-800 - this.x) / (-800 - this.z))); //var theta2 = Math.PI/2 - theta1; 
+		var theta1 = Math.abs(Math.atan((-800 - this.x) / (-800 - this.z)));  
 		var theta2 = Math.abs(Math.atan((-800 - this.x) / (800 - this.z)));
 		var theta3 = Math.abs(Math.atan((800 - this.x) / (800 - this.z)));
 		var theta4 = Math.abs(Math.atan((800 - this.x) / (-800 - this.z)));
 
-		console.log("theta1 " + theta1*180/Math.PI);
-		console.log("theta2 " + theta2*180/Math.PI);
-		console.log("theta3 " + theta3*180/Math.PI);
-		console.log("theta4 " + theta4*180/Math.PI);
+		// console.log("theta1 " + theta1*180/Math.PI);
+		// console.log("theta2 " + theta2*180/Math.PI);
+		// console.log("theta3 " + theta3*180/Math.PI);
+		// console.log("theta4 " + theta4*180/Math.PI);
 
 		if((this.rotationY > 0 && (this.rotationY < theta1 || this.rotationY > (2*Math.PI-theta4))) || 
 			(this.rotationY < 0 && (this.rotationY > -theta4 || this.rotationY < (-2 * Math.PI + theta1))) || 
@@ -78,29 +78,72 @@ Tank.prototype.move = function(newx, newz, rotY) {
 	this.rotationY = rotY;
 }
 
-function getAngularQuadrant(angle) {
-		if (((angle > 0 && angle < Math.PI / 2) || (angle < 0 && angle > -2 * Math.PI && angle < -1.5 * Math.PI)) || angle == 0 || angle == -2 * Math.PI)
-			return 1;
-		else if (((angle > 0 && angle < Math.PI && angle > 0.5 * Math.PI) || (angle < 0 && angle < -Math.PI && angle > -1.5 * Math.PI)) || angle == Math.PI / 2 || angle == -1.5 * Math.PI)
-			return 2;
-		else if (((angle > 0 && angle > Math.PI && angle < 1.5 * Math.PI) || (angle < 0 && angle > -Math.PI && angle < -0.5 * Math.PI)) || angle == Math.PI || angle == -Math.PI)
-			return 3;
-		else
-			return 4;
-		
-	};
-
-function getRegionalQuadrant()
-{
-	if(this.x<=0&&this.x>=-800&&this.z<=0&&this.z>=-800)
-		return 1;
-	if(this.x<0&&this.x>-800&&this.z>=0&&this.z<=800)
-		return 2;
-	if(this.x>0&&this.x<=800&&this.z>0&&this.z<=800)
-		return 3;
-	else
-		return 4;	
+Tank.prototype.endPoint = function() {
+	var corner = this.getCorners();
+	var angQuad = this.getAngularQuadrant();
+	var endZ;
+	var endX;
+	if(corner===1){
+		endZ = -800;
+		if(angQuad===1){
+			var heightX = Math.abs(-800-this.z)*Math.tan(this.rotationY);
+			endX = this.x - heightX;
+		} else if (angQuad===4) {
+			var heightX = Math.abs(-800-this.z)*Math.tan(2*Math.PI-this.rotationY);
+			endX = this.x + heightX;
+		} else {
+			console.log("error in calculating endpoint!");
+		}
+	} else if(corner===2){
+		endX = -800;
+		if(angQuad===1){
+			var heightZ = Math.abs(-800-this.x)/Math.tan(this.rotationY);
+			endZ = this.z - heightZ;
+		} else if (angQuad===2) {
+			var heightZ = Math.abs(-800-this.x)/Math.tan(Math.PI-this.rotationY);
+			endZ = this.z + heightZ;
+		} else {
+			console.log("error in calculating endpoint!");
+		}
+	} else if (corner===3){
+		endZ = 800;
+		if(angQuad===2){
+			var heightX = Math.abs(800-this.z)*Math.tan(Math.PI-this.rotationY);
+			endX = this.x - heightX;
+		} else if (angQuad===3) {
+			var heightX = Math.abs(800-this.z)*Math.tan(this.rotationY-Math.PI);
+			endX = this.x + heightX;
+		} else {
+			console.log("error in calculating endpoint!");
+		}
+	} else if (corner===4){
+		endX = -800;
+		if(angQuad===3){
+			var heightZ = Math.abs(800-this.x)/Math.tan(0.75*Math.PI - this.rotationY);
+			endZ = this.z + heightZ;
+		} else if (angQuad===4) {
+			var heightZ = Math.abs(800-this.x)/Math.tan(this.rotationY-0.75*Math.PI);
+			endZ = this.z - heightZ;
+		} else {
+			console.log("error in calculating endpoint!");
+		}
+	} else {
+		if(angQuad===1) {
+			endX = -800;
+			endZ = -800;
+		} else if(angQuad===2) {
+			endX = -800;
+			endZ = 800;
+		} else if(angQuad===3) {
+			endX = 800;
+			endZ = 800;
+		} else {
+			endX = 800;
+			endZ = -800;
+		}
+	}
+	console.log("corner " + corner);
+	console.log("end points: " + endX + ", " + endZ);
+	//return {endX:endX, endZ: endZ};
 }
-
-// For node.js require
 global.Tank = Tank;

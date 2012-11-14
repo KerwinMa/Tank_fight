@@ -34,7 +34,7 @@ function Player(sid, pid, xPos, zPos) {
 				return lowerbound + Math.floor(Math.random() * range);
 		}
 		else 
-				return 0
+				return 0;
 	}
 }
 

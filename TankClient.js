@@ -193,6 +193,7 @@ function TankClient(){
 				});
 
 				socket.on("createBullet", function(data) {
+					console.log(data);
 					createOppBullet(data.playerID);
 				});
 
@@ -240,7 +241,7 @@ function TankClient(){
 			if(gameStarted) {
 				if(e.which === 1) { // Left click only
 					createBullet(cID);
-					socket.emit("bullet", {
+					socket.emit("createBullet", {
 						playerID: cID
 					});
 					console.log("click");
@@ -255,7 +256,7 @@ function TankClient(){
 			//console.log(e.keyCode);
 			if(gameStarted && e.keyCode === 32) {
 				createBullet(cID);
-				socket.emit("bullet", {
+				socket.emit("createBullet", {
 					playerID: cID
 				});
 				console.log("keydown");
@@ -349,12 +350,15 @@ function TankClient(){
 		sphere.velX = -vel * Math.sin(objects[cID - 1].children[0].rotation.y % (2 * Math.PI));
 		sphere.velZ = -vel * Math.cos(objects[cID - 1].children[0].rotation.y % (2 * Math.PI));
 		sphere.cID = cID;
-		sMyTank.x = objects[cID - 1].position.x;
-		sMyTank.z = objects[cID - 1].position.z;
-		sMyTank.rotationY = objects[cID - 1].children[0].rotation.y % (2 * Math.PI);
+		//bullets.push(sphere);
+		// sMyTank.x = objects[cID - 1].position.x;
+		// sMyTank.z = objects[cID - 1].position.z;
+		// sMyTank.rotationY = objects[cID - 1].children[0].rotation.y % (2 * Math.PI);
+		// sMyTank.endPoint();
+
 		//var corner = sMyTank.getCorners();
-		console.log("corner = " +sMyTank.getCorners());
-		console.log("roty = " + (sMyTank.rotationY % (2 * Math.PI))*180/Math.PI + " x = " + sMyTank.x + " z = " + sMyTank.z);
+		// console.log("corner = " +sMyTank.getCorners());
+		// console.log("roty = " + (sMyTank.rotationY % (2 * Math.PI))*180/Math.PI + " x = " + sMyTank.x + " z = " + sMyTank.z);
 		setTimeout(function() {
 			bullets.push(sphere);
 		}, 50);
@@ -438,9 +442,11 @@ function TankClient(){
 	function updateServer() {
 		if (cID === 1)
 		{
-			if( (Math.abs(obj.position.x-lastPosX)>threshX||Math.abs(obj.position.z-lastPosZ)>threshZ)&&lastRotY!=dae.rotation.y)
+			if((Math.abs(obj.position.x-lastPosX)>threshX||Math.abs(obj.position.z-lastPosZ)>threshZ)&&lastRotY!=dae.rotation.y)
 			{
-				lastPosX=obj.position.x;lastPosZ=obj.position.z;lastRotY=dae.rotation.y
+				lastPosX=obj.position.x;
+				lastPosZ=obj.position.z;
+				lastRotY=dae.rotation.y
 				console.log("Updatin server");
 				socket.emit("move", {
 					newX : obj.position.x,
@@ -453,7 +459,9 @@ function TankClient(){
 		{
 			if((Math.abs(obj2.position.x-lastPosX)>threshX||(Math.abs(obj2.position.z-lastPosZ)>threshZ))&&lastRotY!=dae2.rotation.y)	
 			{
-				lastPosX=obj2.position.x;lastPosZ=obj2.position.z;lastRotY=dae2.rotation.y
+				lastPosX=obj2.position.x;
+				lastPosZ=obj2.position.z;
+				lastRotY=dae2.rotation.y
 				console.log("Updatin server");
 				socket.emit("move", {
 					newX : obj2.position.x,
