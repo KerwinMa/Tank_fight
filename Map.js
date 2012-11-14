@@ -25,6 +25,7 @@ function Map()
 	this.UNITSIZE = 200;		           
 	this.WALLHEIGHT = this.UNITSIZE / 5;
 	this.tankHeight=110;
+	
 	this.getMapSector=function(v) 
 	{
 		var x = Math.floor((v.x + this.UNITSIZE / 2-100) / this.UNITSIZE + this.mapW/2);

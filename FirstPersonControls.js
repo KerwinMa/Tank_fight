@@ -186,16 +186,16 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 			
 		case 82:
 			/*R*/
-			this.moveUp = true;
+			this.moveUp = false;
 			break;
 		case 70:
 			/*F*/
-			this.moveDown = true;
+			this.moveDown = false;
 			break;
 			
 		case 81:
 			/*Q*/
-			this.freeze = !this.freeze;
+			//this.freeze = !this.freeze;
 			break;
 			
 		case 32:
@@ -299,27 +299,25 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 			if (this.moveForward || (this.autoForward && !this.moveBackward)) {
 				var corner1 = this.object.position.clone();
 				var corner2 = this.object.position.clone();
-				corner1.x += this.object.children[0].startX;
-				corner2.x += this.object.children[0].startX;
-				corner1.z -= this.object.children[0].startZ;
-				corner2.z -= this.object.children[0].startZ;
+				// corner1.x += this.object.children[0].startX;
+				// corner2.x += this.object.children[0].startX;
+				// corner1.z -= this.object.children[0].startZ;
+				// corner2.z -= this.object.children[0].startZ;
 				
 				corner1.x -= tankHalfH;
 				corner1.z += tankHalfW;
 				corner2.x -= tankHalfH;
 				corner2.z -= tankHalfW;
 				
-				if ((cd < pai / 2 + da && cd > pai / 2 - da) || (cd < -1.5 * pai + da && cd > -1.5 * pai - da)) {
-					
+				if ((cd < pai / 2 + da && cd > pai / 2 - da) || (cd < -1.5 * pai + da && cd > -1.5 * pai - da)) {					
 					if (!myMap.checkWallCollision(corner1) && !myMap.checkWallCollision(corner2) && this.checkTankCollision(corner1) == -1) {
 						this.object.translateZ( - (actualMoveSpeed + this.autoSpeedFactor));
-					}
-					
+					}					
 				} else {
 					if (quadrant == 1 || quadrant == 4)
 						this.object.children[0].rotation.y = (this.object.children[0].rotation.y + 10 * Math.PI / 180) % (2 * pai);
 					else
-						this.object.children[0].rotation.y = (this.object.children[0].rotation.y - 10 * Math.PI / 180) % (2 * pai);
+						this.object.children[0].rotation.y = (this.object.children[0].rotation.y - 10* Math.PI / 180) % (2 * pai);
 				}
 			}
 			
@@ -327,10 +325,10 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 				var corner1 = this.object.position.clone();
 				var corner2 = this.object.position.clone();
 				
-				corner1.x += this.object.children[0].startX;
-				corner2.x += this.object.children[0].startX;
-				corner1.z -= this.object.children[0].startZ;
-				corner2.z -= this.object.children[0].startZ;
+				// corner1.x += this.object.children[0].startX;
+				// corner2.x += this.object.children[0].startX;
+				// corner1.z -= this.object.children[0].startZ;
+				// corner2.z -= this.object.children[0].startZ;
 				
 				corner1.x += tankHalfH;
 				corner1.z -= tankHalfW;
@@ -356,10 +354,10 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 				var corner1 = this.object.position.clone();
 				var corner2 = this.object.position.clone();
 				
-				corner1.x += this.object.children[0].startX;
-				corner2.x += this.object.children[0].startX;
-				corner1.z -= this.object.children[0].startZ;
-				corner2.z -= this.object.children[0].startZ;
+				// corner1.x += this.object.children[0].startX;
+				// corner2.x += this.object.children[0].startX;
+				// corner1.z -= this.object.children[0].startZ;
+				// corner2.z -= this.object.children[0].startZ;
 				
 				corner1.x -= tankHalfW;
 				corner1.z -= tankHalfH;
@@ -382,10 +380,10 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 				var corner1 = this.object.position.clone();
 				var corner2 = this.object.position.clone();
 				
-				corner1.x += this.object.children[0].startX;
-				corner2.x += this.object.children[0].startX;
-				corner1.z -= this.object.children[0].startZ;
-				corner2.z -= this.object.children[0].startZ;
+				// corner1.x += this.object.children[0].startX;
+				// corner2.x += this.object.children[0].startX;
+				// corner1.z -= this.object.children[0].startZ;
+				// corner2.z -= this.object.children[0].startZ;
 				corner1.x += tankHalfW;
 				corner1.z += tankHalfH;
 				corner2.x -= tankHalfW;
