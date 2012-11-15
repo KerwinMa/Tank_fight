@@ -325,11 +325,6 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 				var corner1 = this.object.position.clone();
 				var corner2 = this.object.position.clone();
 				
-				// corner1.x += this.object.children[0].startX;
-				// corner2.x += this.object.children[0].startX;
-				// corner1.z -= this.object.children[0].startZ;
-				// corner2.z -= this.object.children[0].startZ;
-				
 				corner1.x += tankHalfH;
 				corner1.z -= tankHalfW;
 				
@@ -354,11 +349,6 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 				var corner1 = this.object.position.clone();
 				var corner2 = this.object.position.clone();
 				
-				// corner1.x += this.object.children[0].startX;
-				// corner2.x += this.object.children[0].startX;
-				// corner1.z -= this.object.children[0].startZ;
-				// corner2.z -= this.object.children[0].startZ;
-				
 				corner1.x -= tankHalfW;
 				corner1.z -= tankHalfH;
 				corner2.x += tankHalfW;
@@ -380,10 +370,6 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 				var corner1 = this.object.position.clone();
 				var corner2 = this.object.position.clone();
 				
-				// corner1.x += this.object.children[0].startX;
-				// corner2.x += this.object.children[0].startX;
-				// corner1.z -= this.object.children[0].startZ;
-				// corner2.z -= this.object.children[0].startZ;
 				corner1.x += tankHalfW;
 				corner1.z += tankHalfH;
 				corner2.x -= tankHalfW;

@@ -78,7 +78,7 @@ Tank.prototype.move = function(newx, newz, rotY) {
 	this.rotationY = rotY;
 }
 
-Tank.prototype.endPoint = function() {
+Tank.prototype.endPoint = function(time) {
 	var corner = this.getCorners();
 	var angQuad = this.getAngularQuadrant();
 	var endZ;
@@ -144,6 +144,16 @@ Tank.prototype.endPoint = function() {
 	}
 	console.log("corner " + corner);
 	console.log("end points: " + endX + ", " + endZ);
-	//return {endX:endX, endZ: endZ};
+
+	var vx = Math.sin(this.rotationY)*(-7);
+	console.log("vx = " + vx);
+	//var vz = -7*Math.cos(this.rotationY);
+
+	var stepX = Math.ceil((endX - this.x)/vx);
+	//var stepZ = (endZ - this.z)/vz;
+	console.log("predicted steps = "+stepX);
+	var predTime = 0;
+	predTime = time + ((stepX+1)*1000/60);
+	return {endX:endX, endZ: endZ, predTime: predTime};
 }
 global.Tank = Tank;

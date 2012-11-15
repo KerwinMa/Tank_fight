@@ -20,7 +20,6 @@ function TankClient(){
 	var loader = new THREE.ColladaLoader();
 	var sphereMaterial = new THREE.MeshBasicMaterial({color: 0x333333});
 	var sphereGeo = new THREE.SphereGeometry(5, 30, 30);
-
 	
 	//TANKS
 	var sMyTank, sOppTank, cMyTank; //Tank objects in game 
@@ -46,23 +45,17 @@ function TankClient(){
 	//GAME
 	var tanks = [];
 	var gameStarted = false;
-	var gameStartTime = 0;
+	var gameStartTime = 0, serverStartTime = 0;
 	var disconnected = false;
 	var threshX=threshZ=100;
 	
 	//TO SERVER
 	var lastPosX=-500,lastPosZ=-500,lastRotY=0;
 	
-
 	var sphereMaterial = new THREE.MeshBasicMaterial({
 		color: 0x333333
 	});
 	var sphereGeo = new THREE.SphereGeometry(5, 30, 30);
-
-	var gameStarted = false;
-	var gameStartTime = 0;
-
-	var disconnected = false;
 
 	$(document).ready(function() {
 		$('body').append('<div id="intro">Click to start</div>');
@@ -105,8 +98,6 @@ function TankClient(){
 		obj2.add(dae2);
 		obj2.position.set(0, 0, 0);
 		//dae2.rotation.y =  Math.PI/2;
-		console.log(dae);
-		console.log(dae2);
 		objects.push(obj2);
 		//cloaded = true;
 		init();
@@ -187,14 +178,15 @@ function TankClient(){
 				socket.on("startGame", function(data) {
 					gameStarted = true;
 					controls.movementSpeed = 5000;
-					gameStartTime = data.sTime;
+					gameStartTime = Date.now();
+					//serverStartTime = data.sTime;
 					console.log("Game started!");
 					$('#intro').fadeOut();
 				});
 
 				socket.on("createBullet", function(data) {
-					console.log(data);
-					createOppBullet(data.playerID);
+					console.log("Creating bullet for player " +data.playerID);
+					createOppBullet(data);
 				});
 
 				socket.on("updateBullet", function(data){
@@ -244,7 +236,6 @@ function TankClient(){
 					socket.emit("createBullet", {
 						playerID: cID
 					});
-					console.log("click");
 				}
 			} else {
 				socket.emit("start", {});
@@ -259,7 +250,6 @@ function TankClient(){
 				socket.emit("createBullet", {
 					playerID: cID
 				});
-				console.log("keydown");
 			}
 		}, false);
 
@@ -323,7 +313,8 @@ function TankClient(){
 			var b = bullets[i];
 			var aim = checkTankCollision(b);
 			if(myMap.checkWallCollision(b.position) || aim != -1) {
-				console.log(b.position);
+				console.log("endpoint" + b.position);
+				console.log("steps " + b.stepX);
 				bullets.splice(i, 1);
 				scene.remove(b);
 				if(aim != -1) {
@@ -337,6 +328,7 @@ function TankClient(){
 			} else {
 				b.translateX(b.velX);
 				b.translateZ(b.velZ);
+				b.stepX = b.stepX + 1;
 			}
 		}
 		renderer.render(scene, camera);
@@ -350,11 +342,12 @@ function TankClient(){
 		sphere.velX = -vel * Math.sin(objects[cID - 1].children[0].rotation.y % (2 * Math.PI));
 		sphere.velZ = -vel * Math.cos(objects[cID - 1].children[0].rotation.y % (2 * Math.PI));
 		sphere.cID = cID;
-		//bullets.push(sphere);
-		// sMyTank.x = objects[cID - 1].position.x;
-		// sMyTank.z = objects[cID - 1].position.z;
-		// sMyTank.rotationY = objects[cID - 1].children[0].rotation.y % (2 * Math.PI);
-		// sMyTank.endPoint();
+		sphere.stepX = 0;
+
+		sMyTank.x = objects[cID - 1].position.x;
+		sMyTank.z = objects[cID - 1].position.z;
+		sMyTank.rotationY = objects[cID - 1].children[0].rotation.y % (2 * Math.PI);
+		sMyTank.endPoint();
 
 		//var corner = sMyTank.getCorners();
 		// console.log("corner = " +sMyTank.getCorners());
@@ -365,9 +358,12 @@ function TankClient(){
 		scene.add(sphere);
 	}
 
-	function createOppBullet(player) {
+	function createOppBullet(data) {
+		var player = data.playerID;
 		var sphere = new THREE.Mesh(sphereGeo, sphereMaterial);
 		sphere.position.set(objects[player - 1].position.x, objects[player - 1].position.y + 25, objects[player - 1].position.z);
+		var curGameTime = Date.now()-gameStartTime;
+		var timeToMove = data.predTime - curGameTime;
 		var angle;
 		if(player === 1) {
 			angle = objects[player - 1].children[0].rotation.y;
@@ -376,7 +372,10 @@ function TankClient(){
 		}
 		sphere.velX = -vel * Math.sin(angle % (2 * Math.PI));
 		sphere.velZ = -vel * Math.cos(angle % (2 * Math.PI));
+		// sphere.velX = (data.endX - objects[player - 1].position.x)/timeToMove;
+		// sphere.velZ = (data.endZ - objects[player - 1].position.z)/timeToMove;
 		sphere.cID = player;
+		sphere.stepX = 0;
 		bullets.push(sphere);
 		scene.add(sphere);
 	}
@@ -440,36 +439,42 @@ function TankClient(){
 
 	
 	function updateServer() {
-		if (cID === 1)
-		{
-			if((Math.abs(obj.position.x-lastPosX)>threshX||Math.abs(obj.position.z-lastPosZ)>threshZ)&&lastRotY!=dae.rotation.y)
-			{
-				lastPosX=obj.position.x;
-				lastPosZ=obj.position.z;
-				lastRotY=dae.rotation.y
-				console.log("Updatin server");
-				socket.emit("move", {
-					newX : obj.position.x,
-					newZ : obj.position.z,
-					rotY : dae.rotation.y
-				});
-			}
-		}
+		// if (cID === 1)
+		// {
+		// 	if(lastRotY!=dae.rotation.y)
+		// 	{
+		// 		//(Math.abs(obj.position.x-lastPosX)>threshX||Math.abs(obj.position.z-lastPosZ)>threshZ)&&
+		// 		// lastPosX=obj.position.x;
+		// 		// lastPosZ=obj.position.z;
+		// 		lastRotY=dae.rotation.y
+		// 		console.log("Updatin server");
+		// 		socket.emit("move", {
+		// 			newX : obj.position.x,
+		// 			newZ : obj.position.z,
+		// 			rotY : dae.rotation.y
+		// 		});
+		// 	}
+		// }
+		// else
+		// {
+		// 	if(lastRotY!=dae2.rotation.y)	
+		// 	{
+		// 		// (Math.abs(obj2.position.x-lastPosX)>threshX||(Math.abs(obj2.position.z-lastPosZ)>threshZ))&&
+		// 		// lastPosX=obj2.position.x;
+		// 		// lastPosZ=obj2.position.z;
+		// 		lastRotY=dae2.rotation.y
+		// 		console.log("Updatin server");
+		// 		socket.emit("move", {
+		// 			newX : obj2.position.x,
+		// 			newZ : obj2.position.z,
+		// 			rotY : dae2.rotation.y
+		// 		});
+		// 	}
+		// }
+		if(cID===1)
+			socket.emit("move", {newX: obj.position.x, newZ: obj.position.z, rotY: dae.rotation.y});
 		else
-		{
-			if((Math.abs(obj2.position.x-lastPosX)>threshX||(Math.abs(obj2.position.z-lastPosZ)>threshZ))&&lastRotY!=dae2.rotation.y)	
-			{
-				lastPosX=obj2.position.x;
-				lastPosZ=obj2.position.z;
-				lastRotY=dae2.rotation.y
-				console.log("Updatin server");
-				socket.emit("move", {
-					newX : obj2.position.x,
-					newZ : obj2.position.z,
-					rotY : dae2.rotation.y
-				});
-			}
-		}
+			socket.emit("move", {newX: obj2.position.x, newZ: obj2.position.z, rotY: dae2.rotation.y});
 	}
 
 	function getDistance(pos1, pos2) {
@@ -481,20 +486,11 @@ function TankClient(){
 			if(i == bullet.cID - 1) continue;
 			else {
 				var center = objects[i].position.clone();
-				// center.x += objects[i].children[0].startX;
-				// center.z -= objects[i].children[0].startZ;
-
-				//	console.log("Distance is " + getDistance(corner,center)) ;
-				//	console.log("Close is " + tankCloseDistance) ;
-
 				if(getDistance(bullet.position, center) < tankCloseDistance) return i;
-
 			}
 		}
-
 		return -1;
 	}
-
 }
 
 // This will auto run after this script is loaded
