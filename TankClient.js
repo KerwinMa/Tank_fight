@@ -28,6 +28,7 @@ function TankClient(){
 	var objects=[];
 	var vel=7,velX, velZ;
 	
+		
 	//AI
 	var aispeed=10;
 	
@@ -105,6 +106,34 @@ function TankClient(){
 			render();
 		}, 1000 / 60); //Request animation frame is 60fps
 	});
+	var spinTank = function (angle,id) {
+		new TWEEN.Tween({
+			y : objects[id-1].rotation.y
+		})
+		.to({
+			y : angle
+		}, 500)
+		.onUpdate(function () {
+			objects[id-1].rotation.y = this.y;
+		})
+		.start();
+	}	
+	
+	var moveTank = function (pos,id) {
+		new TWEEN.Tween({
+			x : objects[id-1].position.x,
+			z : objects[id-1].position.z
+		})
+		.to({
+			x : pos.x,
+			z : pos.z
+		}, 500)
+		.onUpdate(function () {
+			objects[id-1].position.x = this.x;
+			objects[id-1].position.z = this.z;
+		})
+		.start();
+	}
 
 	/*=====================
 	initNetwork [Private]
@@ -165,14 +194,21 @@ function TankClient(){
 				// Upon receiving a message tagged with "update", along with an obj "data"
 				socket.on("update", function(data) {
 					if(cID === 1) {
-						obj2.position.x = data.oppX;
-						obj2.position.z = data.oppZ;
-						dae2.rotation.y = data.oppRot + Math.PI / 2;
+						moveTank(new THREE.Vector3(data.oppX,0,data.oppZ), 2);
+						spinTank(data.oppRot+Math.PI/2, 2);
+						//obj2.position.x = data.oppX;
+						//obj2.position.z = data.oppZ;
+						//dae2.rotation.y = data.oppRot + Math.PI / 2;
 						//dae2.rotation.y = data.oppRot;
-					} else {
-						obj.position.x = data.oppX;
-						obj.position.z = data.oppZ;
-						dae.rotation.y = data.oppRot;
+					} else
+					 {
+						
+						moveTank(new THREE.Vector3(data.oppX,0,data.oppZ),1);
+						spinTank(data.oppRot+Math.PI/2,1);
+						
+						//obj.position.x = data.oppX;
+						//obj.position.z = data.oppZ;
+						//dae.rotation.y = data.oppRot;
 					}
 				});
 				socket.on("startGame", function(data) {
@@ -308,6 +344,8 @@ function TankClient(){
 		controls.update(0.001);
 		camera.lookAt(scene.position);
 
+		TWEEN.update();
+			
 		//Simple bullet moving
 		for(var i = bullets.length - 1; i >= 0; i--) {
 			var b = bullets[i];
@@ -336,6 +374,9 @@ function TankClient(){
 	}
 
 	function createBullet(cID) {
+		
+		//moveTank(new THREE.Vector3(100,0,100));
+		//spinTank(Math.PI);
 		var sphere = new THREE.Mesh(sphereGeo, sphereMaterial);
 		sphere.position.set(objects[cID - 1].position.x, objects[cID - 1].position.y + 25, objects[cID - 1].position.z);
 
@@ -350,8 +391,8 @@ function TankClient(){
 		sMyTank.endPoint();
 
 		//var corner = sMyTank.getCorners();
-		// console.log("corner = " +sMyTank.getCorners());
-		// console.log("roty = " + (sMyTank.rotationY % (2 * Math.PI))*180/Math.PI + " x = " + sMyTank.x + " z = " + sMyTank.z);
+		//console.log("corner = " +sMyTank.getCorners());
+		//console.log("roty = " + (sMyTank.rotationY % (2 * Math.PI))*180/Math.PI + " x = " + sMyTank.x + " z = " + sMyTank.z);
 		setTimeout(function() {
 			bullets.push(sphere);
 		}, 50);
@@ -439,42 +480,39 @@ function TankClient(){
 
 	
 	function updateServer() {
-		// if (cID === 1)
-		// {
-		// 	if(lastRotY!=dae.rotation.y)
-		// 	{
-		// 		//(Math.abs(obj.position.x-lastPosX)>threshX||Math.abs(obj.position.z-lastPosZ)>threshZ)&&
-		// 		// lastPosX=obj.position.x;
-		// 		// lastPosZ=obj.position.z;
-		// 		lastRotY=dae.rotation.y
-		// 		console.log("Updatin server");
-		// 		socket.emit("move", {
-		// 			newX : obj.position.x,
-		// 			newZ : obj.position.z,
-		// 			rotY : dae.rotation.y
-		// 		});
-		// 	}
-		// }
-		// else
-		// {
-		// 	if(lastRotY!=dae2.rotation.y)	
-		// 	{
-		// 		// (Math.abs(obj2.position.x-lastPosX)>threshX||(Math.abs(obj2.position.z-lastPosZ)>threshZ))&&
-		// 		// lastPosX=obj2.position.x;
-		// 		// lastPosZ=obj2.position.z;
-		// 		lastRotY=dae2.rotation.y
-		// 		console.log("Updatin server");
-		// 		socket.emit("move", {
-		// 			newX : obj2.position.x,
-		// 			newZ : obj2.position.z,
-		// 			rotY : dae2.rotation.y
-		// 		});
-		// 	}
-		// }
-		if(cID===1)
-			socket.emit("move", {newX: obj.position.x, newZ: obj.position.z, rotY: dae.rotation.y});
+
+		//if(cID===1)
+		//	socket.emit("move", {newX: obj.position.x, newZ: obj.position.z, rotY: dae.rotation.y});
+		//else
+		//	socket.emit("move", {newX: obj2.position.x, newZ: obj2.position.z, rotY: dae2.rotation.y});
+
+		if (cID === 1)
+		{
+			//if( (Math.abs(obj.position.x-lastPosX)>threshX||Math.abs(obj.position.z-lastPosZ)>threshZ)&&lastRotY!=dae.rotation.y)
+			{
+				//lastPosX=obj.position.x;lastPosZ=obj.position.z;lastRotY=dae.rotation.y
+				//console.log("Updatin server");
+				socket.emit("move", {
+					newX : obj.position.x,
+					newZ : obj.position.z,
+					rotY : dae.rotation.y
+				});
+			}
+		}
 		else
-			socket.emit("move", {newX: obj2.position.x, newZ: obj2.position.z, rotY: dae2.rotation.y});
+		{
+			//if((Math.abs(obj2.position.x-lastPosX)>threshX||(Math.abs(obj2.position.z-lastPosZ)>threshZ))&&lastRotY!=dae2.rotation.y)	
+			{
+				//lastPosX=obj2.position.x;lastPosZ=obj2.position.z;lastRotY=dae2.rotation.y
+				//console.log("Updatin server");
+				socket.emit("move", {
+					newX : obj2.position.x,
+					newZ : obj2.position.z,
+					rotY : dae2.rotation.y
+				});
+			}
+		}
+
 	}
 
 	function getDistance(pos1, pos2) {
@@ -486,6 +524,7 @@ function TankClient(){
 			if(i == bullet.cID - 1) continue;
 			else {
 				var center = objects[i].position.clone();
+				
 				if(getDistance(bullet.position, center) < tankCloseDistance) return i;
 			}
 		}

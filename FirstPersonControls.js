@@ -489,8 +489,8 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 				continue;
 			else {
 				var center = this.objects[i].position.clone();
-				center.x += this.objects[i].children[0].startX;
-				center.z -= this.objects[i].children[0].startZ;
+				//center.x += this.objects[i].children[0].startX;
+				//center.z -= this.objects[i].children[0].startZ;
 
 				if (getDistance(corner, center) < tankCloseDistance)
 					return i;
