@@ -127,12 +127,17 @@ function TankServer() {
 					if(exists) {
 						fs.readFile(filePath, function(error, content) {
 							if(error) {
-								response.writeHead(500);
+								response.writeHead(500, {
+									"Access-Control-Allow-Origin": "*"
+								});
+								//response.writeHead("Access-Control-Allow-Origin: *");								
 								response.end();
 							} else {
 								response.writeHead(200, {
-									"Content-Type": contentType
+									"Content-Type": contentType,
+									"Access-Control-Allow-Origin": "*"
 								});
+								//response.writeHead("Access-Control-Allow-Origin: *");
 								response.end(content);
 							}
 						});
