@@ -58,13 +58,16 @@ function TankClient(){
 	});
 	var sphereGeo = new THREE.SphereGeometry(5, 30, 30);
 
-	$(document).ready(function() {
-		$('body').append('<div id="intro">Click to start</div>');
-		$('#intro').css({
-			width: WIDTH,
-			height: HEIGHT
-		});
-	});
+	if(document.readyState==="complete")
+	{
+		
+		div=document.createElement('div');
+		div.innerHTML="Click to start";
+		div.id="intro";
+		div.style.width=WIDTH;
+		div.style.height=HEIGHT;
+		document.getElementById("mybody").appendChild(div);
+	}
 
 	loader.options.convertUpAxis = true;
 	loader.load('./models/simple_tank1.dae', function(collada) {
@@ -97,6 +100,7 @@ function TankClient(){
 		dae2.updateMatrix();
 		dae2.id = 2;
 		obj2.add(dae2);
+		console.log("mobile jq");
 		obj2.position.set(0, 0, 0);
 		//dae2.rotation.y =  Math.PI/2;
 		objects.push(obj2);
@@ -108,13 +112,13 @@ function TankClient(){
 	});
 	var spinTank = function (angle,id) {
 		new TWEEN.Tween({
-			y : objects[id-1].rotation.y
+			y : objects[id-1].children[0].rotation.y
 		})
 		.to({
 			y : angle
-		}, 500)
+		}, 100)
 		.onUpdate(function () {
-			objects[id-1].rotation.y = this.y;
+			objects[id-1].children[0].rotation.y = this.y;
 		})
 		.start();
 	}	
@@ -127,7 +131,7 @@ function TankClient(){
 		.to({
 			x : pos.x,
 			z : pos.z
-		}, 500)
+		}, 100)
 		.onUpdate(function () {
 			objects[id-1].position.x = this.x;
 			objects[id-1].position.z = this.z;
@@ -217,7 +221,7 @@ function TankClient(){
 					gameStartTime = Date.now();
 					//serverStartTime = data.sTime;
 					console.log("Game started!");
-					$('#intro').fadeOut();
+					document.getElementById("intro").style.display="none";
 				});
 
 				socket.on("createBullet", function(data) {
@@ -326,17 +330,28 @@ function TankClient(){
 		camera.updateProjectionMatrix();
 
 		renderer.setSize(window.innerWidth, window.innerHeight);
-		$('#intro, #hurt').css({
+		document.getElementByID("intro").style.width=window.innerWidth;
+		document.getElementByID("intro").style.height=window.innerHeight;
+		
+		document.getElementByID("hurt").style.width=window.innerWidth;
+		document.getElementByID("hurt").style.height=window.innerHeight;
+		/*$('#intro, #hurt').css({
 			width: window.innerWidth,
 			height: window.innerHeight
-		});
+		});*/
 	}
 
 	function render() {
 		if(disconnected) {
-			$(renderer.domElement).fadeOut();
-			$('#intro').fadeIn();
-			$('#intro').html('You have been disconnected!');
+			//$(renderer.domElement).fadeOut();
+			//$('#intro').fadeIn();
+			//$('#intro').html('You have been disconnected!');
+			
+			
+			renderer.domElement.style.opacity=0;
+			document.getElementById("intro").style.display="block";	
+			//document.getElementById("intro").style.visibility="visible
+			document.getElementById("intro").innerHTML='You have been disconnected!';
 			return;
 		}
 		var timer = Date.now() * 0.0005;
