@@ -204,7 +204,7 @@ function TankClient(){
 					 {
 						
 						moveTank(new THREE.Vector3(data.oppX,0,data.oppZ),1);
-						spinTank(data.oppRot+Math.PI/2,1);
+						spinTank(data.oppRot,1);
 						
 						//obj.position.x = data.oppX;
 						//obj.position.z = data.oppZ;
@@ -411,10 +411,8 @@ function TankClient(){
 		} else {
 			angle = objects[player - 1].children[0].rotation.y - Math.PI / 2;
 		}
-		sphere.velX = -vel * Math.sin(angle % (2 * Math.PI));
-		sphere.velZ = -vel * Math.cos(angle % (2 * Math.PI));
-		// sphere.velX = (data.endX - objects[player - 1].position.x)/timeToMove;
-		// sphere.velZ = (data.endZ - objects[player - 1].position.z)/timeToMove;
+		sphere.velX = (data.endX - objects[player - 1].position.x)/(timeToMove/(1000/60));
+		sphere.velZ = (data.endZ - objects[player - 1].position.z)/(timeToMove/(1000/60));
 		sphere.cID = player;
 		sphere.stepX = 0;
 		bullets.push(sphere);

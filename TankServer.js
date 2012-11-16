@@ -12,7 +12,8 @@ function TankServer() {
 	var port; // Game port
 	var count; // Keeps track how many people are connected to server
 	var pause;
-
+	var prevTime = 0;
+	
 	//game
 	var startTime; // game start time in miliseconds
 	var nextPID; // PID to assign to next connected player (i.e. which player slot is open)
@@ -68,6 +69,9 @@ function TankServer() {
 			oppX: p2.tank.x,
 			oppZ: p2.tank.z,
 			oppRot: p2.tank.rotationY,
+			speedX: p2.tank.currTankVx,
+			speedZ:p2.tank.currTankVz,
+			deltaTime: p2.tank.dT,
 		};
 		var send2 = {
 			myX: p2.tank.x,
@@ -76,6 +80,9 @@ function TankServer() {
 			oppX: p1.tank.x,
 			oppZ: p1.tank.z,
 			oppRot: p1.tank.rotationY,
+			speedX: p1.tank.currTankVx,
+			speedZ: p1.tank.currTankVz,
+			deltaTime: p1.tank.dT,
 		};
 		io.sockets.socket(p1.sid).emit('update', send1);
 		io.sockets.socket(p2.sid).emit('update', send2);
@@ -245,6 +252,9 @@ function TankServer() {
 				// Upon receiving a message tagged with "move", along with an obj "data"
 				socket.on('move', function(data) {
 					//console.log(data);
+					//var currTime = Date.now();
+					//dT = currTime - prevTime;
+					//prevTime = currTime;
 					players[socket.id].tank.move(data.newX, data.newZ, data.rotY);
 				});
 

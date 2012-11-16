@@ -11,6 +11,11 @@ function Tank(posX, posZ) {
 	this.rotationY = Math.PI / 2;
 	this.health = 100;
 	this.cID;
+	this.prevTankVx=0;
+	this.currTankVx=0;
+	this.prevPosX=0;
+	this.prevPosZ=0;
+	this.dT = 0;
 
 	this.getAngularQuadrant = function() {
 		if(((this.rotationY > 0 && this.rotationY < Math.PI / 2) || (this.rotationY < 0 && this.rotationY > -2 * Math.PI && this.rotationY < -1.5 * Math.PI)) || this.rotationY == 0 || this.rotationY == -2 * Math.PI) 
@@ -73,9 +78,13 @@ Tank.tankHalfH = 55;
 
 /*=============   move [Public]   =============*/
 Tank.prototype.move = function(newx, newz, rotY) {
+	this.prevPosX = this.x;
+	this.prevPosZ = this.z;
 	this.x = newx;
 	this.z = newz;
 	this.rotationY = rotY;
+	this.currTankVx = (this.x - this.prevPosX)*1000/60;
+	this.currTankVz = (this.z - this.prevPosZ)*1000/60;
 }
 
 Tank.prototype.endPoint = function(time) {
