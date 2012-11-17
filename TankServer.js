@@ -44,16 +44,6 @@ function TankServer() {
 
 		var p1 = getPlayer(1);
 		var p2 = getPlayer(2);
-
-		//game win or lose 
-		// if (ball.y < Pong.HEIGHT/2) { //if ball in upper boundary
-		// 	io.sockets.socket(p1.sid).emit('endGame', {msg: "Player 1 Loses."});
-		// 	io.sockets.socket(p2.sid).emit('endGame', {msg: "Player 1 Loses."});
-		// }
-		// else {
-		// 	io.sockets.socket(p1.sid).emit('endGame', {msg: "Player 2 Loses."});
-		// 	io.sockets.socket(p2.sid).emit('endGame', {msg: "Player 2 Loses."});
-		// }
 	}
 
 	/*===================
@@ -263,9 +253,51 @@ function TankServer() {
 						msg: "There is now " + count + " players."
 					});
 				});
+				
+				/*socket.on('dc',function(data) {
+					var p1 = getPlayer(1);
+					var p2 = getPlayer(2);
+					io.sockets.socket(p1.sid).disconnect();
+					io.sockets.socket(p2.sid).disconnect();
+					});
+				*/
+				socket.on('lost',function(data) {
+					var p1 = getPlayer(1);
+					var p2 = getPlayer(2);
+					if(data.tank === 1) 
+					{
+						console.log("GAME IS FINISHED FOR 1st player");
+						io.sockets.socket(p1.sid).emit('endGameL', {});
+						io.sockets.socket(p2.sid).emit('endGameW', {});
+						//io.sockets.socket(p1.sid).disconnect();
+						//io.sockets.socket(p2.sid).disconnect();
+					}
+					else if(data.tank === 2)
+					{
+						io.sockets.socket(p1.sid).emit('endGameW', {});
+						io.sockets.socket(p2.sid).emit('endGameL', {});
+						console.log("GAME IS FINISHED FOR 2nd player");
+						//io.sockets.socket(p1.sid).disconnect();
+						//io.sockets.socket(p2.sid).disconnect();
+					}
+					if(gameInterval != undefined) {
+					resetGame();
+					}
+					// Decrease count
+					//count--;
+					// Set nextPID to quitting player's PID
+					//nextPID = data.tank;
+					// Remove player who wants to quit/closed the window
+					//delete players[socket.id];
+					// Sends to everyone connected to server except the client
+					//socket.broadcast.emit('serverMsg', {
+					//	msg: "There is now " + count + " players."
+					//});
+				});
 
 				// Upon receiving a message tagged with "start", along with an obj "data" (the "data" sent is {}. Refer to PongClient.js)
 				socket.on('start', function(data) {
+					console.log("start");
 					if(gameInterval !== undefined) {
 						console.log("Already playing!");
 					} else if(Object.keys(players).length < 2) {

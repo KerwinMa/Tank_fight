@@ -5,6 +5,7 @@ loadScript(lib_path, "Tank.js");
 loadScript("", "http://" + Game.SERVER_NAME + ":" + Game.PORT +"/socket.io/socket.io.js");
 //"http://" + Game.SERVER_NAME + ":" + Game.PORT + 
 function TankClient(){
+	var isLost = false;
 	//NETWORK
 	var socket;			// socket used to connect to server
 	var delay;			// delay simulated on current client
@@ -48,6 +49,11 @@ function TankClient(){
 	var gameStarted = false;
 	var gameStartTime = 0, serverStartTime = 0;
 	var disconnected = false;
+	
+	var endGameL = false;
+	var endGameW = false;
+	var restart = false;
+	
 	var threshX=threshZ=100;
 	
 	//TO SERVER
@@ -532,12 +538,14 @@ function TankClient(){
 					}
 				});
 				socket.on("startGame", function(data) {
+					document.getElementById("intro").style.display="none";
+					document.getElementById("intro").innerHTML='none';
 					gameStarted = true;
 					controls.movementSpeed = 5000;
 					gameStartTime = Date.now();
 					//serverStartTime = data.sTime;
 					console.log("Game started!");
-					document.getElementById("intro").style.display="none";
+					//document.getElementById("intro").style.display="none";
 				});
 
 				socket.on("createBullet", function(data) {
@@ -549,7 +557,17 @@ function TankClient(){
 
 				});
 
-				socket.on("endGame", function(data) {});
+				socket.on("endGameL", function() {
+					endGameL = true;
+					gameStarted = false;
+					disconnected = true;
+				});
+				
+				socket.on("endGameW", function() {
+					endGameW = true;
+					gameStarted = false;
+					disconnected = true;
+				});
 
 				// Upon disconnecting from server
 				socket.on("disconnect", function() {
@@ -588,16 +606,28 @@ function TankClient(){
 			console.log("click");
 			e.preventDefault;
 			if(gameStarted) {
+				console.log("playing");
 				if(e.which === 1) { // Left click only
 					createBullet(cID);
 					socket.emit("createBullet", {
 						playerID: cID
 					});
-				}
+				}	
 			} else {
-				socket.emit("start", {});
+				if(endGameL == true || endGameW == true){
+					
+					//initNetwork();
+				}
+					console.log("init network");
+					socket.emit("start", {});
+					//init();
+					console.log("here i am");
+					disconnected = false;
+					endGameL = false;
+					endGameW = false;
 			}
 		}, false);
+
 
 		document.addEventListener("touchend", function(e) {
 			console.log("click");
@@ -685,7 +715,31 @@ function TankClient(){
 	}
 
 	function render() {
-		if(disconnected) {
+		if(endGameL) 
+		{
+			renderer.domElement.style.opacity=0;
+			document.getElementById("intro").style.display="block";	
+			//document.getElementById("intro").style.visibility="visible";
+			document.getElementById("intro").innerHTML='You Lost :(! <div>Play Again?<\div>';
+			//restart = false;
+			socket.emit('dc',{});
+			//return;
+		}
+		else if(endGameW) 
+		{
+			renderer.domElement.style.opacity=0;
+			document.getElementById("intro").style.display="block";
+			//document.getElementById("intro").style.visibility="visible";
+			document.getElementById("intro").innerHTML='You Won:) <div>Play Again?<\div>';
+			socket.emit('dc',{});
+			// document.addEventListener("click", function(e) {
+				// e.preventDefault;
+				// initNetwork();
+				// socket.emit("start", {});
+			// }, false);
+			//return;
+		}
+		else if(disconnected) {
 			//$(renderer.domElement).fadeOut();
 			//$('#intro').fadeIn();
 			//$('#intro').html('You have been disconnected!');
@@ -694,9 +748,8 @@ function TankClient(){
 			renderer.domElement.style.opacity=0;
 			document.getElementById("intro").style.display="block";	
 			//document.getElementById("intro").style.visibility="visible
-			document.getElementById("intro").innerHTML='You have been disconnected!';
-			return;
-		}
+			document.getElementById("intro").innerHTML='You have been disconnected!';	
+		} else if(gameStarted) {
 		var timer = Date.now() * 0.0005;
 		var delta = clock.getDelta();
 		controls.update(0.001);
@@ -737,10 +790,22 @@ function TankClient(){
 				bullets.splice(i, 1);
 				scene.remove(b);
 				if(aim != -1) {
-					for(j = 0; j < tanks.length; j++)
-					if(tanks[j].cID == aim + 1) {
-						tanks[j].health -= 10;
-						//console.log("aim is  " + aim + " with health" + tanks[j].health);
+					for(j = 0; j < tanks.length; j++) 
+					{
+						if(tanks[j].cID == aim + 1) {
+							tanks[j].health -= 10;
+							console.log("aim is " + aim + " with health " + tanks[j].health);
+							if(tanks[j].health <= 0)
+							{
+								isLost = true;
+								console.log("lost is = " + isLost);
+								//disconnected = true;])
+								socket.emit("lost",{tank:tanks[j].cID});
+								tanks[j].health = 100;
+								//break;
+							}
+							
+						}
 					}
 				}
 				continue;
@@ -752,6 +817,9 @@ function TankClient(){
 		}
 		renderer.render(scene, camera);
 		stats.update();
+		} else {
+			console.log("wait");
+		}
 	}
 
 	function createBullet(cID) {
