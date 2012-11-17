@@ -83,6 +83,8 @@ VirtualJoystick.prototype.getDirection = function() {
 		return 3; //right
 	} else if( deltaX <= 0 && Math.abs(deltaY) < Math.abs(deltaX)){
 		return 4; //left
+	} else {
+		return -1;
 	}
 };
 
