@@ -2,8 +2,8 @@ TankClient.js// Load libraries
 var lib_path = "./";
 console.log("loading files...");
 loadScript(lib_path, "Tank.js");
-loadScript("", "http://" + Game.SERVER_NAME + ":" + Game.PORT + "/socket.io/socket.io.js");
-
+loadScript("", "http://" + Game.SERVER_NAME + ":" + Game.PORT +"/socket.io/socket.io.js");
+//"http://" + Game.SERVER_NAME + ":" + Game.PORT + 
 function TankClient(){
 	//NETWORK
 	var socket;			// socket used to connect to server
@@ -28,8 +28,8 @@ function TankClient(){
 	var objects=[];
 	var vel=7,velX=1, velZ=1;
 	
-		
-	//AI
+	//var joystick = new VirtualJoystick();	
+	//AI1
 	var aispeed=10;
 	
 	//MAP
@@ -70,7 +70,7 @@ function TankClient(){
 	}
 
 	loader.options.convertUpAxis = true;
-	loader.load('./models/simple_tank1.dae', function(collada) {
+	loader.load('./simple_tank1.dae', function(collada) {
 		obj = new THREE.Object3D();
 		dae = collada.scene;
 		dae2 = new THREE.Object3D();
@@ -585,6 +585,7 @@ function TankClient(){
 		projector = new THREE.Projector();
 
 		document.addEventListener("click", function(e) {
+			console.log("click");
 			e.preventDefault;
 			if(gameStarted) {
 				if(e.which === 1) { // Left click only
@@ -598,7 +599,21 @@ function TankClient(){
 			}
 		}, false);
 
+		document.addEventListener("touchend", function(e) {
+			console.log("click");
+			e.preventDefault;
+			if(gameStarted) {
+					createBullet(cID);
+					socket.emit("createBullet", {
+						playerID: cID
+					});
+			} else {
+				socket.emit("start", {});
+			}
+		}, false);
+
 		document.addEventListener("keydown", function(e) {
+			console.log("click");
 			e.preventDefault;
 			//console.log(e.keyCode);
 			if(gameStarted && e.keyCode === 32) {
@@ -606,6 +621,8 @@ function TankClient(){
 				socket.emit("createBullet", {
 					playerID: cID
 				});
+			} else {
+				socket.emit("start", {});
 			}
 		}, false);
 

@@ -2,41 +2,28 @@
 <widget xmlns="http://www.w3.org/ns/widgets"
         xmlns:rim="http://www.blackberry.com/ns/widgets"
         version="2.0.0.0">
- 
-  <author href="http://www.example.com/"
+	<author href="http://www.example.com/"
           rim:copyright="Copyright 1998-2012 My Corp">My Corp</author>
+	<name>Tank Fight</name>
+	
+	<rim:orientation mode="auto"/>
  
-  <name>Sample application</name>
- 
-  <description>
-    A sample application to demonstrate some features.
-  </description>
- 
-  <rim:orientation mode="auto"/>
- 
-  <rim:loadingScreen backgroundImage="wall-1.jpg"
+	<rim:loadingScreen backgroundImage="wall-1.jpg"
                      foregroundImage="wall-1.jpg"
                      onLocalPageLoad="true">
-    <rim:transitionEffect type="zoomIn"/>
-  </rim:loadingScreen>
+		<rim:transitionEffect type="zoomIn"/>
+	</rim:loadingScreen>
          
-  <rim:category name="games"/>   
+	<rim:category name="games"/>   
+  
+	<icon src="a.png"/>
  
-  <rim:permissions>
-    <rim:permit>access_shared</rim:permit>
-    <rim:permit>read_geolocation</rim:permit>
-    <rim:permit>use_camera</rim:permit> 
-  </rim:permissions>
+	<content src="tank_fight.html"/>
  
-  <icon src="a.png"/>
+	<feature id="blackberry.ui.dialog"/>
  
-  <content src="tank_fight.html"/>
- 
-  <feature id="blackberry.ui.dialog"/>
- 
-  <access uri="http://www.somedomain.com" subdomains="true">
-    <feature id="blackberry.app.event"/>
-    <feature id="blackberry.invoke"/>
-  </access>
- 
+	<access uri="http://www.somedomain.com" subdomains="true">
+		<feature id="blackberry.app.event"/>
+		<feature id="blackberry.invoke"/>
+	</access> 
 </widget>

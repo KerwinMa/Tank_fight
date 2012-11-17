@@ -1,11 +1,11 @@
--client should notify bullet creation, server should inform other client
+-scale to 4 players
+-rounds - maybe 1 more (proof of concept)
+-audio-visual effects
+-proper testing
+-reset game
+-bandwidth reduction
 
 
-Blackberry:
--add a lobby html file, which can be used to connect to the actual server, so that our game can be ported to blackberry bar file. 
--add controls
 
--can be accessed in playbook, just type url. But frame rate too low. (should be ported, should see how to) (FIXED! Needs to be tested)
-
-Later
--collision between bullet and tank & between tank and tank
+-local perception filter
+-report

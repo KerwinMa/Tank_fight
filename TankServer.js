@@ -29,11 +29,11 @@ function TankServer() {
 	  getPlayer [Private]
 	  ===================*/
 	var getPlayer = function(pid) {
-			// Returns the player in the players object, based on given PID
-			for(p in players) {
-				if(players[p].pid === pid) return players[p];
-			}
+		// Returns the player in the players object, based on given PID
+		for(p in players) {
+			if(players[p].pid === pid) return players[p];
 		}
+	}
 		/*===================
 	  resetGame [Private]
 	  ===================*/

@@ -45,11 +45,6 @@ function Tank(posX, posZ) {
 		var theta3 = Math.abs(Math.atan((800 - this.x) / (800 - this.z)));
 		var theta4 = Math.abs(Math.atan((800 - this.x) / (-800 - this.z)));
 
-		// console.log("theta1 " + theta1*180/Math.PI);
-		// console.log("theta2 " + theta2*180/Math.PI);
-		// console.log("theta3 " + theta3*180/Math.PI);
-		// console.log("theta4 " + theta4*180/Math.PI);
-
 		if((this.rotationY > 0 && (this.rotationY < theta1 || this.rotationY > (2*Math.PI-theta4))) || 
 			(this.rotationY < 0 && (this.rotationY > -theta4 || this.rotationY < (-2 * Math.PI + theta1))) || 
 			this.rotationY == 0) 

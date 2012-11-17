@@ -11,7 +11,10 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 	this.objects = objects;
 	this.target = new THREE.Vector3(0, 0, 0);
 	this.domElement = (domElement !== undefined) ? domElement : document;
-	
+	this.joystick	= new VirtualJoystick({
+				container	: document.getElementById('mybody'),
+				mouseSupport	: true
+	});
 	this.movementSpeed = 1.0;
 	this.lookSpeed = 0.005;
 	
@@ -56,10 +59,8 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 	var tankHalfW = 30;
 	var tankHalfH = 55;
 	var tankCloseDistance = 50;
-	if (this.domElement !== document) {
-		
-		this.domElement.setAttribute('tabindex', -1);
-		
+	if (this.domElement !== document) {		
+		this.domElement.setAttribute('tabindex', -1);		
 	}
 	
 	//
@@ -93,15 +94,13 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 		
 		if (this.activeLook) {
 			
-			switch (event.button) {
-				
+			switch (event.button) {				
 			case 0:
 				this.moveForward = true;
 				break;
 			case 2:
 				this.moveBackward = true;
-				break;
-				
+				break;				
 			}
 			
 		}
@@ -268,6 +267,38 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 	};
 	
 	this.update = function (delta) {
+		
+		console.log("joystick" + this.joystick.getDirection());
+		var touchDirection = this.joystick.getDirection();
+		if(touchDirection ===1){
+			this.moveForward= true;
+			this.moveBackward = false;
+			this.moveRight = false;
+			this.moveLeft = false;
+			console.log("up");
+		}
+		else if(touchDirection ===2){
+			this.moveForward= false;
+			this.moveBackward = true;
+			this.moveRight = false;
+			this.moveLeft = false;
+			console.log("down");
+		}
+		else if (touchDirection ===3) {
+			this.moveForward= false;
+			this.moveBackward = false;
+			this.moveRight = true;
+			this.moveLeft = false;
+			console.log("right");
+		} 
+		else if (touchDirection ===4) {
+			this.moveForward= false;
+			this.moveBackward = false;
+			this.moveRight = false;
+			this.moveLeft = true;
+			console.log("left");
+		}
+
 		var actualMoveSpeed = 0;
 		
 		if (this.freeze) {
@@ -296,7 +327,8 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 			var da = 5 * Math.PI / 180;
 			var pai = Math.PI;
 			
-			if (this.moveForward || (this.autoForward && !this.moveBackward)) {
+			if (this.moveForward) {
+				console.log("forward");
 				var corner1 = this.object.position.clone();
 				var corner2 = this.object.position.clone();
 				// corner1.x += this.object.children[0].startX;
@@ -320,8 +352,9 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 						this.object.children[0].rotation.y = (this.object.children[0].rotation.y - 10* Math.PI / 180) % (2 * pai);
 				}
 			}
-			
+		
 			if (this.moveBackward) {
+				console.log("moveBackward");
 				var corner1 = this.object.position.clone();
 				var corner2 = this.object.position.clone();
 				
@@ -343,9 +376,9 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 						this.object.children[0].rotation.y = (this.object.children[0].rotation.y - 10 * Math.PI / 180) % (2 * pai);
 				}
 			}
-			
-			if (this.moveRight) {
 				
+			if (this.moveRight) {
+				console.log("moveRight");
 				var corner1 = this.object.position.clone();
 				var corner2 = this.object.position.clone();
 				
@@ -367,6 +400,7 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 				}
 			}
 			if (this.moveLeft) {
+				console.log("moveLeft");
 				var corner1 = this.object.position.clone();
 				var corner2 = this.object.position.clone();
 				

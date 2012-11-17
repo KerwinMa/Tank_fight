@@ -107,7 +107,7 @@ THREE.ColladaLoader = function () {
 
 			}
 
-			request.open( "GET", url, true );
+			request.open( "GET", url, false);
 			request.send( null );
 
 		} else {
