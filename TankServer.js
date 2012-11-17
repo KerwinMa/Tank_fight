@@ -2,7 +2,11 @@ var libpath = "./";
 require(libpath + "Game.js");
 require(libpath + "Player.js");
 require(libpath + "Tank.js");
-
+require(libpath + "Map.js");
+var bullets = [];
+var myMap = new Map();
+var vel =7;
+var tankCloseDistance = 50;
 function TankServer() {
 	/*=========
 	  Variables
@@ -62,7 +66,8 @@ function TankServer() {
 		var p1 = getPlayer(1);
 		var p2 = getPlayer(2);
 
-		var send1 = {
+		var send1 = 
+		{
 			myX: p1.tank.x,
 			myZ: p1.tank.z,
 			myRot: p1.tank.rotationY,
@@ -73,7 +78,8 @@ function TankServer() {
 			speedZ:p2.tank.currTankVz,
 			deltaTime: p2.tank.dT,
 		};
-		var send2 = {
+		var send2 = 
+		{
 			myX: p2.tank.x,
 			myZ: p2.tank.z,
 			myRot: p2.tank.rotationY,
@@ -86,11 +92,36 @@ function TankServer() {
 		};
 		io.sockets.socket(p1.sid).emit('update', send1);
 		io.sockets.socket(p2.sid).emit('update', send2);
-		// } else {
-		// 	// Reset
-		// 	console.log("resetGame");
-		// 	resetGame();
-		// }
+		
+		for(var i = bullets.length - 1; i >= 0; i--) 
+		{
+			var b = bullets[i];
+			var aim = checkTankCollision(b.x,b.z);
+			var position={x:0,z:0};
+			position.x=b.x;
+			position.z=b.z;
+			if(myMap.checkWallCollision(position) || aim != -1) {
+				
+				bullets.splice(i, 1);
+				console.log("slicing");
+				//scene.remove(b);
+				if(aim != -1)
+				 {
+					for(j = 0; j <players.length; j++)
+					if(player[j].tank.cID == aim + 1)
+					 {
+						player[j].tank.health -= 10;
+					}
+				}
+				continue;
+			} else 
+			{
+				b.x+=b.velX;
+				b.z+=b.velZ;
+				
+			}
+		}
+
 	}
 
 	/*==================
@@ -263,21 +294,45 @@ function TankServer() {
 					players[socket.id].tank.move(data.newX, data.newZ, data.rotY);
 				});
 
-				socket.on('createBullet', function(data) {
+				socket.on('createBullet', function(data)
+				 {
 					//console.log("createBullet");
 					var p1 = getPlayer(1);
 					var p2 = getPlayer(2);
 					var curGameTime = Date.now() - startTime;
-					if(socket.id === p1.sid) {						
+					
+					
+					if(socket.id === p1.sid) 
+					{						
 						var prediction = p1.tank.endPoint(curGameTime);
+						
+						var bullet={x:0,z:0,velX:0,velZ:0};
+						
+						bullet.x=p1.tank.x;
+						bullet.z=p1.tank.z;
+						bullet.velX = -vel * Math.sin(p1.tank.rotationY % (2 * Math.PI));
+						bullet.velZ = -vel * Math.cos(p1.tank.rotationY % (2 * Math.PI));
+						bullets.push(bullet);
+						console.log("creating bullet for player p1  at x"+bullet.x+" z = "+bullet.z);
 						io.sockets.socket(p2.sid).emit("createBullet", {
 							playerID: data.playerID,
 							predTime: prediction.predTime,
 							endX: prediction.endX,
 							endZ: prediction.endZ
 						});
-					} else {
+					} 
+					else
+					{
 						var prediction = p2.tank.endPoint(curGameTime);
+						
+						var bullet={x:0,z:0,velX:0,velZ:0};
+
+						bullet.x=p2.tank.x;
+						bullet.x=p2.tank.z;
+						bullet.velX = -vel * Math.sin(p2.tank.rotationY % (2 * Math.PI));
+						bullet.velZ = -vel * Math.cos(p2.tank.rotationY % (2 * Math.PI));
+						bullets.push(bullet);
+						console.log("creating bullet for player p1  at x"+bullet.x+" z = "+bullet.z);
 						io.sockets.socket(p1.sid).emit("createBullet", {
 							playerID: data.playerID,
 							predTime: prediction.predTime,
@@ -297,6 +352,27 @@ function TankServer() {
 			console.log("Cannot listen to " + port + "\n" + e);
 		}
 	}
+
+function checkTankCollision	 (bulletX, bulletZ) {
+		for (i=0;i<players.length;i++) 
+		{
+			var centerX = players[i].tank.x;
+			var centerZ = players[i].tank.z;
+			if (getDistance(centerX, centerZ, bulletX, bulletZ) < tankCloseDistance)
+					return i;
+				
+			
+		}
+		
+		return -1;
+	}
+
+
+function getDistance(x1, z1, x2, z2) 
+	{
+			return Math.sqrt(Math.pow(x1 - x2) + Math.pow(z1 - z2));
+	}
+
 }
 
 // "public static void main(String[] args)"

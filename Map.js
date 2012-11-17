@@ -41,3 +41,4 @@ function Map()
 	}
 
 }
+global.Map=Map; 
