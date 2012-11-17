@@ -26,7 +26,7 @@ function TankClient(){
 	var tankCloseDistance = 50;
 	//for loading tank
 	var objects=[];
-	var vel=7,velX, velZ;
+	var vel=7,velX=1, velZ=1;
 	
 		
 	//AI
@@ -52,7 +52,7 @@ function TankClient(){
 	
 	//TO SERVER
 	var lastPosX=-500,lastPosZ=-500,lastRotY=0;
-	
+
 	var sphereMaterial = new THREE.MeshBasicMaterial({
 		color: 0x333333
 	});
@@ -110,13 +110,16 @@ function TankClient(){
 			render();
 		}, 1000 / 60); //Request animation frame is 60fps
 	});
+	
+	
+
 	var spinTank = function (angle,id) {
 		new TWEEN.Tween({
 			y : objects[id-1].children[0].rotation.y
 		})
 		.to({
 			y : angle
-		}, 100)
+		}, 50)
 		.onUpdate(function () {
 			objects[id-1].children[0].rotation.y = this.y;
 		})
@@ -192,24 +195,337 @@ function TankClient(){
 
 					setInterval(function() {
 						updateServer();
-					}, 50);
+					}, 100);
 				});
 
 				// Upon receiving a message tagged with "update", along with an obj "data"
 				socket.on("update", function(data) {
 					if(cID === 1) {
-						moveTank(new THREE.Vector3(data.oppX,0,data.oppZ), 2);
-						spinTank(data.oppRot+Math.PI/2, 2);
+						if(!(objects[1].prevX==data.oppX&&objects[1].prevZ==data.oppZ))
+							{
+								moveTank(new THREE.Vector3(data.oppX,0,data.oppZ), 2);
+								objects[1].prevX=data.oppX;
+								objects[1].prevZ=data.oppZ;
+							}		
+						//spinTank(data.oppRot+Math.PI/2, 2);
+						var direction = 1; //clockwise
+						var closest = closestAngle(data.oppRot);
+						console.log("closest" + closest*180/Math.PI);
+						console.log("my old rotation = "+objects[1].prevOppRot*180/Math.PI);
+						console.log("my current rotation = "+ objects[1].children[0].rotation.y*180/Math.PI + " obj rotation =" + objects[1].rotation.y*180/Math.PI);
+						console.log("my new rotation = "+data.oppRot*180/Math.PI);
+						var threshAngle = 5 * Math.PI / 180;
+
+						if(data.oppRot-objects[1].prevOppRot>0)
+							direction = 2; //anticlocwise
+						else if(data.oppRot-objects[1].prevOppRot==0)
+							direction = 0;//same direction 			
+						
+						objects[1].prevOppRot=data.oppRot;
+						//console.log("changing direction");
+						
+						if(direction!=0){
+							if(Math.abs(closest-data.oppRot)<=threshAngle)
+							{
+								console.log(closest);
+								spinTank(closest+Math.PI/2, 2);
+								setAutoSpeed(closest,1);
+
+							} else if(getRegion(data.oppRot)==1)
+							{
+
+								if(direction==1) 
+								{
+									if(data.oppRot>0)
+									{
+										spinTank(Math.PI/2 ,2);
+										setAutoSpeed(0,1);
+									}
+									else
+									{
+										spinTank(-3*Math.PI/2 ,2);
+										setAutoSpeed(0,1);
+									}
+										
+								}
+								else if(direction==2)
+								{
+									if(data.oppRot>0)
+									{
+										spinTank(Math.PI, 2);
+										setAutoSpeed(Math.PI/2,1);
+											
+									}
+									else
+									{
+										spinTank(-Math.PI, 2);
+										setAutoSpeed(-1.5*Math.PI,1);
+											
+									}
+								}
+							}
+							else if(getRegion(data.oppRot)==2)
+								{
+									if(direction==1)
+									{
+										if(data.oppRot>0)
+										{
+											spinTank(Math.PI, 2);
+											setAutoSpeed(Math.PI/2,1);	
+										}
+										else
+										{
+											spinTank(-Math.PI, 2);
+											setAutoSpeed(-1.5*Math.PI,1);
+										}
+										
+									}
+									else if(direction==2)
+									{
+										if(data.oppRot>0)
+										{
+											spinTank(1.5*Math.PI, 2);
+											setAutoSpeed(Math.PI,1);	
+										}
+										else
+										{
+											spinTank(-Math.PI/2, 2);
+											setAutoSpeed(-Math.PI,1);
+										}	
+									}
+								}
+								if(getRegion(data.oppRot)==3)
+								{
+									if(direction==1)
+									{
+										if(data.oppRot>0)
+										{
+											spinTank(Math.PI+Math.PI/2, 2);
+											setAutoSpeed(Math.PI,1);
+											//objects[1].children[0].rotation.y=Math.PI;
+											
+										}
+										else
+										{
+											spinTank(-Math.PI+Math.PI/2, 2);
+											setAutoSpeed(-Math.PI,1);
+										}
+									}
+									else if(direction==2)
+									{
+										if(data.oppRot>0)
+										{
+											spinTank(0, 2);
+											setAutoSpeed(1.5*Math.PI,1);
+											
+										}
+										else
+										{
+											spinTank(0, 2);
+											setAutoSpeed(-0.5*Math.PI,1);
+										}	
+									}
+								}	
+								if(getRegion(data.oppRot)==4)
+								{
+									if(direction==1)
+									{
+										if(data.oppRot>0)
+										{
+											spinTank(0, 2);
+											setAutoSpeed(1.5*Math.PI,1);
+										}
+										else
+										{
+											spinTank(0, 2);
+											setAutoSpeed(-0.5*Math.PI,1);
+										}
+									}
+									else if(direction==2)
+									{
+										if(data.oppRot>0)
+										{
+											spinTank(Math.PI/2, 2);
+											setAutoSpeed(0,1);
+										}
+										else
+										{
+											spinTank(-3*Math.PI/2, 2);
+											setAutoSpeed(0,1);
+
+										}	
+									}
+								}
+
+						}
+						//  console.log("prevx = "+objects[1].prevX+" prevz = "+objects[1].prevZ);
+						// console.log("direction =  "+direction);			
 						//obj2.position.x = data.oppX;
 						//obj2.position.z = data.oppZ;
 						//dae2.rotation.y = data.oppRot + Math.PI / 2;
 						//dae2.rotation.y = data.oppRot;
 					} else
 					 {
+						if(!(objects[0].prevX==data.oppX&&objects[0].prevX==data.oppZ))
+							{
+								moveTank(new THREE.Vector3(data.oppX,0,data.oppZ), 1);
+								objects[0].prevX=data.oppX;
+								objects[0].prevZ=data.oppZ;
+							}
 						
-						moveTank(new THREE.Vector3(data.oppX,0,data.oppZ),1);
-						spinTank(data.oppRot,1);
-						
+						//spinTank(data.oppRot,1);
+						var direction = 1; //clockwise
+						var closest = closestAngle(data.oppRot);
+						console.log("closest" + closest*180/Math.PI);
+						console.log("my old rotation = "+objects[0].prevOppRot*180/Math.PI);
+						console.log("my current rotation = "+ objects[0].children[0].rotation.y*180/Math.PI + " obj rotation =" + objects[0].rotation.y*180/Math.PI);
+						console.log("my new rotation = "+data.oppRot*180/Math.PI);
+						var threshAngle = 5 * Math.PI / 180;
+
+						if(data.oppRot-objects[0].prevOppRot>0)
+							direction = 2; //anticlocwise
+						if(data.oppRot-objects[0].prevOppRot==0)
+							direction = 0;//same direction 			
+						else
+							objects[0].prevOppRot=data.oppRot;
+						if(direction!=0){
+							if(Math.abs(closest-data.oppRot)<=threshAngle)
+							{
+								spinTank(closest, 1);
+								setAutoSpeed(closest,0);
+
+							} else if(getRegion(data.oppRot)==1)
+							{
+
+								if(direction==1) 
+								{
+									if(data.oppRot>0)
+									{
+										spinTank(0 ,1);
+										setAutoSpeed(0,0);
+									}
+									else
+									{
+										spinTank(0 ,1);
+										setAutoSpeed(0,0);
+									}
+										
+								}
+								else if(direction==2)
+								{
+									if(data.oppRot>0)
+									{
+										spinTank(Math.PI/2, 1);
+										setAutoSpeed(Math.PI/2,0);
+											
+									}
+									else
+									{
+										spinTank(-1.5*Math.PI, 1);
+										setAutoSpeed(-1.5*Math.PI,0);
+											
+									}
+								}
+							}
+							else if(getRegion(data.oppRot)==2)
+								{
+									if(direction==1)
+									{
+										if(data.oppRot>0)
+										{
+											spinTank(Math.PI/2, 1);
+											setAutoSpeed(Math.PI/2,0);	
+										}
+										else
+										{
+											spinTank(-1.5*Math.PI, 1);
+											setAutoSpeed(-1.5*Math.PI,0);
+										}
+										
+									}
+									else if(direction==2)
+									{
+										if(data.oppRot>0)
+										{
+											spinTank(Math.PI, 1);
+											setAutoSpeed(Math.PI,0);	
+										}
+										else
+										{
+											spinTank(-Math.PI, 1);
+											setAutoSpeed(-Math.PI,0);
+										}	
+									}
+								}
+								if(getRegion(data.oppRot)==3)
+								{
+									if(direction==1)
+									{
+										if(data.oppRot>0)
+										{
+											spinTank(Math.PI, 1);
+											setAutoSpeed(Math.PI,0);
+											//objects[1].children[0].rotation.y=Math.PI;
+											
+										}
+										else
+										{
+											spinTank(-Math.PI, 1);
+											setAutoSpeed(-Math.PI,0);
+										}
+									}
+									else if(direction==2)
+									{
+										if(data.oppRot>0)
+										{
+											spinTank(1.5*Math.PI, 1);
+											setAutoSpeed(1.5*Math.PI,0);
+											
+										}
+										else
+										{
+											spinTank(-0.5*Math.PI, 1);
+											setAutoSpeed(-0.5*Math.PI,0);
+										}	
+									}
+								}	
+								if(getRegion(data.oppRot)==4)
+								{
+									if(direction==1)
+									{
+										if(data.oppRot>0)
+										{
+											spinTank(1.5*Math.PI, 1);
+											setAutoSpeed(1.5*Math.PI,0);
+										}
+										else
+										{
+											spinTank(-0.5*Math.PI, 1);
+											setAutoSpeed(-0.5*Math.PI,0);
+										}
+									}
+									else if(direction==2)
+									{
+										if(data.oppRot>0)
+										{
+											spinTank(0, 1);
+											setAutoSpeed(0,0);
+										}
+										else
+										{
+											spinTank(0, 1);
+											setAutoSpeed(0,0);
+
+										}	
+									}
+								}
+
+						}
+						// console.log("direction =  "+direction);	
+						//   console.log("prevx = "+objects[0].prevX+" prevz = "+objects[0].prevZ);
+	
+						 // console.log("vx = "+objects[0].vx+" vz = "+objects[0].vz);
+
 						//obj.position.x = data.oppX;
 						//obj.position.z = data.oppZ;
 						//dae.rotation.y = data.oppRot;
@@ -225,7 +541,7 @@ function TankClient(){
 				});
 
 				socket.on("createBullet", function(data) {
-					console.log("Creating bullet for player " +data.playerID);
+					//console.log("Creating bullet for player " +data.playerID);
 					createOppBullet(data);
 				});
 
@@ -257,7 +573,7 @@ function TankClient(){
 		Game.HEIGHT = window.innerHeight;
 		Game.WIDTH = window.innerWidth;
 
-		console.log("game width:" + Game.HEIGHT + " " + Game.WIDTH);
+		//console.log("game width:" + Game.HEIGHT + " " + Game.WIDTH);
 		camera = new THREE.OrthographicCamera(window.innerWidth / -1, window.innerWidth / 1, window.innerHeight / 1, window.innerHeight / -1, -1000, 1000);
 		camera.position.x = 55; //60
 		camera.position.y = 45; //45
@@ -321,7 +637,17 @@ function TankClient(){
 		stats.domElement.style.position = 'absolute';
 		stats.domElement.style.top = '0px';
 		container.appendChild(stats.domElement);
-
+		for(i=0;i<objects.length;i++)
+	{
+		
+		{
+			objects[i].vx=0;
+			objects[i].vz=0;
+			objects[i].prevOppRot=objects[i].children[0].rotation.y;
+			objects[i].prevX=objects[i].position.x;
+			objects[i].prevZ=objects[i].position.z;
+		}
+	}
 		//window.addEventListener('resize', onWindowResize, false);
 	}
 
@@ -357,6 +683,29 @@ function TankClient(){
 		var timer = Date.now() * 0.0005;
 		var delta = clock.getDelta();
 		controls.update(0.001);
+		 
+
+
+		for(i=0;i<objects.length;i++)
+		{
+			 if(i==cID-1)
+			 	continue;
+			if(cID==1)
+			{
+				objects[i].translateX(objects[i].vx);
+				objects[i].translateZ(objects[i].vz);
+				//console.log("x= "+objects[i].vx+" z ="+objects[i].vz);
+			}
+			else if(cID==2)
+			{
+				objects[i].translateX(-objects[i].vz);
+				objects[i].translateZ(objects[i].vx);
+				//console.log("x= "+objects[i].vx+" z ="+objects[i].vz);
+			}	
+				
+		}
+		// console.log("vx = "+objects[0].vx+" vz = "+objects[0].vz+"rot"+objects[0].children[0].rotation.y);
+
 		camera.lookAt(scene.position);
 
 		TWEEN.update();
@@ -366,15 +715,15 @@ function TankClient(){
 			var b = bullets[i];
 			var aim = checkTankCollision(b);
 			if(myMap.checkWallCollision(b.position) || aim != -1) {
-				console.log("endpoint" + b.position);
-				console.log("steps " + b.stepX);
+				// console.log("endpoint" + b.position);
+				// console.log("steps " + b.stepX);
 				bullets.splice(i, 1);
 				scene.remove(b);
 				if(aim != -1) {
 					for(j = 0; j < tanks.length; j++)
 					if(tanks[j].cID == aim + 1) {
 						tanks[j].health -= 10;
-						console.log("aim is  " + aim + " with health" + tanks[j].health);
+						//console.log("aim is  " + aim + " with health" + tanks[j].health);
 					}
 				}
 				continue;
@@ -543,7 +892,55 @@ function TankClient(){
 		}
 		return -1;
 	}
-}
+	function getRegion(angle) {
+		if (((angle > 0 && angle < Math.PI / 2) || (angle < 0 && angle > -2 * Math.PI && angle < -1.5 * Math.PI)) || angle == 0 || angle == -2 * Math.PI)
+			return 1;
+		else if (((angle > 0 && angle < Math.PI && angle > 0.5 * Math.PI) || (angle < 0 && angle < -Math.PI && angle > -1.5 * Math.PI)) || angle == Math.PI / 2 || angle == -1.5 * Math.PI)
+			return 2;
+		else if (((angle > 0 && angle > Math.PI && angle < 1.5 * Math.PI) || (angle < 0 && angle > -Math.PI && angle < -0.5 * Math.PI)) || angle == Math.PI || angle == -Math.PI)
+			return 3;
+		else
+			return 4;
+		
+	}
+	function closestAngle(angle,direction)
+	{
+		var threshAngle=5*Math.PI/180;
+		var closest=3/2*Math.PI;
+		for(ang=(3/2)*Math.PI;ang>=-3/2*Math.PI;ang-=Math.PI/2)
+		{
+			if(Math.abs(angle-ang)<Math.abs(closest-angle))
+				closest=ang;	
+		}
+		return closest;
+	}
+	function setAutoSpeed(angle,id)
+	{
+		if(angle==0)
+		{
+			objects[id].vx=0;
+			objects[id].vz=-velZ;
+		}
+		if(angle==Math.PI/2||angle==-1.5*Math.PI)
+		{
+			objects[id].vx=-velX;
+			objects[id].vz=0;
+		}
+		if(angle==Math.PI||angle==-Math.PI)
+		{
+			objects[id].vx=0;
+			objects[id].vz=velZ;
+		}
+		if(angle==1.5*Math.PI||angle==-Math.PI/2)
+		{
+			objects[id].vx=velX;
+			objects[id].vz=0;
+		}
+
+	}
+		
+	}
+
 
 // This will auto run after this script is loaded
 // Run Client. Give leeway of 0.1 second for libraries to load
