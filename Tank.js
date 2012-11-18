@@ -89,7 +89,9 @@ Tank.prototype.endPoint = function(time) {
 	var endX;
 	if(corner===1){
 		endZ = -800;
-		if(angQuad===1){
+		if(Math.abs(this.rotationY%2*Math.PI) <1) {
+			endX = this.x;
+		} else if(angQuad===1){
 			var heightX = Math.abs(-800-this.z)*Math.tan(this.rotationY);
 			endX = this.x - heightX;
 		} else if (angQuad===4) {
@@ -100,7 +102,9 @@ Tank.prototype.endPoint = function(time) {
 		}
 	} else if(corner===2){
 		endX = -800;
-		if(angQuad===1){
+		if(Math.abs(this.rotationY + 1.5*Math.PI) <1 || Math.abs(this.rotationY - Math.PI/2) <1){
+			endZ = this.z;
+		} else if(angQuad===1){
 			var heightZ = Math.abs(-800-this.x)/Math.tan(this.rotationY);
 			endZ = this.z - heightZ;
 		} else if (angQuad===2) {
@@ -111,7 +115,9 @@ Tank.prototype.endPoint = function(time) {
 		}
 	} else if (corner===3){
 		endZ = 800;
-		if(angQuad===2){
+		if(Math.abs(Math.abs(this.rotationY) - Math.PI) < 1) {
+			endX = this.x;
+		} else if(angQuad===2){
 			var heightX = Math.abs(800-this.z)*Math.tan(Math.PI-this.rotationY);
 			endX = this.x - heightX;
 		} else if (angQuad===3) {
@@ -121,13 +127,16 @@ Tank.prototype.endPoint = function(time) {
 			console.log("error in calculating endpoint!");
 		}
 	} else if (corner===4){
-		endX = -800;
-		if(angQuad===3){
-			var heightZ = Math.abs(800-this.x)/Math.tan(0.75*Math.PI - this.rotationY);
-			console.log("rotation" + this.rotationY*Math.PI/180 + "heightZ" + heightZ);
+		endX = 800;
+		console.log(this.rotationY + " z =" + this.z);
+		console.log(Math.abs(this.rotationY - 1.5*Math.PI)*180/Math.PI);
+		if(Math.abs(this.rotationY - 1.5*Math.PI)*180/Math.PI < 1 || Math.abs(this.rotationY + Math.PI/2)*180/Math.PI < 1){
+			endZ = this.z;
+		} else if(angQuad===3){
+			var heightZ = Math.abs(800-this.x)/Math.tan(1.5*Math.PI - this.rotationY);
 			endZ = this.z + heightZ;
 		} else if (angQuad===4) {
-			var heightZ = Math.abs(800-this.x)/Math.tan(this.rotationY-0.75*Math.PI);
+			var heightZ = Math.abs(800-this.x)/Math.tan(this.rotationY-1.5*Math.PI);
 			endZ = this.z - heightZ;
 		} else {
 			console.log("error in calculating endpoint!");
@@ -147,27 +156,27 @@ Tank.prototype.endPoint = function(time) {
 			endZ = -800;
 		}
 	}
-	// console.log("corner " + corner);
+
 	console.log("end points: " + endX + ", " + endZ);
 
-	var vx = Math.sin(this.rotationY)*(-7);
-	var vz = -7*Math.cos(this.rotationY);
-	console.log(Math.floor(vx) + " " + Math.floor(vz) + " predvelocity ");
-
+	var vx = Math.sin(this.rotationY%(2*Math.PI))*(-7);
+	var vz = (-7)*Math.cos(this.rotationY%(2*Math.PI));
+	console.log(Math.floor(vx) + " " + Math.ceil(vz) + " predvelocity ");
 
 	var stepX = Math.ceil((endX - this.x)/vx);
 	var stepZ = Math.ceil((endZ - this.z)/vz);
 	
 	var predTime = 0;
 
-	if(Math.floor(vx)==0) {
-		console.log("predicted steps  z="+ stepZ + "/ " +stepX);
+	if(Math.floor(vx)==0||Math.floor(vx)==-1) {
+		console.log("predicted steps  z="+ stepZ + "/ " + stepX);
 		predTime = time + ((stepZ+1)*1000/60);
 	} else {
-		console.log("predicted steps x= "+stepX + "/ " + stepZ);
+		console.log("predicted steps x= "+ stepX + "/ " + stepZ);
 		predTime = time + ((stepX+1)*1000/60);
 	}
 
 	return {endX:endX, endZ: endZ, predTime: predTime};
 }
+
 global.Tank = Tank;
