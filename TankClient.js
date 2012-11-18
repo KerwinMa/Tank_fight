@@ -43,7 +43,6 @@ function TankClient(){
 	//BULLETS
 	var bullets = [];
 	
-	
 	//GAME
 	var tanks = [];
 	var gameStarted = false;
@@ -54,7 +53,7 @@ function TankClient(){
 	var endGameW = false;
 	var restart = false;
 	
-	var threshX=threshZ=100;
+	var threshX=100,threshZ=100;
 	
 	//TO SERVER
 	var lastPosX=-500,lastPosZ=-500,lastRotY=0;
@@ -649,9 +648,6 @@ function TankClient(){
 			if(myMap.checkWallCollision(b.position) || aim != -1) {
 				bullets.splice(i, 1);
 				playSound("shot.mp3");
-				camera.position.x-= 10; //60
-				camera.position.y-=10; //45
-				camera.position.z = 0;
 				scene.remove(b);
 
 				// if(aim != -1) {
@@ -811,16 +807,13 @@ function TankClient(){
 	
 	function updateServer() {
 
-		//if(cID===1)
-		//	socket.emit("move", {newX: obj.position.x, newZ: obj.position.z, rotY: dae.rotation.y});
-		//else
-		//	socket.emit("move", {newX: obj2.position.x, newZ: obj2.position.z, rotY: dae2.rotation.y});
-
 		if (cID === 1) {
-			//if( (Math.abs(obj.position.x-lastPosX)>threshX||Math.abs(obj.position.z-lastPosZ)>threshZ)&&lastRotY!=dae.rotation.y)
+			( (Math.abs(obj.position.x-lastPosX)>threshX||Math.abs(obj.position.z-lastPosZ)>threshZ)||lastRotY!=dae.rotation.y)
 			{
-				//lastPosX=obj.position.x;lastPosZ=obj.position.z;lastRotY=dae.rotation.y
-				//console.log("Updatin server");
+				lastPosX=obj.position.x;
+				lastPosZ=obj.position.z;
+				lastRotY=dae.rotation.y
+				console.log("Updating server");
 				socket.emit("move", {
 					newX : obj.position.x,
 					newZ : obj.position.z,
@@ -828,10 +821,12 @@ function TankClient(){
 				});
 			}
 		} else {
-			//if((Math.abs(obj2.position.x-lastPosX)>threshX||(Math.abs(obj2.position.z-lastPosZ)>threshZ))&&lastRotY!=dae2.rotation.y)	
+			if((Math.abs(obj2.position.x-lastPosX)>threshX||(Math.abs(obj2.position.z-lastPosZ)>threshZ))||lastRotY!=dae2.rotation.y)	
 			{
-				//lastPosX=obj2.position.x;lastPosZ=obj2.position.z;lastRotY=dae2.rotation.y
-				//console.log("Updatin server");
+				lastPosX=obj2.position.x;
+				lastPosZ=obj2.position.z;
+				lastRotY=dae2.rotation.y
+				console.log("Updating server");
 				socket.emit("move", {
 					newX : obj2.position.x,
 					newZ : obj2.position.z,

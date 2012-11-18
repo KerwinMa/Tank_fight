@@ -74,10 +74,10 @@ function TankServer() {
 
 			if(myMap.checkWallCollision(position) || aim != -1) {
 				bullets.splice(i, 1);
-				//console.log("slicing");
+				console.log("slicing");
 				if(aim != -1) {
 					for(j = 0; j < players.length; j++) {
-						if(player[j].tank.cID == aim + 1) {
+						if(j==aim) {
 							player[j].tank.health -= 10;
 							if(player[j].tank.health <= 0) {
 								resetGame();
@@ -390,7 +390,7 @@ function TankServer() {
 
 	function getDistance(x1, z1, x2, z2) 
 	{
-			return Math.sqrt(Math.pow(x1 - x2) + Math.pow(z1 - z2));
+			return Math.sqrt(Math.pow(x1 - x2,2) + Math.pow(z1 - z2,2));
 	}
 
 }

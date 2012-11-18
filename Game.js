@@ -6,7 +6,7 @@ var Game = {
 	WIDTH: 500,
 	PORT: 8081,
 	FRAME_RATE: 60,	//30	
-	SERVER_NAME: "172.23.89.19"
+	SERVER_NAME: "localhost"
 
 	//SERVER_NAME: "ec2-175-41-154-33.ap-southeast-1.compute.amazonaws.com" 
 }
