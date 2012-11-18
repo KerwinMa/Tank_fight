@@ -13,14 +13,13 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 	this.domElement = (domElement !== undefined) ? domElement : document;
 	this.joystick	= new VirtualJoystick({
 				container	: document.getElementById('mybody'),
-				mouseSupport	: true
+				mouseSupport	: false
 	});
 	this.movementSpeed = 1.0;
 	this.lookSpeed = 0.005;
 	
 	this.lookVertical = true;
 	this.autoForward = false;
-	// this.invertVertical = false;
 	
 	this.activeLook = true;
 	
@@ -63,48 +62,35 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 		this.domElement.setAttribute('tabindex', -1);		
 	}
 	
-	//
-	
-	this.handleResize = function () {
-		
+	this.handleResize = function () {		
 		if (this.domElement === document) {
-			
 			this.viewHalfX = window.innerWidth / 2;
-			this.viewHalfY = window.innerHeight / 2;
-			
-		} else {
-			
+			this.viewHalfY = window.innerHeight / 2;			
+		} else {			
 			this.viewHalfX = this.domElement.offsetWidth / 2;
-			this.viewHalfY = this.domElement.offsetHeight / 2;
-			
-		}
-		
+			this.viewHalfY = this.domElement.offsetHeight / 2;			
+		}		
 	};
 	
 	this.onMouseDown = function (event) {
 		
-		if (this.domElement !== document) {
-			
-			this.domElement.focus();
-			
+		if (this.domElement !== document) {			
+			this.domElement.focus();			
 		}
 		
 		event.preventDefault();
 		event.stopPropagation();
 		
-		if (this.activeLook) {
-			
+		if (this.activeLook) {			
 			switch (event.button) {				
-			case 0:
-				this.moveForward = true;
-				break;
-			case 2:
-				this.moveBackward = true;
-				break;				
-			}
-			
-		}
-		
+				case 0:
+					this.moveForward = true;
+					break;
+				case 2:
+					this.moveBackward = true;
+					break;				
+			}			
+		}		
 		this.mouseDragOn = true;
 		
 	};
@@ -114,47 +100,34 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 		event.preventDefault();
 		event.stopPropagation();
 		
-		if (this.activeLook) {
-			
-			switch (event.button) {
-				
-			case 0:
-				this.moveForward = false;
-				break;
-			case 2:
-				this.moveBackward = false;
-				break;
-				
-			}
-			
-		}
-		
-		this.mouseDragOn = false;
-		
+		if (this.activeLook) {			
+			switch (event.button) {				
+				case 0:
+					this.moveForward = false;
+					break;
+				case 2:
+					this.moveBackward = false;
+					break;
+			}			
+		}		
+		this.mouseDragOn = false;		
 	};
 	
-	this.onMouseMove = function (event) {
-		
-		if (this.domElement === document) {
-			
+	this.onMouseMove = function (event) {		
+		if (this.domElement === document) {			
 			this.mouseX = event.pageX - this.viewHalfX;
-			this.mouseY = event.pageY - this.viewHalfY;
-			
-		} else {
-			
+			this.mouseY = event.pageY - this.viewHalfY;			
+		} else {			
 			this.mouseX = event.pageX - this.domElement.offsetLeft - this.viewHalfX;
-			this.mouseY = event.pageY - this.domElement.offsetTop - this.viewHalfY;
-			
-		}
-		
+			this.mouseY = event.pageY - this.domElement.offsetTop - this.viewHalfY;			
+		}		
 	};
 	
 	this.onKeyDown = function (event) {
 		
 		//event.preventDefault();
 		//console.log(event.keyCode);
-		switch (event.keyCode) {
-			
+		switch (event.keyCode) {			
 		case 38:
 			/*up*/
 		case 87:
@@ -167,22 +140,19 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 		case 65:
 			/*A*/
 			this.moveLeft = true;
-			break;
-			
+			break;			
 		case 40:
 			/*down*/
 		case 83:
 			/*S*/
 			this.moveBackward = true;
-			break;
-			
+			break;			
 		case 39:
 			/*right*/
 		case 68:
 			/*D*/
 			this.moveRight = true;
-			break;
-			
+			break;			
 		case 82:
 			/*R*/
 			this.moveUp = false;
@@ -190,18 +160,15 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 		case 70:
 			/*F*/
 			this.moveDown = false;
-			break;
-			
+			break;			
 		case 81:
 			/*Q*/
 			//this.freeze = !this.freeze;
-			break;
-			
+			break;			
 		case 32:
 			/*space*/
 			this.shoot = true;
-			break;
-			
+			break;			
 		}
 		
 	};
@@ -267,57 +234,46 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 	};
 	
 	this.update = function (delta) {
-		
-		console.log("joystick" + this.joystick.getDirection());
 		var touchDirection = this.joystick.getDirection();
 		if(touchDirection ===1){
 			this.moveForward= true;
 			this.moveBackward = false;
 			this.moveRight = false;
 			this.moveLeft = false;
-			console.log("up");
 		}
 		else if(touchDirection ===2){
 			this.moveForward= false;
 			this.moveBackward = true;
 			this.moveRight = false;
 			this.moveLeft = false;
-			console.log("down");
 		}
 		else if (touchDirection ===3) {
 			this.moveForward= false;
 			this.moveBackward = false;
 			this.moveRight = true;
 			this.moveLeft = false;
-			console.log("right");
 		} 
 		else if (touchDirection ===4) {
 			this.moveForward= false;
 			this.moveBackward = false;
 			this.moveRight = false;
 			this.moveLeft = true;
-			console.log("left");
 		}
 
 		var actualMoveSpeed = 0;
 		
 		if (this.freeze) {
 			console.log("this.freeze");
-			return;
-			
+			return;			
 		} else {
 			
-			if (this.heightSpeed) {
-				
+			if (this.heightSpeed) {				
 				var y = THREE.Math.clamp(this.object.position.y, this.heightMin, this.heightMax);
 				var heightDelta = y - this.heightMin;
 				
-				this.autoSpeedFactor = delta * (heightDelta * this.heightCoef);
-				
-			} else {
-				
-				this.autoSpeedFactor = 0.0;
-				
+				this.autoSpeedFactor = delta * (heightDelta * this.heightCoef);				
+			} else {				
+				this.autoSpeedFactor = 0.0;				
 			}
 			
 			actualMoveSpeed = delta * this.movementSpeed;
@@ -328,13 +284,8 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 			var pai = Math.PI;
 			
 			if (this.moveForward) {
-				console.log("forward");
 				var corner1 = this.object.position.clone();
 				var corner2 = this.object.position.clone();
-				// corner1.x += this.object.children[0].startX;
-				// corner2.x += this.object.children[0].startX;
-				// corner1.z -= this.object.children[0].startZ;
-				// corner2.z -= this.object.children[0].startZ;
 				
 				corner1.x -= tankHalfH;
 				corner1.z += tankHalfW;
@@ -354,7 +305,6 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 			}
 		
 			if (this.moveBackward) {
-				console.log("moveBackward");
 				var corner1 = this.object.position.clone();
 				var corner2 = this.object.position.clone();
 				
@@ -366,7 +316,6 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 				
 				if ((cd > 1.5 * pai - da && cd < 1.5 * pai + da) || (cd < -0.5 * pai + da && cd > -0.5 * pai - da)) {
 					if (!myMap.checkWallCollision(corner1) && !myMap.checkWallCollision(corner2) && this.checkTankCollision(corner1) == -1) {
-						
 						this.object.translateZ(actualMoveSpeed);
 					}
 				} else {
@@ -378,7 +327,6 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 			}
 				
 			if (this.moveRight) {
-				console.log("moveRight");
 				var corner1 = this.object.position.clone();
 				var corner2 = this.object.position.clone();
 				
@@ -400,7 +348,6 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 				}
 			}
 			if (this.moveLeft) {
-				console.log("moveLeft");
 				var corner1 = this.object.position.clone();
 				var corner2 = this.object.position.clone();
 				
@@ -436,7 +383,7 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 			
 			this.lon += this.mouseX * actualLookSpeed;
 			if (this.lookVertical)
-				this.lat -= this.mouseY * actualLookSpeed; // * this.invertVertical?-1:1;
+				this.lat -= this.mouseY * actualLookSpeed; 
 			
 			this.lat = Math.max( - 85, Math.min(85, this.lat));
 			this.phi = (90 - this.lat) * Math.PI / 180;
@@ -447,8 +394,7 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 			
 			targetPosition.x = position.x + 100 * Math.sin(this.phi) * Math.cos(this.theta);
 			targetPosition.y = position.y + 100 * Math.cos(this.phi);
-			targetPosition.z = position.z + 100 * Math.sin(this.phi) * Math.sin(this.theta);
-			
+			targetPosition.z = position.z + 100 * Math.sin(this.phi) * Math.sin(this.theta);			
 		}
 		
 		var verticalLookRatio = 1;
@@ -469,9 +415,7 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 		this.theta = this.lon * Math.PI / 180;
 		
 		if (this.constrainVertical) {
-			
-			this.phi = THREE.Math.mapLinear(this.phi, 0, Math.PI, this.verticalMin, this.verticalMax);
-			
+			this.phi = THREE.Math.mapLinear(this.phi, 0, Math.PI, this.verticalMin, this.verticalMax);			
 		}
 		
 		var targetPosition = this.target,
@@ -501,18 +445,15 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 		else if (((angle > 0 && angle > Math.PI && angle < 1.5 * Math.PI) || (angle < 0 && angle > -Math.PI && angle < -0.5 * Math.PI)) || angle == Math.PI || angle == -Math.PI)
 			return 3;
 		else
-			return 4;
-		
+			return 4;		
 	};
-	function bind(scope, fn) {
-		
-		return function () {
-			
-			fn.apply(scope, arguments);
-			
-		};
-		
+
+	function bind(scope, fn) {		
+		return function () {			
+			fn.apply(scope, arguments);			
+		};		
 	};
+
 	function getDistance(pos1, pos2) {
 		return Math.sqrt(Math.pow(pos1.x - pos2.x, 2) + Math.pow(pos1.z - pos2.z, 2));
 	}
@@ -523,18 +464,11 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 				continue;
 			else {
 				var center = this.objects[i].position.clone();
-				//center.x += this.objects[i].children[0].startX;
-				//center.z -= this.objects[i].children[0].startZ;
-
 				if (getDistance(corner, center) < tankCloseDistance)
-					return i;
-				
+					return i;		
 			}
-		}
-		
+		}		
 		return -1;
-	}
-	
-	this.handleResize();
-	
+	}	
+	this.handleResize();	
 };

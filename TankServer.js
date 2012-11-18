@@ -34,7 +34,8 @@ function TankServer() {
 			if(players[p].pid === pid) return players[p];
 		}
 	}
-		/*===================
+
+	/*===================
 	  resetGame [Private]
 	  ===================*/
 	var resetGame = function() {
@@ -49,69 +50,68 @@ function TankServer() {
 	/*===================
 	  gameLoop [Private]
 	  ===================*/
-	var gameLoop = function() {
-		// Check if ball is moving
-		//if (ball.isMoving()) {
-		// Grab players
-		var p1 = getPlayer(1);
-		var p2 = getPlayer(2);
-
-		var send1 = 
-		{
-			myX: p1.tank.x,
-			myZ: p1.tank.z,
-			myRot: p1.tank.rotationY,
-			oppX: p2.tank.x,
-			oppZ: p2.tank.z,
-			oppRot: p2.tank.rotationY,
-			speedX: p2.tank.currTankVx,
-			speedZ:p2.tank.currTankVz,
-			deltaTime: p2.tank.dT,
-		};
-		var send2 = 
-		{
-			myX: p2.tank.x,
-			myZ: p2.tank.z,
-			myRot: p2.tank.rotationY,
-			oppX: p1.tank.x,
-			oppZ: p1.tank.z,
-			oppRot: p1.tank.rotationY,
-			speedX: p1.tank.currTankVx,
-			speedZ: p1.tank.currTankVz,
-			deltaTime: p1.tank.dT,
-		};
-		io.sockets.socket(p1.sid).emit('update', send1);
-		io.sockets.socket(p2.sid).emit('update', send2);
-		
-		for(var i = bullets.length - 1; i >= 0; i--) 
-		{
+	var gameLoop = function() {		
+		for(var i = bullets.length - 1; i >= 0; i--) {
 			var b = bullets[i];
-			var aim = checkTankCollision(b.x,b.z);
-			var position={x:0,z:0};
-			position.x=b.x;
-			position.z=b.z;
+			var aim = checkTankCollision(b.x, b.z);
+
+			var position = {
+				x: 0,
+				z: 0
+			};
+			position.x = b.x;
+			position.z = b.z;
+
 			if(myMap.checkWallCollision(position) || aim != -1) {
-				
 				bullets.splice(i, 1);
 				console.log("slicing");
-				//scene.remove(b);
-				if(aim != -1)
-				 {
-					for(j = 0; j <players.length; j++)
-					if(player[j].tank.cID == aim + 1)
-					 {
-						player[j].tank.health -= 10;
+				if(aim != -1) {
+					for(j = 0; j < players.length; j++) {
+						if(player[j].tank.cID == aim + 1) {
+							player[j].tank.health -= 10;
+						}
 					}
 				}
 				continue;
-			} else 
-			{
-				b.x+=b.velX;
-				b.z+=b.velZ;
-				
+			} else {
+				b.x += b.velX;
+				b.z += b.velZ;
 			}
 		}
+	}
 
+	var updatePlayers = function() {
+		if(gameInterval!= undefined) {
+			var p1 = getPlayer(1);
+			var p2 = getPlayer(2);
+
+			var send1 = {
+				myX: p1.tank.x,
+				myZ: p1.tank.z,
+				myRot: p1.tank.rotationY,
+				oppX: p2.tank.x,
+				oppZ: p2.tank.z,
+				oppRot: p2.tank.rotationY,
+				speedX: p2.tank.currTankVx,
+				speedZ:p2.tank.currTankVz,
+				deltaTime: p2.tank.dT,
+			};
+
+			var send2 = {
+				myX: p2.tank.x,
+				myZ: p2.tank.z,
+				myRot: p2.tank.rotationY,
+				oppX: p1.tank.x,
+				oppZ: p1.tank.z,
+				oppRot: p1.tank.rotationY,
+				speedX: p1.tank.currTankVx,
+				speedZ: p1.tank.currTankVz,
+				deltaTime: p1.tank.dT,
+			};
+
+			io.sockets.socket(p1.sid).emit('update', send1);
+			io.sockets.socket(p2.sid).emit('update', send2);
+		}	
 	}
 
 	/*==================
@@ -138,7 +138,8 @@ function TankServer() {
 
 			var app = connect().use(connect.favicon()).use(connect.static(__dirname)).use(connect.logger()).use(connect.logger('dev')).use(function(request, response) {
 				var filePath = '.' + request.url;
-				if(filePath == './') filePath = './tank_fight.html';
+				if(filePath == './') 
+					filePath = './tank_fight.html';
 
 				var extname = path.extname(filePath);
 				var contentType = mimeTypes[extname];
@@ -150,15 +151,13 @@ function TankServer() {
 							if(error) {
 								response.writeHead(500, {
 									"Access-Control-Allow-Origin": "*"
-								});
-								//response.writeHead("Access-Control-Allow-Origin: *");								
+								});							
 								response.end();
 							} else {
 								response.writeHead(200, {
 									"Content-Type": contentType,
 									"Access-Control-Allow-Origin": "*"
 								});
-								//response.writeHead("Access-Control-Allow-Origin: *");
 								response.end(content);
 							}
 						});
@@ -254,50 +253,28 @@ function TankServer() {
 					});
 				});
 				
-				/*socket.on('dc',function(data) {
-					var p1 = getPlayer(1);
-					var p2 = getPlayer(2);
-					io.sockets.socket(p1.sid).disconnect();
-					io.sockets.socket(p2.sid).disconnect();
-					});
-				*/
 				socket.on('lost',function(data) {
 					var p1 = getPlayer(1);
 					var p2 = getPlayer(2);
 					if(data.tank === 1) 
 					{
-						console.log("GAME IS FINISHED FOR 1st player");
+						console.log("Game Over. Player 1 Lost");
 						io.sockets.socket(p1.sid).emit('endGameL', {});
 						io.sockets.socket(p2.sid).emit('endGameW', {});
-						//io.sockets.socket(p1.sid).disconnect();
-						//io.sockets.socket(p2.sid).disconnect();
 					}
 					else if(data.tank === 2)
 					{
 						io.sockets.socket(p1.sid).emit('endGameW', {});
 						io.sockets.socket(p2.sid).emit('endGameL', {});
-						console.log("GAME IS FINISHED FOR 2nd player");
-						//io.sockets.socket(p1.sid).disconnect();
-						//io.sockets.socket(p2.sid).disconnect();
+						console.log("Game Over. Player 1 Won");
 					}
 					if(gameInterval != undefined) {
-					resetGame();
+						resetGame();
 					}
-					// Decrease count
-					//count--;
-					// Set nextPID to quitting player's PID
-					//nextPID = data.tank;
-					// Remove player who wants to quit/closed the window
-					//delete players[socket.id];
-					// Sends to everyone connected to server except the client
-					//socket.broadcast.emit('serverMsg', {
-					//	msg: "There is now " + count + " players."
-					//});
 				});
 
 				// Upon receiving a message tagged with "start", along with an obj "data" (the "data" sent is {}. Refer to PongClient.js)
 				socket.on('start', function(data) {
-					console.log("start");
 					if(gameInterval !== undefined) {
 						console.log("Already playing!");
 					} else if(Object.keys(players).length < 2) {
@@ -313,58 +290,61 @@ function TankServer() {
 						});
 						gameInterval = setInterval(function() {
 							gameLoop();
-						}, 100);
+						}, 1000/Game.FRAME_RATE);
+						setInterval(function(){
+							updatePlayers();
+						}, 200);
 					}
 				});
 
 				// Upon receiving a message tagged with "move", along with an obj "data"
 				socket.on('move', function(data) {
-					//console.log(data);
-					//var currTime = Date.now();
-					//dT = currTime - prevTime;
-					//prevTime = currTime;
 					players[socket.id].tank.move(data.newX, data.newZ, data.rotY);
 				});
 
-				socket.on('createBullet', function(data)
-				 {
-					//console.log("createBullet");
+				socket.on('createBullet', function(data) {
 					var p1 = getPlayer(1);
 					var p2 = getPlayer(2);
 					var curGameTime = Date.now() - startTime;
-					
-					
-					if(socket.id === p1.sid) 
-					{						
+
+					if(socket.id === p1.sid) {
 						var prediction = p1.tank.endPoint(curGameTime);
-						
-						var bullet={x:0,z:0,velX:0,velZ:0};
-						
-						bullet.x=p1.tank.x;
-						bullet.z=p1.tank.z;
+
+						var bullet = {
+							x: 0,
+							z: 0,
+							velX: 0,
+							velZ: 0
+						};
+
+						bullet.x = p1.tank.x;
+						bullet.z = p1.tank.z;
 						bullet.velX = -vel * Math.sin(p1.tank.rotationY % (2 * Math.PI));
 						bullet.velZ = -vel * Math.cos(p1.tank.rotationY % (2 * Math.PI));
 						bullets.push(bullet);
-						console.log("creating bullet for player p1  at x"+bullet.x+" z = "+bullet.z);
+						//console.log("creating bullet for player p1  at x" + bullet.x + " z = " + bullet.z);
 						io.sockets.socket(p2.sid).emit("createBullet", {
 							playerID: data.playerID,
 							predTime: prediction.predTime,
 							endX: prediction.endX,
 							endZ: prediction.endZ
 						});
-					} 
-					else
-					{
+					} else {
 						var prediction = p2.tank.endPoint(curGameTime);
-						
-						var bullet={x:0,z:0,velX:0,velZ:0};
 
-						bullet.x=p2.tank.x;
-						bullet.x=p2.tank.z;
+						var bullet = {
+							x: 0,
+							z: 0,
+							velX: 0,
+							velZ: 0
+						};
+
+						bullet.x = p2.tank.x;
+						bullet.x = p2.tank.z;
 						bullet.velX = -vel * Math.sin(p2.tank.rotationY % (2 * Math.PI));
 						bullet.velZ = -vel * Math.cos(p2.tank.rotationY % (2 * Math.PI));
 						bullets.push(bullet);
-						console.log("creating bullet for player p1  at x"+bullet.x+" z = "+bullet.z);
+						//console.log("creating bullet for player p1  at x" + bullet.x + " z = " + bullet.z);
 						io.sockets.socket(p1.sid).emit("createBullet", {
 							playerID: data.playerID,
 							predTime: prediction.predTime,
@@ -385,22 +365,19 @@ function TankServer() {
 		}
 	}
 
-function checkTankCollision	 (bulletX, bulletZ) {
+	function checkTankCollision	 (bulletX, bulletZ) {
 		for (i=0;i<players.length;i++) 
 		{
 			var centerX = players[i].tank.x;
 			var centerZ = players[i].tank.z;
 			if (getDistance(centerX, centerZ, bulletX, bulletZ) < tankCloseDistance)
-					return i;
-				
-			
+					return i;		
 		}
-		
 		return -1;
 	}
 
 
-function getDistance(x1, z1, x2, z2) 
+	function getDistance(x1, z1, x2, z2) 
 	{
 			return Math.sqrt(Math.pow(x1 - x2) + Math.pow(z1 - z2));
 	}
