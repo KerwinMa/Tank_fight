@@ -63,7 +63,6 @@ function TankClient(){
 		color: 0x333333
 	});
 	var sphereGeo = new THREE.SphereGeometry(5, 30, 30);
-
 	if(document.readyState==="complete")
 	{
 		div=document.createElement('div');
@@ -507,6 +506,7 @@ function TankClient(){
 			e.preventDefault;
 			if(gameStarted && e.keyCode === 32) {
 				createBullet(cID);
+				playSound("fire.mp3");
 				socket.emit("createBullet", {
 					playerID: cID
 				});
@@ -607,10 +607,28 @@ function TankClient(){
 		var delta = clock.getDelta();
 		controls.update(0.001);
 		 
-		for(i = 0; i < objects.length; i++) {
-			if(i == cID - 1) 
-				continue;
-			if(cID == 1) {
+
+		for(i=0;i<objects.length;i++) {
+			if(i==cID-1)
+			 	continue;
+			if(myMap.checkWallCollision(objects[i].position)) {
+				objects[i].vx=0;
+				objects[i].vz=0;
+			}
+			for(j = 0; j < objects.length; j++) {
+				if(i == j) 
+					continue;
+				else {
+					var center = objects[i].position.clone();
+					
+					if(getDistance(objects[j].position, objects[i].position) < tankCloseDistance) {
+						objects[i].vx=0;
+						objects[i].vz=0;
+					}
+				}
+			}
+
+			if(cID==1) {
 				objects[i].translateX(objects[i].vx);
 				objects[i].translateZ(objects[i].vz);
 			} else if(cID == 2) {
@@ -630,7 +648,12 @@ function TankClient(){
 			var aim = checkTankCollision(b);
 			if(myMap.checkWallCollision(b.position) || aim != -1) {
 				bullets.splice(i, 1);
+				playSound("shot.mp3");
+				camera.position.x-= 10; //60
+				camera.position.y-=10; //45
+				camera.position.z = 0;
 				scene.remove(b);
+
 				// if(aim != -1) {
 				// 	for(j = 0; j < tanks.length; j++) {
 				// 		if(tanks[j].cID == aim + 1) {
@@ -736,18 +759,18 @@ function TankClient(){
 			}
 		}
 		var sphereGeo2 = new THREE.SphereGeometry(30, 30, 30);
-		var sphere1 = new THREE.Mesh(sphereGeo2, sphereMaterial);
-		sphere1.position.set(800,myMap.WALLHEIGHT, 800);
-		scene.add(sphere1);
-		var sphere2 = new THREE.Mesh(sphereGeo2, sphereMaterial);
-		sphere2.position.set(-800,myMap.WALLHEIGHT, -800);
-		scene.add(sphere2);
-		var sphere3 = new THREE.Mesh(sphereGeo2, sphereMaterial);
-		sphere3.position.set(800,myMap.WALLHEIGHT, -800);
-		scene.add(sphere3);
-		var sphere4 = new THREE.Mesh(sphereGeo2, sphereMaterial);
-		sphere4.position.set(-800,myMap.WALLHEIGHT, 800);
-		scene.add(sphere4);
+		//var sphere1 = new THREE.Mesh(sphereGeo2, sphereMaterial);
+		// sphere1.position.set(800,myMap.WALLHEIGHT, 800);
+		// scene.add(sphere1);
+		// var sphere2 = new THREE.Mesh(sphereGeo2, sphereMaterial);
+		// sphere2.position.set(-800,myMap.WALLHEIGHT, -800);
+		// scene.add(sphere2);
+		// var sphere3 = new THREE.Mesh(sphereGeo2, sphereMaterial);
+		// sphere3.position.set(800,myMap.WALLHEIGHT, -800);
+		// scene.add(sphere3);
+		// var sphere4 = new THREE.Mesh(sphereGeo2, sphereMaterial);
+		// sphere4.position.set(-800,myMap.WALLHEIGHT, 800);
+		// scene.add(sphere4);
 	}
 
 	function resetGame() {
@@ -869,9 +892,13 @@ function TankClient(){
 			objects[id].vx = velX;
 			objects[id].vz = 0;
 		}
-	}		
+	}
+		
+	function playSound(soundfile) {
+		 document.getElementById("dummy").innerHTML=
+		 "<embed src=\""+soundfile+"\" hidden=\"true\" autostart=\"true\" loop=\"false\" />";
+	}
 }
-
 // This will auto run after this script is loaded
 // Run Client. Give leeway of 0.1 second for libraries to load
 var client = new TankClient();
