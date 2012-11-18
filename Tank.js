@@ -124,6 +124,7 @@ Tank.prototype.endPoint = function(time) {
 		endX = -800;
 		if(angQuad===3){
 			var heightZ = Math.abs(800-this.x)/Math.tan(0.75*Math.PI - this.rotationY);
+			console.log("rotation" + this.rotationY*Math.PI/180 + "heightZ" + heightZ);
 			endZ = this.z + heightZ;
 		} else if (angQuad===4) {
 			var heightZ = Math.abs(800-this.x)/Math.tan(this.rotationY-0.75*Math.PI);
@@ -146,18 +147,27 @@ Tank.prototype.endPoint = function(time) {
 			endZ = -800;
 		}
 	}
-	console.log("corner " + corner);
+	// console.log("corner " + corner);
 	console.log("end points: " + endX + ", " + endZ);
 
 	var vx = Math.sin(this.rotationY)*(-7);
-	console.log("vx = " + vx);
-	//var vz = -7*Math.cos(this.rotationY);
+	var vz = -7*Math.cos(this.rotationY);
+	console.log(Math.floor(vx) + " " + Math.floor(vz) + " predvelocity ");
+
 
 	var stepX = Math.ceil((endX - this.x)/vx);
-	//var stepZ = (endZ - this.z)/vz;
-	console.log("predicted steps = "+stepX);
+	var stepZ = Math.ceil((endZ - this.z)/vz);
+	
 	var predTime = 0;
-	predTime = time + ((stepX+1)*1000/60);
+
+	if(Math.floor(vx)==0) {
+		console.log("predicted steps  z="+ stepZ + "/ " +stepX);
+		predTime = time + ((stepZ+1)*1000/60);
+	} else {
+		console.log("predicted steps x= "+stepX + "/ " + stepZ);
+		predTime = time + ((stepX+1)*1000/60);
+	}
+
 	return {endX:endX, endZ: endZ, predTime: predTime};
 }
 global.Tank = Tank;

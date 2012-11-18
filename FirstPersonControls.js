@@ -57,6 +57,12 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 	var myMap = new Map();
 	var tankHalfW = 30;
 	var tankHalfH = 55;
+
+	var autoUp=false;
+	var autoRight=false;
+	var autoDown=false;
+	var autoLeft=false;
+
 	var tankCloseDistance = 50;
 	if (this.domElement !== document) {		
 		this.domElement.setAttribute('tabindex', -1);		
@@ -279,7 +285,7 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 			var da = 5 * Math.PI / 180;
 			var pai = Math.PI;
 			
-			if (this.moveForward) {
+			if (this.moveForward||autoUp) {
 				var corner1 = this.object.position.clone();
 				var corner2 = this.object.position.clone();
 				
@@ -287,7 +293,12 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 				corner1.z += tankHalfW;
 				corner2.x -= tankHalfH;
 				corner2.z -= tankHalfW;
-				
+
+				autoUp=true;
+				autoRight=false;
+				autoDown=false;
+				autoLeft=false;
+							
 				if ((cd < pai / 2 + da && cd > pai / 2 - da) || (cd < -1.5 * pai + da && cd > -1.5 * pai - da)) {					
 					if (!myMap.checkWallCollision(corner1) && !myMap.checkWallCollision(corner2) && this.checkTankCollision(corner1) == -1) {
 						this.object.translateZ( - (actualMoveSpeed + this.autoSpeedFactor));
@@ -300,10 +311,15 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 				}
 			}
 		
-			if (this.moveBackward) {
+			if (this.moveBackward||autoDown) {
 				var corner1 = this.object.position.clone();
 				var corner2 = this.object.position.clone();
 				
+				autoUp=false;
+				autoRight=false;
+				autoDown=true;
+				autoLeft=false;
+
 				corner1.x += tankHalfH;
 				corner1.z -= tankHalfW;
 				
@@ -322,7 +338,11 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 				}
 			}
 				
-			if (this.moveRight) {
+			if (this.moveRight||autoRight) {
+				autoUp=false;
+				autoRight=true;
+				autoDown=false;
+				autoLeft=false;
 				var corner1 = this.object.position.clone();
 				var corner2 = this.object.position.clone();
 				
@@ -343,7 +363,11 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 						this.object.children[0].rotation.y = (this.object.children[0].rotation.y + 10 * Math.PI / 180) % (2 * pai);
 				}
 			}
-			if (this.moveLeft) {
+			if (this.moveLeft||autoLeft) {
+				autoUp=false;
+				autoRight=false;
+				autoDown=false;
+				autoLeft=true;
 				var corner1 = this.object.position.clone();
 				var corner2 = this.object.position.clone();
 				

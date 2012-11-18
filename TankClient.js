@@ -28,7 +28,7 @@ function TankClient(){
 	
 	//for loading tank
 	var objects=[];
-	var vel=7,velX=1, velZ=1;
+	var vel=7,velX=7, velZ=7;
 	
 	//AI1
 	var aispeed=10;
@@ -53,7 +53,7 @@ function TankClient(){
 	var endGameW = false;
 	var restart = false;
 	
-	var threshX=100,threshZ=100;
+	var threshX=30,threshZ=30;
 	
 	//TO SERVER
 	var lastPosX=-500,lastPosZ=-500,lastRotY=0;
@@ -184,7 +184,7 @@ function TankClient(){
 
 				setInterval(function() {
 					updateServer();
-				}, 100);
+				}, 50);
 			});
 
 			// Upon receiving a message tagged with "update", along with an obj "data"
@@ -195,14 +195,15 @@ function TankClient(){
 						objects[1].prevX = data.oppX;
 						objects[1].prevZ = data.oppZ;
 					}
+					//console.log(data);
 					tanks[0].health = data.myHealth;
 					tanks[1].health = data.oppHealth;
 					var direction = 1; //clockwise
 					var closest = closestAngle(data.oppRot);
-					console.log("closest" + closest*180/Math.PI);
-					console.log("my old rotation = "+objects[1].prevOppRot*180/Math.PI);
-					console.log("my current rotation = "+ objects[1].children[0].rotation.y*180/Math.PI + " obj rotation =" + objects[1].rotation.y*180/Math.PI);
-					console.log("my new rotation = "+data.oppRot*180/Math.PI);
+					// console.log("closest" + closest*180/Math.PI);
+					// console.log("my old rotation = "+objects[1].prevOppRot*180/Math.PI);
+					// console.log("my current rotation = "+ objects[1].children[0].rotation.y*180/Math.PI + " obj rotation =" + objects[1].rotation.y*180/Math.PI);
+					// console.log("my new rotation = "+data.oppRot*180/Math.PI);
 					var threshAngle = 5 * Math.PI / 180;
 
 					if(data.oppRot - objects[1].prevOppRot > 0) 
@@ -325,6 +326,7 @@ function TankClient(){
 						if(Math.abs(closest - data.oppRot) <= threshAngle) {
 							spinTank(closest, 1);
 							setAutoSpeed(closest, 0);
+
 						} else if(getRegion(data.oppRot) == 1) {
 							if(direction == 1) {
 								if(data.oppRot > 0) {
@@ -474,7 +476,7 @@ function TankClient(){
 		projector = new THREE.Projector();
 
 		document.addEventListener("click", function(e) {
-			console.log("click");
+			//console.log("click");
 			e.preventDefault;
 			if(gameStarted) {
 				console.log("playing");
@@ -483,23 +485,24 @@ function TankClient(){
 					socket.emit("createBullet", {
 						playerID: cID
 					});
+					console.log("createBullet");
 				}	
-			} else {
-					socket.emit("start", {});
-			}
-		}, false);
-
-		document.addEventListener("touchend", function(e) {
-			e.preventDefault;
-			if(gameStarted) {
-					createBullet(cID);
-					socket.emit("createBullet", {
-						playerID: cID
-					});
 			} else {
 				socket.emit("start", {});
 			}
 		}, false);
+
+		// document.addEventListener("touchend", function(e) {
+		// 	e.preventDefault;
+		// 	if(gameStarted) {
+		// 			createBullet(cID);
+		// 			socket.emit("createBullet", {
+		// 				playerID: cID
+		// 			});
+		// 	} else {
+		// 		socket.emit("start", {});
+		// 	}
+		// }, false);
 
 		document.addEventListener("keydown", function(e) {
 			e.preventDefault;
@@ -610,30 +613,43 @@ function TankClient(){
 		for(i=0;i<objects.length;i++) {
 			if(i==cID-1)
 			 	continue;
-			if(myMap.checkWallCollision(objects[i].position)) {
-				objects[i].vx=0;
-				objects[i].vz=0;
-			}
-			for(j = 0; j < objects.length; j++) {
-				if(i == j) 
-					continue;
-				else {
-					var center = objects[i].position.clone();
-					
-					if(getDistance(objects[j].position, objects[i].position) < tankCloseDistance) {
-						objects[i].vx=0;
-						objects[i].vz=0;
+			else
+			{
+				if(myMap.checkWallCollision(objects[i].position)) {
+					//console.log("setting speed to zero for tank"+(i+1));
+					objects[i].vx=0;
+					objects[i].vz=0;
+				}
+				for(j = 0; j < objects.length; j++) {
+					if(i == j) 
+						continue;
+					else {
+						var center1 = objects[j].position.clone();
+						var center2 = objects[i].position.clone();
+						
+						if(getDistance(center1, center2) < tankCloseDistance) {
+							//console.log("setting speed to zero for tank"+(i+1));
+							objects[i].vx=0;
+							objects[i].vz=0;
+						}
 					}
 				}
-			}
+				if(cID==1) {
+					objects[i].translateX(objects[i].vx);
+					objects[i].translateZ(objects[i].vz);
+					//console.log("translating my opp by "+objects[i].vx+" "+objects[i].vz );
+				} else if(cID == 2) {
+					console.log("translating my opp by "+objects[i].vx+" "+objects[i].vz );
+					console.log("before translatin"+objects[i].position.x+" "+objects[i].position.z);
+	
+					objects[i].translateX(-objects[i].vz);
+					objects[i].translateZ(objects[i].vx);
 
-			if(cID==1) {
-				objects[i].translateX(objects[i].vx);
-				objects[i].translateZ(objects[i].vz);
-			} else if(cID == 2) {
-				objects[i].translateX(-objects[i].vz);
-				objects[i].translateZ(objects[i].vx);
-			}
+					console.log("after translatin"+objects[i].position.x+" "+objects[i].position.z);
+					//console.log("translating my opp by "+objects[i].vx+" "+objects[i].vz );
+					//console.log(" my opp is at  "+objects[i].position.x+" "+objects[i].position.z );
+				}
+			}	
 		}
 		// console.log("vx = "+objects[0].vx+" vz = "+objects[0].vz+"rot"+objects[0].children[0].rotation.y);
 
@@ -649,7 +665,8 @@ function TankClient(){
 				bullets.splice(i, 1);
 				playSound("shot.mp3");
 				scene.remove(b);
-
+				//console.log("predicted steps = " + b.stepX);
+				//console.log("endPoint = " + b.position.x + " " + b.position.z);
 				// if(aim != -1) {
 				// 	for(j = 0; j < tanks.length; j++) {
 				// 		if(tanks[j].cID == aim + 1) {
@@ -671,10 +688,10 @@ function TankClient(){
 			}
 		}
 
-		if(tanks[cID-1].health < 25) 
-			document.getElementById("health").style.color = "#DF0101";
+		// if(tanks[cID-1].health < 25) 
+		// 	document.getElementById("health").style.color = "#DF0101";
 
-		document.getElementById("health").innerHTML = tanks[cID-1].health;
+		// document.getElementById("health").innerHTML = tanks[cID-1].health;
 
 		renderer.render(scene, camera);
 		stats.update();	
@@ -695,7 +712,7 @@ function TankClient(){
 		sMyTank.z = objects[cID - 1].position.z;
 		sMyTank.rotationY = objects[cID - 1].children[0].rotation.y % (2 * Math.PI);
 		sMyTank.endPoint();
-
+		//console.log(sphere);
 		//var corner = sMyTank.getCorners();
 		//console.log("corner = " +sMyTank.getCorners());
 		//console.log("roty = " + (sMyTank.rotationY % (2 * Math.PI))*180/Math.PI + " x = " + sMyTank.x + " z = " + sMyTank.z);
@@ -755,18 +772,18 @@ function TankClient(){
 			}
 		}
 		var sphereGeo2 = new THREE.SphereGeometry(30, 30, 30);
-		//var sphere1 = new THREE.Mesh(sphereGeo2, sphereMaterial);
-		// sphere1.position.set(800,myMap.WALLHEIGHT, 800);
-		// scene.add(sphere1);
-		// var sphere2 = new THREE.Mesh(sphereGeo2, sphereMaterial);
-		// sphere2.position.set(-800,myMap.WALLHEIGHT, -800);
-		// scene.add(sphere2);
-		// var sphere3 = new THREE.Mesh(sphereGeo2, sphereMaterial);
-		// sphere3.position.set(800,myMap.WALLHEIGHT, -800);
-		// scene.add(sphere3);
-		// var sphere4 = new THREE.Mesh(sphereGeo2, sphereMaterial);
-		// sphere4.position.set(-800,myMap.WALLHEIGHT, 800);
-		// scene.add(sphere4);
+		var sphere1 = new THREE.Mesh(sphereGeo2, sphereMaterial);
+		sphere1.position.set(800,myMap.WALLHEIGHT, 800);
+		scene.add(sphere1);
+		var sphere2 = new THREE.Mesh(sphereGeo2, sphereMaterial);
+		sphere2.position.set(-800,myMap.WALLHEIGHT, -800);
+		scene.add(sphere2);
+		var sphere3 = new THREE.Mesh(sphereGeo2, sphereMaterial);
+		sphere3.position.set(800,myMap.WALLHEIGHT, -800);
+		scene.add(sphere3);
+		var sphere4 = new THREE.Mesh(sphereGeo2, sphereMaterial);
+		sphere4.position.set(-800,myMap.WALLHEIGHT, 800);
+		scene.add(sphere4);
 	}
 
 	function resetGame() {
@@ -808,11 +825,14 @@ function TankClient(){
 	function updateServer() {
 
 		if (cID === 1) {
-			( (Math.abs(obj.position.x-lastPosX)>threshX||Math.abs(obj.position.z-lastPosZ)>threshZ)||lastRotY!=dae.rotation.y)
+			if( Math.abs(obj.position.x-lastPosX)>threshX||Math.abs(obj.position.z-lastPosZ)>threshZ||lastRotY!=dae.rotation.y)
 			{
+				//console.log("lastPosX   = "+lastPosX+" and lastPosZ = "+ lastPosZ);
 				lastPosX=obj.position.x;
 				lastPosZ=obj.position.z;
 				lastRotY=dae.rotation.y
+				
+				//console.log("objX   = "+obj.position.x+" and objZ = "+ obj.position.z);
 				console.log("Updating server");
 				socket.emit("move", {
 					newX : obj.position.x,
@@ -821,17 +841,22 @@ function TankClient(){
 				});
 			}
 		} else {
-			if((Math.abs(obj2.position.x-lastPosX)>threshX||(Math.abs(obj2.position.z-lastPosZ)>threshZ))||lastRotY!=dae2.rotation.y)	
+       if(Math.abs(obj2.position.x-lastPosX)>threshX||(Math.abs(obj2.position.z-lastPosZ)>threshZ)||lastRotY!=dae2.rotation.y)	
 			{
+				//console.log("lastPosX   = "+lastPosX+" and lastPosZ = "+ lastPosZ);
 				lastPosX=obj2.position.x;
 				lastPosZ=obj2.position.z;
 				lastRotY=dae2.rotation.y
+				
+				//console.log("objX   = "+obj2.position.x+" and objZ = "+ obj2.position.z);
 				console.log("Updating server");
+				
 				socket.emit("move", {
 					newX : obj2.position.x,
 					newZ : obj2.position.z,
 					rotY : dae2.rotation.y
 				});
+			
 			}
 		}
 	}
@@ -877,15 +902,19 @@ function TankClient(){
 		if(angle == 0) {
 			objects[id].vx = 0;
 			objects[id].vz = -velZ;
+			console.log("setting speed  "+objects[id].vx+" "+objects[id].vz);
 		} else if(angle == Math.PI / 2 || angle == -1.5 * Math.PI) {
 			objects[id].vx = -velX;
 			objects[id].vz = 0;
+			console.log("setting speed  "+objects[id].vx+" "+objects[id].vz);
 		} else if(angle == Math.PI || angle == -Math.PI) {
 			objects[id].vx = 0;
 			objects[id].vz = velZ;
+			console.log("setting speed  "+objects[id].vx+" "+objects[id].vz);
 		} else if(angle == 1.5 * Math.PI || angle == -Math.PI / 2) {
 			objects[id].vx = velX;
 			objects[id].vz = 0;
+			console.log("setting speed  "+objects[id].vx+" "+objects[id].vz);
 		}
 	}
 		
