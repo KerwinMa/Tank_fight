@@ -45,6 +45,16 @@ function TankServer() {
 
 		var p1 = getPlayer(1);
 		var p2 = getPlayer(2);
+
+		if(p1.tank.health <= 0) {
+			io.sockets.socket(p1.sid).emit('endGame', {result: lost});
+			io.sockets.socket(p2.sid).emit('endGame', {result: won});
+			console.log("Game Over. Player 2 Won");
+		} else if(p2.tank.health <= 0) {
+			io.sockets.socket(p1.sid).emit('endGame', {result: won});
+			io.sockets.socket(p2.sid).emit('endGame', {result: lost});
+			console.log("Game Over. Player 1 Won");
+		}		
 	}
 
 	/*===================
@@ -64,11 +74,14 @@ function TankServer() {
 
 			if(myMap.checkWallCollision(position) || aim != -1) {
 				bullets.splice(i, 1);
-				console.log("slicing");
+				//console.log("slicing");
 				if(aim != -1) {
 					for(j = 0; j < players.length; j++) {
 						if(player[j].tank.cID == aim + 1) {
 							player[j].tank.health -= 10;
+							if(player[j].tank.health <= 0) {
+								resetGame();
+							}
 						}
 					}
 				}
@@ -89,24 +102,22 @@ function TankServer() {
 				myX: p1.tank.x,
 				myZ: p1.tank.z,
 				myRot: p1.tank.rotationY,
+				myHealth: p1.tank.health,
 				oppX: p2.tank.x,
 				oppZ: p2.tank.z,
 				oppRot: p2.tank.rotationY,
-				speedX: p2.tank.currTankVx,
-				speedZ:p2.tank.currTankVz,
-				deltaTime: p2.tank.dT,
+				oppHealth: p2.tank.health
 			};
 
 			var send2 = {
 				myX: p2.tank.x,
 				myZ: p2.tank.z,
 				myRot: p2.tank.rotationY,
+				myHealth:p2.tank.health,
 				oppX: p1.tank.x,
 				oppZ: p1.tank.z,
 				oppRot: p1.tank.rotationY,
-				speedX: p1.tank.currTankVx,
-				speedZ: p1.tank.currTankVz,
-				deltaTime: p1.tank.dT,
+				oppHealth: p1.tank.health
 			};
 
 			io.sockets.socket(p1.sid).emit('update', send1);

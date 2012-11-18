@@ -235,26 +235,23 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 	
 	this.update = function (delta) {
 		var touchDirection = this.joystick.getDirection();
-		if(touchDirection ===1){
-			this.moveForward= true;
+		if(touchDirection === 1) {
+			this.moveForward = true;
 			this.moveBackward = false;
 			this.moveRight = false;
 			this.moveLeft = false;
-		}
-		else if(touchDirection ===2){
-			this.moveForward= false;
+		} else if(touchDirection === 2) {
+			this.moveForward = false;
 			this.moveBackward = true;
 			this.moveRight = false;
 			this.moveLeft = false;
-		}
-		else if (touchDirection ===3) {
-			this.moveForward= false;
+		} else if(touchDirection === 3) {
+			this.moveForward = false;
 			this.moveBackward = false;
 			this.moveRight = true;
 			this.moveLeft = false;
-		} 
-		else if (touchDirection ===4) {
-			this.moveForward= false;
+		} else if(touchDirection === 4) {
+			this.moveForward = false;
 			this.moveBackward = false;
 			this.moveRight = false;
 			this.moveLeft = true;
@@ -266,7 +263,6 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 			console.log("this.freeze");
 			return;			
 		} else {
-			
 			if (this.heightSpeed) {				
 				var y = THREE.Math.clamp(this.object.position.y, this.heightMin, this.heightMax);
 				var heightDelta = y - this.heightMin;
@@ -364,8 +360,7 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 						this.object.children[0].rotation.y = (this.object.children[0].rotation.y - 10 * Math.PI / 180) % (2 * pai);
 					else
 						this.object.children[0].rotation.y = (this.object.children[0].rotation.y + 10 * Math.PI / 180) % (2 * pai);
-				}
-				
+				}				
 			}
 			
 			if (this.moveUp)

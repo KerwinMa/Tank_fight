@@ -197,13 +197,14 @@ function TankClient(){
 						objects[1].prevX = data.oppX;
 						objects[1].prevZ = data.oppZ;
 					}
-					//spinTank(data.oppRot+Math.PI/2, 2);
+					tanks[0].health = data.myHealth;
+					tanks[1].health = data.oppHealth;
 					var direction = 1; //clockwise
 					var closest = closestAngle(data.oppRot);
-					// console.log("closest" + closest*180/Math.PI);
-					// console.log("my old rotation = "+objects[1].prevOppRot*180/Math.PI);
-					// console.log("my current rotation = "+ objects[1].children[0].rotation.y*180/Math.PI + " obj rotation =" + objects[1].rotation.y*180/Math.PI);
-					// console.log("my new rotation = "+data.oppRot*180/Math.PI);
+					console.log("closest" + closest*180/Math.PI);
+					console.log("my old rotation = "+objects[1].prevOppRot*180/Math.PI);
+					console.log("my current rotation = "+ objects[1].children[0].rotation.y*180/Math.PI + " obj rotation =" + objects[1].rotation.y*180/Math.PI);
+					console.log("my new rotation = "+data.oppRot*180/Math.PI);
 					var threshAngle = 5 * Math.PI / 180;
 
 					if(data.oppRot - objects[1].prevOppRot > 0) 
@@ -298,6 +299,9 @@ function TankClient(){
 					//dae2.rotation.y = data.oppRot + Math.PI / 2;
 					//dae2.rotation.y = data.oppRot;
 				} else {
+					tanks[1].health = data.myHealth;
+					tanks[0].health = data.oppHealth;
+
 					if(!(objects[0].prevX == data.oppX && objects[0].prevX == data.oppZ)) {
 						moveTank(new THREE.Vector3(data.oppX, 0, data.oppZ), 1);
 						objects[0].prevX = data.oppX;
@@ -427,9 +431,12 @@ function TankClient(){
 
 			});
 
-			socket.on("endGameL", function() {
+			socket.on("endGame", function(data) {
 				console.log("Lost game");
-				endGameL = true;
+				if(data.result == "won")
+					endGameW = true;
+				else
+					endGameL = true;
 				gameStarted = false;
 			});
 			
@@ -518,7 +525,6 @@ function TankClient(){
 		controls.noFly = true;
 		controls.activeLook = false;
 
-		// Lights
 		scene.add(new THREE.AmbientLight(0xcccccc));
 
 		var directionalLight = new THREE.DirectionalLight(0xeeeeee);
@@ -538,9 +544,9 @@ function TankClient(){
 		container.appendChild(stats.domElement);
 
 		var div2=document.createElement('div');
-		div2.innerHTML="<p>Health: <span id=\"health\">100</span><br />Score: <span id=\"score\">0</span></p>";
+		div2.innerHTML='<p>Health: <span id="health">100</span><br />Score: <span id="score">0</span></p>';
 		div2.id="hud";
-		renderer.domElement.appendChild(div2);	
+		container.appendChild(div2);	
 
 		for(i=0;i<objects.length;i++) {			
 			objects[i].vx=0;
@@ -568,35 +574,33 @@ function TankClient(){
 	}
 
 	function render() {
-		if(endGameL) 
-		{
-			renderer.domElement.style.opacity=0;
-			document.getElementById("intro").style.display="block";	
+		if(endGameL) {
+			renderer.domElement.style.opacity = 0;
+			document.getElementById("intro").style.display = "block";
 			//document.getElementById("intro").style.visibility="visible";
-			document.getElementById("intro").innerHTML='You Lost :(! <div>Play Again?<\div>';
+			document.getElementById("intro").innerHTML = 'You Lost :(! <div>Play Again?<\div>';
 			resetGame();
-		}
-		else if(endGameW) 
-		{
-			renderer.domElement.style.opacity=0;
-			document.getElementById("intro").style.display="block";
+		} else if(endGameW) {
+			renderer.domElement.style.opacity = 0;
+			document.getElementById("intro").style.display = "block";
 			//document.getElementById("intro").style.visibility="visible";
-			document.getElementById("intro").innerHTML='You Won:) <div>Play Again?<\div>';
-			resetGame()			
+			document.getElementById("intro").innerHTML = 'You Won:) <div>Play Again?<\div>';
+			resetGame()
 		}
+
 		if(disconnected) {
 			//$(renderer.domElement).fadeOut();
 			//$('#intro').fadeIn();
 			//$('#intro').html('You have been disconnected!');		
-			renderer.domElement.style.opacity=0;
-			document.getElementById("intro").style.display="block";	
-			document.getElementById("intro").innerHTML='You have been disconnected!';	
+			renderer.domElement.style.opacity = 0;
+			document.getElementById("intro").style.display = "block";
+			document.getElementById("intro").innerHTML = 'You have been disconnected!';
 		}
 
 		if(gameStarted) {
-			renderer.domElement.style.opacity=1.0;
+			renderer.domElement.style.opacity = 1.0;
 		} else {
-			renderer.domElement.style.opacity=0;
+			renderer.domElement.style.opacity = 0;
 		}
 
 		var timer = Date.now() * 0.0005;
@@ -624,27 +628,22 @@ function TankClient(){
 		for(var i = bullets.length - 1; i >= 0; i--) {
 			var b = bullets[i];
 			var aim = checkTankCollision(b);
-
 			if(myMap.checkWallCollision(b.position) || aim != -1) {
-				// console.log("endpoint" + b.position);
-				// console.log("steps " + b.stepX);
 				bullets.splice(i, 1);
 				scene.remove(b);
-				if(aim != -1) {
-					for(j = 0; j < tanks.length; j++) 
-					{
-						if(tanks[j].cID == aim + 1) {
-							tanks[j].health -= 10;
-							//console.log("aim is " + aim + " with health " + tanks[j].health);
-							if(tanks[j].health <= 0)
-							{
-								isLost = true;
-								console.log("lost is = " + isLost);
-								socket.emit("lost",{tank:tanks[j].cID});
-							}								
-						}
-					}
-				}
+				// if(aim != -1) {
+				// 	for(j = 0; j < tanks.length; j++) {
+				// 		if(tanks[j].cID == aim + 1) {
+				// 			tanks[j].health -= 10;
+				// 			//console.log("aim is " + aim + " with health " + tanks[j].health);
+				// 			if(tanks[j].health <= 0) {
+				// 				isLost = true;
+				// 				console.log("lost is = " + isLost);
+				// 				socket.emit("lost",{tank:tanks[j].cID});
+				// 			}								
+				// 		}
+				// 	}
+				// }
 				continue;
 			} else {
 				b.translateX(b.velX);
@@ -653,7 +652,10 @@ function TankClient(){
 			}
 		}
 
-		//container.getElementById("health").innerText = tanks[cID-1].health;
+		if(tanks[cID-1].health < 25) 
+			document.getElementById("health").style.color = "#DF0101";
+
+		document.getElementById("health").innerHTML = tanks[cID-1].health;
 
 		renderer.render(scene, camera);
 		stats.update();	
@@ -716,11 +718,11 @@ function TankClient(){
 		// Geometry: walls
 		var cube = new THREE.CubeGeometry(myMap.UNITSIZE, myMap.WALLHEIGHT, myMap.UNITSIZE);
 		var materials = [
-		new THREE.MeshLambertMaterial({
-			map: THREE.ImageUtils.loadTexture('wall-1.jpg')
-		}), new THREE.MeshLambertMaterial({
-			map: THREE.ImageUtils.loadTexture('wall-1.jpg')
-		}), ];
+			new THREE.MeshLambertMaterial({
+				map: THREE.ImageUtils.loadTexture('wall-1.jpg')
+			}), new THREE.MeshLambertMaterial({
+				map: THREE.ImageUtils.loadTexture('wall-1.jpg')
+			}), ];
 
 		for(var i = 0; i < myMap.mapW; i++) {
 			for(var j = 0, m = myMap.map[i].length; j < m; j++) {
@@ -748,7 +750,7 @@ function TankClient(){
 		scene.add(sphere4);
 	}
 
-	function resetGame(){
+	function resetGame() {
 		//stop movement of own tank
 		controls.movementSpeed = 0;
 
@@ -843,8 +845,7 @@ function TankClient(){
 			return 4;		
 	}
 
-	function closestAngle(angle,direction)
-	{
+	function closestAngle(angle,direction) {
 		var threshAngle=5*Math.PI/180;
 		var closest=3/2*Math.PI;
 		for(ang=(3/2)*Math.PI;ang>=-3/2*Math.PI;ang-=Math.PI/2) {
@@ -854,8 +855,7 @@ function TankClient(){
 		return closest;
 	}
 
-	function setAutoSpeed(angle,id)
-	{
+	function setAutoSpeed(angle,id) {
 		if(angle == 0) {
 			objects[id].vx = 0;
 			objects[id].vz = -velZ;
@@ -869,8 +869,7 @@ function TankClient(){
 			objects[id].vx = velX;
 			objects[id].vz = 0;
 		}
-	}
-		
+	}		
 }
 
 // This will auto run after this script is loaded
