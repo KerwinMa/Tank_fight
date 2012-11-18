@@ -185,7 +185,7 @@ function TankClient(){
 
 				setInterval(function() {
 					updateServer();
-				}, 100);
+				}, 50);
 			});
 
 			// Upon receiving a message tagged with "update", along with an obj "data"
@@ -196,6 +196,7 @@ function TankClient(){
 						objects[1].prevX = data.oppX;
 						objects[1].prevZ = data.oppZ;
 					}
+					console.log(data);
 					tanks[0].health = data.myHealth;
 					tanks[1].health = data.oppHealth;
 					var direction = 1; //clockwise
@@ -484,23 +485,24 @@ function TankClient(){
 					socket.emit("createBullet", {
 						playerID: cID
 					});
+					console.log("createBullet");
 				}	
-			} else {
-					socket.emit("start", {});
-			}
-		}, false);
-
-		document.addEventListener("touchend", function(e) {
-			e.preventDefault;
-			if(gameStarted) {
-					createBullet(cID);
-					socket.emit("createBullet", {
-						playerID: cID
-					});
 			} else {
 				socket.emit("start", {});
 			}
 		}, false);
+
+		// document.addEventListener("touchend", function(e) {
+		// 	e.preventDefault;
+		// 	if(gameStarted) {
+		// 			createBullet(cID);
+		// 			socket.emit("createBullet", {
+		// 				playerID: cID
+		// 			});
+		// 	} else {
+		// 		socket.emit("start", {});
+		// 	}
+		// }, false);
 
 		document.addEventListener("keydown", function(e) {
 			e.preventDefault;
@@ -649,11 +651,9 @@ function TankClient(){
 			if(myMap.checkWallCollision(b.position) || aim != -1) {
 				bullets.splice(i, 1);
 				playSound("shot.mp3");
-				camera.position.x-= 10; //60
-				camera.position.y-=10; //45
-				camera.position.z = 0;
 				scene.remove(b);
-
+				console.log("predicted steps = " + b.stepX);
+				console.log("endPoint = " + b.position.x + " " + b.position.z);
 				// if(aim != -1) {
 				// 	for(j = 0; j < tanks.length; j++) {
 				// 		if(tanks[j].cID == aim + 1) {
@@ -675,10 +675,10 @@ function TankClient(){
 			}
 		}
 
-		if(tanks[cID-1].health < 25) 
-			document.getElementById("health").style.color = "#DF0101";
+		// if(tanks[cID-1].health < 25) 
+		// 	document.getElementById("health").style.color = "#DF0101";
 
-		document.getElementById("health").innerHTML = tanks[cID-1].health;
+		// document.getElementById("health").innerHTML = tanks[cID-1].health;
 
 		renderer.render(scene, camera);
 		stats.update();	
@@ -699,7 +699,7 @@ function TankClient(){
 		sMyTank.z = objects[cID - 1].position.z;
 		sMyTank.rotationY = objects[cID - 1].children[0].rotation.y % (2 * Math.PI);
 		sMyTank.endPoint();
-
+		console.log(sphere);
 		//var corner = sMyTank.getCorners();
 		//console.log("corner = " +sMyTank.getCorners());
 		//console.log("roty = " + (sMyTank.rotationY % (2 * Math.PI))*180/Math.PI + " x = " + sMyTank.x + " z = " + sMyTank.z);
@@ -759,18 +759,18 @@ function TankClient(){
 			}
 		}
 		var sphereGeo2 = new THREE.SphereGeometry(30, 30, 30);
-		//var sphere1 = new THREE.Mesh(sphereGeo2, sphereMaterial);
-		// sphere1.position.set(800,myMap.WALLHEIGHT, 800);
-		// scene.add(sphere1);
-		// var sphere2 = new THREE.Mesh(sphereGeo2, sphereMaterial);
-		// sphere2.position.set(-800,myMap.WALLHEIGHT, -800);
-		// scene.add(sphere2);
-		// var sphere3 = new THREE.Mesh(sphereGeo2, sphereMaterial);
-		// sphere3.position.set(800,myMap.WALLHEIGHT, -800);
-		// scene.add(sphere3);
-		// var sphere4 = new THREE.Mesh(sphereGeo2, sphereMaterial);
-		// sphere4.position.set(-800,myMap.WALLHEIGHT, 800);
-		// scene.add(sphere4);
+		var sphere1 = new THREE.Mesh(sphereGeo2, sphereMaterial);
+		sphere1.position.set(800,myMap.WALLHEIGHT, 800);
+		scene.add(sphere1);
+		var sphere2 = new THREE.Mesh(sphereGeo2, sphereMaterial);
+		sphere2.position.set(-800,myMap.WALLHEIGHT, -800);
+		scene.add(sphere2);
+		var sphere3 = new THREE.Mesh(sphereGeo2, sphereMaterial);
+		sphere3.position.set(800,myMap.WALLHEIGHT, -800);
+		scene.add(sphere3);
+		var sphere4 = new THREE.Mesh(sphereGeo2, sphereMaterial);
+		sphere4.position.set(-800,myMap.WALLHEIGHT, 800);
+		scene.add(sphere4);
 	}
 
 	function resetGame() {
