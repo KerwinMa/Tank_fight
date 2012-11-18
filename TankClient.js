@@ -201,12 +201,7 @@ function TankClient(){
 					tanks[1].health = data.oppHealth;
 					var direction = 1; //clockwise
 					var closest = closestAngle(data.oppRot);
-					// console.log("closest" + closest*180/Math.PI);
-					// console.log("my old rotation = "+objects[1].prevOppRot*180/Math.PI);
-					// console.log("my current rotation = "+ objects[1].children[0].rotation.y*180/Math.PI + " obj rotation =" + objects[1].rotation.y*180/Math.PI);
-					// console.log("my new rotation = "+data.oppRot*180/Math.PI);
 					var threshAngle = 5 * Math.PI / 180;
-
 					if(data.oppRot - objects[1].prevOppRot > 0) 
 						direction = 2; //anticlocwise
 					else if(data.oppRot - objects[1].prevOppRot == 0) 
@@ -292,12 +287,6 @@ function TankClient(){
 							}
 						}
 					}
-					//  console.log("prevx = "+objects[1].prevX+" prevz = "+objects[1].prevZ);
-					// console.log("direction =  "+direction);			
-					//obj2.position.x = data.oppX;
-					//obj2.position.z = data.oppZ;
-					//dae2.rotation.y = data.oppRot + Math.PI / 2;
-					//dae2.rotation.y = data.oppRot;
 				} else {
 					tanks[1].health = data.myHealth;
 					tanks[0].health = data.oppHealth;
@@ -309,10 +298,6 @@ function TankClient(){
 					}
 
 					var closest = closestAngle(data.oppRot);
-					// console.log("closest" + closest*180/Math.PI);
-					// console.log("my old rotation = "+objects[0].prevOppRot*180/Math.PI);
-					// console.log("my current rotation = "+ objects[0].children[0].rotation.y*180/Math.PI + " obj rotation =" + objects[0].rotation.y*180/Math.PI);
-					// console.log("my new rotation = "+data.oppRot*180/Math.PI);
 					var threshAngle = 5 * Math.PI / 180;
 
 					var direction = 1; //clockwise
@@ -403,21 +388,14 @@ function TankClient(){
 							}
 						}
 					}
-					// console.log("direction =  "+direction);	
-					//   console.log("prevx = "+objects[0].prevX+" prevz = "+objects[0].prevZ);
-					// console.log("vx = "+objects[0].vx+" vz = "+objects[0].vz);
-					//obj.position.x = data.oppX;
-					//obj.position.z = data.oppZ;
-					//dae.rotation.y = data.oppRot;
 				}
 			});
 
 			socket.on("startGame", function(data) {
 				document.getElementById("intro").style.display="none";
 				document.getElementById("intro").innerHTML='none';
-				//document.getElementById("mybody").style.opacity=1.0;
 				gameStarted = true;
-				controls.movementSpeed = 5000;
+				controls.movementSpeed = 4000;
 				endGameL = false;
 				endGameW = false;
 				gameStartTime = Date.now();
@@ -487,17 +465,17 @@ function TankClient(){
 			}
 		}, false);
 
-		// document.addEventListener("touchend", function(e) {
-		// 	e.preventDefault;
-		// 	if(gameStarted) {
-		// 			createBullet(cID);
-		// 			socket.emit("createBullet", {
-		// 				playerID: cID
-		// 			});
-		// 	} else {
-		// 		socket.emit("start", {});
-		// 	}
-		// }, false);
+		document.addEventListener("touchend", function(e) {
+			if(gameStarted) {
+				createBullet(cID);
+				socket.emit("createBullet", {
+					playerID: cID
+				});
+				console.log("createBullet");	
+			} else {
+				socket.emit("start", {});
+			}
+		}, false);
 
 		document.addEventListener("keydown", function(e) {
 			e.preventDefault;
@@ -541,7 +519,7 @@ function TankClient(){
 		container.appendChild(stats.domElement);
 
 		var div2=document.createElement('div');
-		div2.innerHTML='<p>Health: <span id="health">100</span><br />Score: <span id="score">0</span></p>';
+		div2.innerHTML='<p>Health: <span id="health">100</span></p>';
 		div2.id="hud";
 		container.appendChild(div2);	
 
@@ -552,6 +530,7 @@ function TankClient(){
 			objects[i].prevX=objects[i].position.x;
 			objects[i].prevZ=objects[i].position.z;
 		}
+		//THREEx.WindowResize(renderer, camera);
 	}
 
 	function onWindowResize() {
@@ -561,13 +540,6 @@ function TankClient(){
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		document.getElementById("intro").style.width=window.innerWidth;
 		document.getElementById("intro").style.height=window.innerHeight;
-		
-		document.getElementById("hurt").style.width=window.innerWidth;
-		document.getElementById("hurt").style.height=window.innerHeight;
-		/*$('#intro, #hurt').css({
-			width: window.innerWidth,
-			height: window.innerHeight
-		});*/
 	}
 
 	function render() {
@@ -586,11 +558,7 @@ function TankClient(){
 			resetGame();
 			return;
 		}
-
-		if(disconnected) {
-			//$(renderer.domElement).fadeOut();
-			//$('#intro').fadeIn();
-			//$('#intro').html('You have been disconnected!');		
+		if(disconnected) {		
 			renderer.domElement.style.opacity = 0;
 			document.getElementById("intro").style.display = "block";
 			document.getElementById("intro").innerHTML = 'You have been disconnected!';
@@ -614,7 +582,6 @@ function TankClient(){
 			else
 			{
 				if(myMap.checkWallCollision(objects[i].position)) {
-					//console.log("setting speed to zero for tank"+(i+1));
 					objects[i].vx=0;
 					objects[i].vz=0;
 				}
@@ -626,7 +593,6 @@ function TankClient(){
 						var center2 = objects[i].position.clone();
 						
 						if(getDistance(center1, center2) < tankCloseDistance) {
-							//console.log("setting speed to zero for tank"+(i+1));
 							objects[i].vx=0;
 							objects[i].vz=0;
 						}
@@ -635,17 +601,9 @@ function TankClient(){
 				if(cID==1) {
 					objects[i].translateX(objects[i].vx);
 					objects[i].translateZ(objects[i].vz);
-					//console.log("translating my opp by "+objects[i].vx+" "+objects[i].vz );
-				} else if(cID == 2) {
-					console.log("translating my opp by "+objects[i].vx+" "+objects[i].vz );
-					console.log("before translatin"+objects[i].position.x+" "+objects[i].position.z);
-	
+				} else if(cID == 2) {	
 					objects[i].translateX(-objects[i].vz);
 					objects[i].translateZ(objects[i].vx);
-
-					console.log("after translatin"+objects[i].position.x+" "+objects[i].position.z);
-					//console.log("translating my opp by "+objects[i].vx+" "+objects[i].vz );
-					//console.log(" my opp is at  "+objects[i].position.x+" "+objects[i].position.z );
 				}
 			}	
 		}
@@ -663,21 +621,6 @@ function TankClient(){
 				bullets.splice(i, 1);
 				playSound("shot.mp3");
 				scene.remove(b);
-				//console.log("predicted steps = " + b.stepX);
-				//console.log("endPoint = " + b.position.x + " " + b.position.z);
-				// if(aim != -1) {
-				// 	for(j = 0; j < tanks.length; j++) {
-				// 		if(tanks[j].cID == aim + 1) {
-				// 			tanks[j].health -= 10;
-				// 			console.log("aim is " + aim + " with health " + tanks[j].health);
-				// 			// if(tanks[j].health <= 0) {
-				// 			// 	isLost = true;
-				// 			// 	console.log("lost is = " + isLost);
-				// 			// 	socket.emit("lost",{tank:tanks[j].cID});
-				// 			// }								
-				// 		}
-				// 	}
-				// }
 				continue;
 			} else {
 				b.translateX(b.velX);
@@ -686,8 +629,8 @@ function TankClient(){
 			}
 		}
 
-		// if(tanks[cID-1].health < 25) 
-		// 	document.getElementById("health").style.color = "#DF0101";
+		if(tanks[cID-1].health < 35) 
+			document.getElementById("hud").style.color = "#DF0101";
 
 		document.getElementById("health").innerHTML = tanks[cID-1].health;
 
@@ -695,9 +638,7 @@ function TankClient(){
 		stats.update();	
 	}
 
-	function createBullet(cID) {		
-		//moveTank(new THREE.Vector3(100,0,100));
-		//spinTank(Math.PI);
+	function createBullet(cID) {
 		var sphere = new THREE.Mesh(sphereGeo, sphereMaterial);
 		sphere.position.set(objects[cID - 1].position.x, objects[cID - 1].position.y + 25, objects[cID - 1].position.z);
 
@@ -711,9 +652,6 @@ function TankClient(){
 		sMyTank.rotationY = objects[cID - 1].children[0].rotation.y % (2 * Math.PI);
 		sMyTank.endPoint();
 		console.log("sphere " + sphere.velX + "  " + sphere.velZ);
-		//var corner = sMyTank.getCorners();
-		//console.log("corner = " +sMyTank.getCorners());
-		//console.log("roty = " + (sMyTank.rotationY % (2 * Math.PI))*180/Math.PI + " x = " + sMyTank.x + " z = " + sMyTank.z);
 		setTimeout(function() {
 			bullets.push(sphere);
 		}, 50);
@@ -792,12 +730,16 @@ function TankClient(){
 		//reset position of tank
 		obj.position.set(-500, 0,-500);
 		obj2.position.set(500, 0, 500);
+
+		for(var i = bullets.length - 1; i >= 0; i--) {
+			scene.remove(bullets[i]);
+		}
+
 		bullets = [];
 
 		for(i=0;i<objects.length;i++) {	
 			//reset the rotation of tanks to zero	
 			objects[i].children[0].rotation.y = 0;	
-
 			//reset tweening parameters
 			objects[i].vx=0;
 			objects[i].vz=0;
@@ -848,8 +790,7 @@ function TankClient(){
 				lastRotY=dae2.rotation.y
 				
 				//console.log("objX   = "+obj2.position.x+" and objZ = "+ obj2.position.z);
-				console.log("Updating server");
-				
+				console.log("Updating server");				
 				socket.emit("move", {
 					newX : obj2.position.x,
 					newZ : obj2.position.z,

@@ -78,8 +78,7 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 		}		
 	};
 	
-	this.onMouseDown = function (event) {
-		
+	this.onMouseDown = function (event) {		
 		if (this.domElement !== document) {			
 			this.domElement.focus();			
 		}
@@ -97,12 +96,10 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 					break;				
 			}			
 		}		
-		this.mouseDragOn = true;
-		
+		this.mouseDragOn = true;		
 	};
 	
-	this.onMouseUp = function (event) {
-		
+	this.onMouseUp = function (event) {		
 		event.preventDefault();
 		event.stopPropagation();
 		
@@ -129,8 +126,7 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 		}		
 	};
 	
-	this.onKeyDown = function (event) {
-		
+	this.onKeyDown = function (event) {		
 		//event.preventDefault();
 		//console.log(event.keyCode);
 		switch (event.keyCode) {			
@@ -394,10 +390,8 @@ THREE.FirstPersonControls = function (objects, index, domElement) {
 			
 			var actualLookSpeed = delta * this.lookSpeed;
 			
-			if (!this.activeLook) {
-				
-				actualLookSpeed = 0;
-				
+			if (!this.activeLook) {				
+				actualLookSpeed = 0;				
 			}
 			
 			this.lon += this.mouseX * actualLookSpeed;

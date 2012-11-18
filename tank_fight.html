@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<span id="dummy"></span>
-		<title>three.js webgl - collada</title>
+		<title>Tank Fight</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<meta  name ="touch-event-mode" content="native">
@@ -15,6 +14,7 @@
 			}
 		    #info {
 				color: #ffffff;
+				font-size: 32px;
 				position: absolute;
 				top: 10px;
 				width: 100%;
@@ -27,14 +27,7 @@
 		      position: absolute;
 		      right: 10px;
 		      z-index: 100;
-		    }
-		    #credits {
-		      font-size: 12px;
-		      position: absolute;
-		      text-align: center;
-		      top: 10px;
-		      width: 100%;
-		      z-index: 100;
+		      font-size: 10px;
 		    }
 		    p {
 		      background-color: #EEEEEE;
@@ -42,14 +35,6 @@
 		      display: inline-block;
 		      margin: 0;
 		      padding: 5px;
-		    }
-		    #radar {
-		      background-color: #EEEEEE;
-		      border: 1px solid black;
-		      bottom: 10px;
-		      left: 10px;
-		      position: absolute;
-		      z-index: 100;
 		    }
 		    #intro {
 		      background-color: #000000;
@@ -63,16 +48,6 @@
 		      text-align: center;
 		      z-index: 1001;
 		    }
-			#end {
-			  background-color: #000000;
-		      color: #FFFFFF;
-		      cursor: pointer;
-		      font-size: 32px;
-		      opacity: 0.7;
-		      padding: 120px;
-		      text-align: center;
-		      z-index: 1001;
-			}
 		    #hurt {
 		      background-color: red;
 		      display: none;
@@ -83,13 +58,6 @@
 		      top: 0;
 		      z-index: 1002;
 		    }
-		    #container {
-				width		: 100%;
-				height		: 100%;
-				overflow	: hidden;
-				padding		: 0;
-				margin		: 0;
-			}
 		    a { color: skyblue }
   		</style>
 		<script type="text/javascript">
@@ -105,11 +73,13 @@
 		<script src="Map.js"></script>
 		<script src="Tween.js"></script>
 		<script type="text/javascript" src="virtualjoystick.js"></script>
+		<!--script type="text/javascript" src="THREEx.WindowResize.js"></script-->
 	</head>
 	<body id ="mybody" onload="loadScript('', 'TankClient.js')">
 		<script>
-			if ( !Detector.webgl ) Detector.addGetWebGLMessage();		
+			if (!Detector.webgl) 
+				Detector.addGetWebGLMessage();		
 		</script>
-		<audio id="bground" src="bgsound.mp3" autostart="true" loop="true" hidden="true" />
+		<embed id="bground" src="bgsound.mp3" autostart="true" loop="true" hidden="true" />
 	</body>
 </html>

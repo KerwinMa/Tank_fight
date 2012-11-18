@@ -128,8 +128,8 @@ Tank.prototype.endPoint = function(time) {
 		}
 	} else if (corner===4){
 		endX = 800;
-		console.log(this.rotationY + " z =" + this.z);
-		console.log(Math.abs(this.rotationY - 1.5*Math.PI)*180/Math.PI);
+		// console.log(this.rotationY + " z =" + this.z);
+		// console.log(Math.abs(this.rotationY - 1.5*Math.PI)*180/Math.PI);
 		if(Math.abs(this.rotationY - 1.5*Math.PI)*180/Math.PI < 1 || Math.abs(this.rotationY + Math.PI/2)*180/Math.PI < 1){
 			endZ = this.z;
 		} else if(angQuad===3){
@@ -157,25 +157,22 @@ Tank.prototype.endPoint = function(time) {
 		}
 	}
 
-	console.log("end points: " + endX + ", " + endZ);
-
+	//console.log("end points: " + endX + ", " + endZ);
 	var vx = Math.sin(this.rotationY%(2*Math.PI))*(-7);
 	var vz = (-7)*Math.cos(this.rotationY%(2*Math.PI));
-	console.log(Math.floor(vx) + " " + Math.ceil(vz) + " predvelocity ");
-
+	//console.log(Math.floor(vx) + " " + Math.ceil(vz) + " predvelocity ");
 	var stepX = Math.ceil((endX - this.x)/vx);
 	var stepZ = Math.ceil((endZ - this.z)/vz);
 	
 	var predTime = 0;
 
 	if(Math.floor(vx)==0||Math.floor(vx)==-1) {
-		console.log("predicted steps  z="+ stepZ + "/ " + stepX);
+		//console.log("predicted steps  z="+ stepZ + "/ " + stepX);
 		predTime = time + ((stepZ+1)*1000/60);
 	} else {
-		console.log("predicted steps x= "+ stepX + "/ " + stepZ);
+		//console.log("predicted steps x= "+ stepX + "/ " + stepZ);
 		predTime = time + ((stepX+1)*1000/60);
 	}
-
 	return {endX:endX, endZ: endZ, predTime: predTime};
 }
 
