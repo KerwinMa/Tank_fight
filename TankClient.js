@@ -62,7 +62,14 @@ function TankClient(){
 		color: 0x333333
 	});
 
+	/*=====================
+	bullet geometry
+	=====================*/
 	var sphereGeo = new THREE.SphereGeometry(5, 30, 30);
+
+	/*=====================
+	initialise screen
+	=====================*/
 	if(document.readyState==="complete")
 	{
 		div=document.createElement('div');
@@ -73,6 +80,9 @@ function TankClient(){
 		document.getElementById("mybody").appendChild(div);		
 	}
 
+	/*=====================
+	load 3D tank Models 
+	=====================*/
 	loader.options.convertUpAxis = true;
 	loader.load('./simple_tank1.dae', function(collada) {
 		obj = new THREE.Object3D();
@@ -108,9 +118,12 @@ function TankClient(){
 		init();
 		rendInterval = setInterval(function() {
 			render();
-		}, 1000 / 60); //Request animation frame is 60fps
+		}, 1000 / Game.FRAME_RATE); //Request animation frame is 60fps
 	});
 
+	/*--------------------
+	TANK Smooth Convergence
+	-----------------------*/
 	var spinTank = function (angle,id) {
 		new TWEEN.Tween({
 			y : objects[id-1].children[0].rotation.y
@@ -185,7 +198,7 @@ function TankClient(){
 
 				setInterval(function() {
 					updateServer();
-				}, 60);
+				}, 50);
 			});
 
 			// Upon receiving a message tagged with "update", along with an obj "data"
@@ -390,7 +403,8 @@ function TankClient(){
 					}
 				}
 			});
-
+			
+			//on receiving a start signal from server
 			socket.on("startGame", function(data) {
 				document.getElementById("intro").style.display="none";
 				document.getElementById("intro").innerHTML='none';
@@ -402,14 +416,12 @@ function TankClient(){
 				console.log("Game started!");
 			});
 
+			//create opponent bullet
 			socket.on("createBullet", function(data) {
 				createOppBullet(data);
 			});
 
-			socket.on("updateBullet", function(data){
-
-			});
-
+			//upon finishing current round!
 			socket.on("endGame", function(data) {
 				console.log("Lost game");
 				if(data.result == "won")
@@ -430,7 +442,9 @@ function TankClient(){
 		}
 	}
 
-
+	/*=====================
+	init GUI [Private]
+	=====================*/
 	function init() {
 		container = document.createElement('div');
 		document.body.appendChild(container);
@@ -538,6 +552,9 @@ function TankClient(){
 		document.getElementById("intro").style.height=window.innerHeight;
 	}
 
+	/*=====================
+	render [Private]
+	=====================*/
 	function render() {
 		if(endGameL) {
 			renderer.domElement.style.opacity = 0;
@@ -665,14 +682,17 @@ function TankClient(){
 		} else {
 			angle = objects[player - 1].children[0].rotation.y - Math.PI / 2;
 		}
-		sphere.velX = (data.endX - objects[player - 1].position.x)/(timeToMove/(1000/60));
-		sphere.velZ = (data.endZ - objects[player - 1].position.z)/(timeToMove/(1000/60));
+		sphere.velX = (data.endX - objects[player - 1].position.x)/(timeToMove/(1000/Game.FRAME_RATE));
+		sphere.velZ = (data.endZ - objects[player - 1].position.z)/(timeToMove/(1000/Game.FRAME_RATE));
 		sphere.cID = player;
 
 		bullets.push(sphere);
 		scene.add(sphere);
 	}
 
+	/*=====================
+	setup Scent (MAP) [Private]
+	=====================*/
 	function setupScene() {
 		var units = myMap.mapW;
 		// Geometry: floor
@@ -704,6 +724,9 @@ function TankClient(){
 		}
 	}
 
+	/*=====================
+	reset game end of round [Private]
+	=====================*/
 	function resetGame() {
 		//stop movement of own tank
 		controls.movementSpeed = 0;
@@ -738,7 +761,9 @@ function TankClient(){
 		initNetwork();
 	}
 
-	
+	/*=====================
+	updateServer about position [Private]
+	=====================*/
 	function updateServer() {
 		if (cID === 1) {
 			if( Math.abs(obj.position.x-lastPosX)>threshX||Math.abs(obj.position.z-lastPosZ)>threshZ||lastRotY!=dae.rotation.y)
@@ -771,10 +796,9 @@ function TankClient(){
 		}
 	}
 
-	function getDistance(pos1, pos2) {
-		return Math.sqrt(Math.pow(pos1.x - pos2.x, 2) + Math.pow(pos1.z - pos2.z, 2));
-	}
-
+	/*=====================
+	check collision of bullet with tank [Private]
+	=====================*/
 	function checkTankCollision(bullet) {
 		for(i = 0; i < objects.length; i++) {
 			if(i == bullet.cID - 1) continue;
@@ -798,6 +822,10 @@ function TankClient(){
 			return 4;		
 	}
 
+	function getDistance(pos1, pos2) {
+		return Math.sqrt(Math.pow(pos1.x - pos2.x, 2) + Math.pow(pos1.z - pos2.z, 2));
+	}
+
 	function closestAngle(angle,direction) {
 		var threshAngle=5*Math.PI/180;
 		var closest=3/2*Math.PI;
@@ -807,6 +835,8 @@ function TankClient(){
 		}
 		return closest;
 	}
+
+	/* for convergence */
 
 	function setAutoSpeed(angle,id) {
 		if(angle == 0) {
@@ -835,7 +865,8 @@ function TankClient(){
 }
 // This will auto run after this script is loaded
 // Run Client. Give leeway of 0.1 second for libraries to load
-if (!Detector.webgl) 
+
+if (!Detector.webgl) //check browsers compatibility to WebGL
 	Detector.addGetWebGLMessage();	
 else {
 	var client = new TankClient();
