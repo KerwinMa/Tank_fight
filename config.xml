@@ -8,8 +8,8 @@
 	
 	<rim:orientation mode="auto"/>
  
-	<rim:loadingScreen backgroundImage="wall-1.jpg"
-                     foregroundImage="wall-1.jpg"
+	<rim:loadingScreen backgroundImage="Tanks.jpg"
+                     foregroundImage="Tanks.jpg"
                      onLocalPageLoad="true">
 		<rim:transitionEffect type="zoomIn"/>
 	</rim:loadingScreen>
@@ -18,7 +18,7 @@
   
 	<icon src="a.png"/>
  
-	<content src="tank_fight.html"/>
+	<content src="tank_fight_BB.html"/>
  
 	<feature id="blackberry.ui.dialog"/>
  

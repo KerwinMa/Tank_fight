@@ -390,7 +390,8 @@ function TankClient(){
 					}
 				}
 			});
-
+			
+			//On receiving Start game signal from server
 			socket.on("startGame", function(data) {
 				document.getElementById("intro").style.display="none";
 				document.getElementById("intro").innerHTML='none';
@@ -448,31 +449,30 @@ function TankClient(){
 		setupScene();
 		projector = new THREE.Projector();
 
-		document.addEventListener("click", function(e) {
-			e.preventDefault;
-			if(gameStarted) {
-				console.log("playing");
-				if(e.which === 1) { // Left click only
+		// document.addEventListener("click", function(e) {
+		// 	e.preventDefault;
+		// 	if(gameStarted) {
+		// 		console.log("playing");
+		// 		if(e.which === 1) { // Left click only
 					
-					playSound("fire.mp3");
-					socket.emit("createBullet", {
-						playerID: cID,
-						posX: objects[cID-1].position.x,
-						posZ: objects[cID-1].position.z,
-						rotY: objects[cID-1].children[0].rotation.y
-					});
-					createBullet(cID);
-					console.log("createBullet");
-				}	
-			} else {
-				socket.emit("start", {});
-			}
-		}, false);
+		// 			playSound("fire.mp3");
+		// 			socket.emit("createBullet", {
+		// 				playerID: cID,
+		// 				posX: objects[cID-1].position.x,
+		// 				posZ: objects[cID-1].position.z,
+		// 				rotY: objects[cID-1].children[0].rotation.y
+		// 			});
+		// 			createBullet(cID);
+		// 			console.log("createBullet");
+		// 		}	
+		// 	} else {
+		// 		socket.emit("start", {});
+		// 	}
+		// }, false);
 
-		document.addEventListener("keydown", function(e) {
-			e.preventDefault;
-			if(gameStarted && e.keyCode === 32) {
-				playSound("fire.mp3");
+		document.addEventListener("touchend", function(e) {
+			if(gameStarted) {
+				//playSound("fire.mp3");	
 				socket.emit("createBullet", {
 					playerID: cID,
 					posX: objects[cID-1].position.x,
@@ -480,10 +480,27 @@ function TankClient(){
 					rotY: objects[cID-1].children[0].rotation.y
 				});
 				createBullet(cID);
+				console.log("createBullet");	
 			} else {
 				socket.emit("start", {});
 			}
 		}, false);
+
+		// document.addEventListener("keydown", function(e) {
+		// 	e.preventDefault;
+		// 	if(gameStarted && e.keyCode === 32) {
+		// 		playSound("fire.mp3");
+		// 		socket.emit("createBullet", {
+		// 			playerID: cID,
+		// 			posX: objects[cID-1].position.x,
+		// 			posZ: objects[cID-1].position.z,
+		// 			rotY: objects[cID-1].children[0].rotation.y
+		// 		});
+		// 		createBullet(cID);
+		// 	} else {
+		// 		socket.emit("start", {});
+		// 	}
+		// }, false);
 
 		scene.add(obj);
 		scene.add(obj2);
@@ -525,7 +542,7 @@ function TankClient(){
 			objects[i].prevX=objects[i].position.x;
 			objects[i].prevZ=objects[i].position.z;
 		}
-		THREEx.WindowResize(renderer, camera);
+		//THREEx.WindowResize(renderer, camera);
 	}
 
 	function onWindowResize() {
@@ -612,7 +629,6 @@ function TankClient(){
 			var aim = checkTankCollision(b);
 			if(myMap.checkWallCollision(b.position) || aim != -1) {
 				bullets.splice(i, 1);
-				playSound("shot.mp3");
 				scene.remove(b);
 				continue;
 			} else {
@@ -621,15 +637,16 @@ function TankClient(){
 			}
 		}
 
-		if(tanks[cID-1]!=undefined && tanks[cID-1].health!=null) {
-			document.getElementById("health").innerHTML = tanks[cID-1].health;
-			if(tanks[cID-1].health < 35) 
-				document.getElementById("hud").style.color = "#DF0101";
-			else
-				document.getElementById("hud").style.color = "#000000";
-		} else
-			document.getElementById("health").innerHTML = 100;
-		
+		if(document.getElementById("health")!=null){
+			if(tanks[cID-1]!=undefined && tanks[cID-1].health!=null) {
+				document.getElementById("health").innerHTML = tanks[cID-1].health;
+				if(tanks[cID-1].health < 35) 
+					document.getElementById("hud").style.color = "#DF0101";
+				else
+					document.getElementById("hud").style.color = "#000000";
+			} else
+				document.getElementById("health").innerHTML = 100;
+		}		
 
 		renderer.render(scene, camera);
 		stats.update();	
@@ -827,10 +844,10 @@ function TankClient(){
 		}
 	}
 		
-	function playSound(soundfile) {
-		 document.getElementById("dummy").innerHTML=
-		 "<embed src=\""+soundfile+"\" hidden=\"true\" autostart=\"true\" loop=\"false\" />";
-	}
+	// function playSound(soundfile) {
+	// 	 document.getElementById("dummy").innerHTML=
+	// 	 "<embed src=\""+soundfile+"\" hidden=\"true\" autostart=\"true\" loop=\"false\" />";
+	// }
 }
 // This will auto run after this script is loaded
 // Run Client. Give leeway of 0.1 second for libraries to load
