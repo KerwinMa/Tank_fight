@@ -23,7 +23,7 @@ function TankServer() {
 	var startTime; // game start time in miliseconds
 	var nextPID; // PID to assign to next connected player (i.e. which player slot is open)
 	var gameInterval = undefined; // Interval variable used for gameLoop
-	var updateInterval = undefined;
+	//var updateInterval = undefined;
 	var players; // Associative array for players, indexed via sid
 	// To get a Player object, do "players[sid]"
 	// Can extend to more players if needed			
@@ -44,9 +44,6 @@ function TankServer() {
 		// Clears gameInterval and set it to undefined
 		clearInterval(gameInterval);
 		gameInterval = undefined;
-
-		clearInterval(updateInterval);
-		updateInterval = undefined;
 
 		var p1 = getPlayer(1);
 		var p2 = getPlayer(2);
@@ -82,13 +79,9 @@ function TankServer() {
 			if(myMap.checkWallCollision(position) || aim != -1) {
 				console.log
 				bullets.splice(i, 1);
-				// console.log("slicing at " + b.x + ", " + b.z);
-				// console.log("player1 at " + getPlayer(1).tank.x +", " + getPlayer(1).tank.z);
-				// console.log("player2 at " + getPlayer(2).tank.x +", " + getPlayer(2).tank.z);
 				if(aim != -1) {
 					var target = getPlayer(aim);
 					target.tank.health -= 10;
-					//console.log("bullet hit player " + aim + ", health = " + target.tank.health);
 					if(target.tank.health <= 0) 
 						resetGame();
 				}
@@ -126,7 +119,7 @@ function TankServer() {
 				oppHealth: p1.tank.health
 			};
 
-			//setTimeout(function(){
+			//setTimeout(function(){	
 				io.sockets.socket(p1.sid).emit('update', send1);
 			//}, p1.getDelay());
 			//setTimeout(function(){
@@ -136,7 +129,6 @@ function TankServer() {
 	}
 
 	function checkTankCollision(bulletX, bulletZ, playerID) {
-		//console.log("check tank collision " + bulletX + " " + bulletZ);
 		var i = 1;
 		for(i=1; i<=2; i++) {
 			if(playerID === i) {
@@ -152,9 +144,7 @@ function TankServer() {
 	}
 
 	function getDistance(x1, z1, x2, z2) {
-		//console.log("tanks " + x1 + " " + z1 + " " + "bullets " + x2+ " " +  z2);
 		var dist = Math.sqrt(Math.pow(x1 - x2,2) + Math.pow(z1 - z2,2));
-		//console.log("distance between tank = " + dist);
 		return dist;
 	}
 
@@ -169,8 +159,6 @@ function TankServer() {
 			var fs = require('fs');
 			var path = require('path');
 			var connect = require('connect');
-			// change log level to 3 for debugging messages
-			//.listen(port, { 'log level':3  );
 			var mimeTypes = {
 				".html": "text/html",
 				".jpeg": "image/jpeg",
@@ -222,7 +210,7 @@ function TankServer() {
 			count = 0;
 			nextPID = 1;
 			gameInterval = undefined;
-			updateInterval = undefined;
+
 			players = new Object;
 			console.log("current time is : " + Date.now());
 			/*----------------------
@@ -319,9 +307,9 @@ function TankServer() {
 							gameLoop();
 						}, 1000/Game.FRAME_RATE);
 
-						updateInterval = setInterval(function(){
+						setInterval(function(){
 							updatePlayers();
-						}, 300);
+						}, 150);
 					}
 				});
 
@@ -336,6 +324,9 @@ function TankServer() {
 					var curGameTime = Date.now() - startTime;
 
 					if(socket.id === p1.sid) {
+						p1.tank.x = data.posX;
+						p1.tank.z = data.posZ;
+						p1.tank.rotationY = data.rotY;
 						var prediction = p1.tank.endPoint(curGameTime);
 						var bullet = {
 							x: 0,
@@ -361,6 +352,9 @@ function TankServer() {
 						//}, p2.getDelay());
 						
 					} else {
+						p2.tank.x = data.posX;
+						p2.tank.z = data.posZ;
+						p2.tank.rotationY = data.rotY;
 						var prediction = p2.tank.endPoint(curGameTime);
 						var bullet = {
 							x: 0,
@@ -383,8 +377,7 @@ function TankServer() {
 								endX: prediction.endX,
 								endZ: prediction.endZ
 							});
-						//}, p1.getDelay());
-						
+						//}, p1.getDelay());						
 					}
 				});
 

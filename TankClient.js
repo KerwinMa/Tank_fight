@@ -185,7 +185,7 @@ function TankClient(){
 
 				setInterval(function() {
 					updateServer();
-				}, 50);
+				}, 60);
 			});
 
 			// Upon receiving a message tagged with "update", along with an obj "data"
@@ -449,14 +449,16 @@ function TankClient(){
 		projector = new THREE.Projector();
 
 		document.addEventListener("click", function(e) {
-			//console.log("click");
 			e.preventDefault;
 			if(gameStarted) {
 				console.log("playing");
 				if(e.which === 1) { // Left click only
 					createBullet(cID);
 					socket.emit("createBullet", {
-						playerID: cID
+						playerID: cID,
+						posX: objects[cID-1].position.x,
+						posZ: objects[cID-1].position.z,
+						rotY: objects[cID-1].children[0].rotation.y
 					});
 					console.log("createBullet");
 				}	
@@ -469,7 +471,10 @@ function TankClient(){
 			if(gameStarted) {
 				createBullet(cID);
 				socket.emit("createBullet", {
-					playerID: cID
+					playerID: cID,
+					posX: objects[cID-1].position.x,
+					posZ: objects[cID-1].position.z,
+					rotY: objects[cID-1].children[0].rotation.y
 				});
 				console.log("createBullet");	
 			} else {
@@ -707,20 +712,6 @@ function TankClient(){
 				}
 			}
 		}
-
-		var sphereGeo2 = new THREE.SphereGeometry(30, 30, 30);
-		var sphere1 = new THREE.Mesh(sphereGeo2, sphereMaterial);
-		sphere1.position.set(800,myMap.WALLHEIGHT, 800);
-		scene.add(sphere1);
-		var sphere2 = new THREE.Mesh(sphereGeo2, sphereMaterial);
-		sphere2.position.set(-800,myMap.WALLHEIGHT, -800);
-		scene.add(sphere2);
-		var sphere3 = new THREE.Mesh(sphereGeo2, sphereMaterial);
-		sphere3.position.set(800,myMap.WALLHEIGHT, -800);
-		scene.add(sphere3);
-		var sphere4 = new THREE.Mesh(sphereGeo2, sphereMaterial);
-		sphere4.position.set(-800,myMap.WALLHEIGHT, 800);
-		scene.add(sphere4);
 	}
 
 	function resetGame() {
@@ -739,8 +730,7 @@ function TankClient(){
 
 		for(i=0;i<objects.length;i++) {	
 			//reset the rotation of tanks to zero	
-			objects[i].children[0].rotation.y = 0;	
-			//reset tweening parameters
+			objects[i].children[0].rotation.y = 0;
 			objects[i].vx=0;
 			objects[i].vz=0;
 			objects[i].prevOppRot=objects[i].children[0].rotation.y;
@@ -755,11 +745,6 @@ function TankClient(){
 	==================*/
 	this.start = function() {
 		// Initialize game objects
-		//date = new Date();
-		//delay = 0;
-		//rendInterval = undefined;
-		//simInterval = undefined;
-		// Initialize network
 		initNetwork();
 	}
 
