@@ -851,7 +851,12 @@ function TankClient(){
 }
 // This will auto run after this script is loaded
 // Run Client. Give leeway of 0.1 second for libraries to load
-var client = new TankClient();
-setTimeout(function() {
-	client.start();
-}, 1000);
+if (!Detector.webgl) 
+	Detector.addGetWebGLMessage();	
+else {
+	var client = new TankClient();
+	setTimeout(function() {
+		client.start();
+	}, 1000);
+}
+

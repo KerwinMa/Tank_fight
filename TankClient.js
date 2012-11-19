@@ -452,8 +452,7 @@ function TankClient(){
 			e.preventDefault;
 			if(gameStarted) {
 				console.log("playing");
-				if(e.which === 1) { // Left click only
-					
+				if(e.which === 1) { // Left click only					
 					playSound("fire.mp3");
 					socket.emit("createBullet", {
 						playerID: cID,
@@ -504,7 +503,9 @@ function TankClient(){
 		directionalLight.position.normalize();
 		scene.add(directionalLight);
 
-		renderer = new THREE.WebGLRenderer();
+		renderer = new THREE.WebGLRenderer({
+					antialias		: true
+				});
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		container.appendChild(renderer.domElement);
 
@@ -834,7 +835,12 @@ function TankClient(){
 }
 // This will auto run after this script is loaded
 // Run Client. Give leeway of 0.1 second for libraries to load
-var client = new TankClient();
-setTimeout(function() {
-	client.start();
-}, 1000);
+if (!Detector.webgl) 
+	Detector.addGetWebGLMessage();	
+else {
+	var client = new TankClient();
+	setTimeout(function() {
+		client.start();
+	}, 1000);
+}
+
